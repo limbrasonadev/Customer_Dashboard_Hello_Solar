@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hello Solar customer dashboard — monitor your solar system, energy production, savings, and payments.">
+    <title>Hello Solar — Dashboard</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="assets/css/portal.css">
+
+    <!-- Page Specific Styles -->
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.45fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .chart-summary-ribbon {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 16px 20px;
+            border-top: 1px solid var(--gray-100);
+            background: var(--gray-50);
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        }
+
+        .ribbon-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .ribbon-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .ribbon-val {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--navy);
+            letter-spacing: -0.01em;
+        }
+
+        .ribbon-sub {
+            font-size: 11px;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .ribbon-val.highlight {
+            color: var(--solar-orange-dark);
+        }
+
+        .chart-tabs {
+            display: flex;
+            background: var(--gray-100);
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            gap: 4px;
+        }
+
+        .chart-tab {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-500);
+            transition: all var(--transition-fast);
+        }
+
+        .chart-tab:hover {
+            color: var(--navy);
+        }
+
+        .chart-tab.active {
+            background: var(--white);
+            color: var(--navy);
+            box-shadow: var(--shadow-xs);
+        }
+
+        .chart-area {
+            height: 240px;
+            padding: 10px 16px;
+            position: relative;
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .chart-grid-line {
+            stroke: var(--gray-200);
+            stroke-dasharray: 4;
+            stroke-width: 1;
+        }
+
+        .chart-label {
+            font-size: 11px;
+            fill: var(--gray-400);
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .chart-line {
+            fill: none;
+            stroke: var(--solar-orange);
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .chart-area-fill {
+            fill: url(#solarGradient);
+            opacity: 0.25;
+        }
+
+        .chart-point {
+            fill: var(--white);
+            stroke: var(--solar-orange);
+            stroke-width: 2.5;
+            transition: r var(--transition-fast);
+        }
+
+        .chart-point:hover {
+            r: 6;
+            cursor: pointer;
+        }
+
+        .chart-legend {
+            padding: 12px 24px 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--gray-500);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: var(--radius-full);
+            background: var(--solar-orange);
+        }
+
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Live Telemetry Master Panel */
+        .status-panel {
+            padding: 22px 24px 20px;
+            position: relative;
+            overflow: hidden;
+            background: var(--white);
+        }
+
+        .status-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .status-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .status-heading h2 {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--navy);
+            letter-spacing: -0.01em;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .telemetry-live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ecfdf5;
+            color: #059669;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid #a7f3d0;
+            letter-spacing: 0.02em;
+        }
+
+        .telemetry-pulse-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: livePulse 2s infinite;
+        }
+
+        @keyframes livePulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        .telemetry-sync-btn {
+            background: #f8fafc;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            padding: 5px 9px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .telemetry-sync-btn:hover {
+            color: var(--solar-orange-dark);
+            border-color: var(--solar-orange);
+            background: #fffdf9;
+        }
+
+        .telemetry-sync-btn.syncing svg {
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* Power Flow Stage */
+        .power-flow-stage {
+            background: radial-gradient(circle at 50% 50%, #fffcf5 0%, #fff8eb 100%);
+            border: 1px solid #fed7aa;
+            border-radius: var(--radius-md);
+            padding: 16px 12px 14px;
+            position: relative;
+            margin-bottom: 14px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 4px rgba(255, 138, 0, 0.05);
+        }
+
+        .power-flow-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            row-gap: 12px;
+            column-gap: 8px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .node-top {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .node-left {
+            grid-column: 1;
+            grid-row: 2;
+            display: flex;
+            justify-content: center;
+        }
+
+        .node-center {
+            grid-column: 2;
+            grid-row: 2;
+            display: flex;
+            justify-content: center;
+        }
+
+        .node-right {
+            grid-column: 3;
+            grid-row: 2;
+            display: flex;
+            justify-content: center;
+        }
+
+        .node-bottom {
+            grid-column: 1 / -1;
+            grid-row: 3;
+            display: flex;
+            justify-content: center;
+        }
+
+        .energy-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 10px;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(16, 26, 46, 0.05);
+            min-width: 82px;
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .energy-node:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 14px rgba(16, 26, 46, 0.09);
+        }
+
+        .energy-node.node-solar {
+            border-color: #fbd38d;
+            background: linear-gradient(180deg, #ffffff 0%, #fffef8 100%);
+        }
+
+        .energy-node.node-inverter {
+            min-width: 96px;
+            padding: 10px 12px;
+            border-color: #fdba74;
+            background: #ffffff;
+            box-shadow: 0 0 16px rgba(255, 138, 0, 0.16);
+        }
+
+        .energy-node.node-battery {
+            border-color: #a7f3d0;
+        }
+
+        .energy-node.node-home {
+            border-color: #fed7aa;
+        }
+
+        .energy-node.node-grid {
+            border-color: #bfdbfe;
+        }
+
+        .node-icon-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 4px;
+        }
+
+        .node-solar .node-icon-circle {
+            background: #fffbeb;
+            color: #d97706;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+        }
+
+        .node-inverter .node-icon-circle {
+            background: #fff7ed;
+            color: var(--solar-orange);
+        }
+
+        .node-battery .node-icon-circle {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .node-home .node-icon-circle {
+            background: #fff7ed;
+            color: #ea580c;
+        }
+
+        .node-grid .node-icon-circle {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .node-name {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .node-wattage {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--navy);
+            margin-top: 1px;
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
+        }
+
+        .node-solar .node-wattage {
+            color: var(--solar-orange-dark);
+        }
+
+        .node-state {
+            font-size: 9.5px;
+            font-weight: 600;
+            color: var(--gray-400);
+            margin-top: 1px;
+        }
+
+        .node-battery .node-state {
+            color: #059669;
+        }
+
+        .node-grid .node-state {
+            color: #2563eb;
+        }
+
+        /* SVG Flow Overlay with animated energy particles */
+        .flow-svg-overlay {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .flow-line {
+            fill: none;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+        }
+
+        .flow-line-solar {
+            stroke: #f59e0b;
+            stroke-dasharray: 6 5;
+            animation: dashFlow 1.2s linear infinite;
+        }
+
+        .flow-line-home {
+            stroke: #ea580c;
+            stroke-dasharray: 6 5;
+            animation: dashFlow 1.4s linear infinite;
+        }
+
+        .flow-line-battery {
+            stroke: #10b981;
+            stroke-dasharray: 6 5;
+            animation: dashFlow 1.5s linear infinite;
+        }
+
+        .flow-line-grid {
+            stroke: #3b82f6;
+            stroke-dasharray: 6 5;
+            animation: dashFlow 1.7s linear infinite;
+        }
+
+        @keyframes dashFlow {
+            from {
+                stroke-dashoffset: 22;
+            }
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Vital Telemetry Chips Grid */
+        .telemetry-vitals {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .vital-chip {
+            padding: 8px 10px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            transition: all 0.15s ease;
+        }
+
+        .vital-chip:hover {
+            background: #fffdfa;
+            border-color: #fed7aa;
+        }
+
+        .vital-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .vital-val {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--navy);
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
+        }
+
+        .vital-meta {
+            font-size: 10px;
+            color: var(--gray-400);
+        }
+
+        /* Telemetry Footer Status */
+        .telemetry-footer-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px solid var(--gray-100);
+            font-size: 11.5px;
+            color: var(--gray-500);
+        }
+
+        .telemetry-status-msg {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        .telemetry-timestamp {
+            font-size: 11px;
+            color: var(--gray-400);
+            font-feature-settings: "tnum";
+        }
+
+        /* Installation Snapshot Panel */
+        .installation-panel {
+            padding: 22px 24px;
+        }
+
+        .installation-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .installation-header h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .progress-line {
+            height: 6px;
+            background: var(--gray-100);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 100%;
+            background: var(--solar-gradient);
+            border-radius: 3px;
+        }
+
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .step-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-dot-done {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--green-bg);
+            color: var(--green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        /* Activity Panel */
+        .activity-panel {
+            margin-top: 20px;
+        }
+
+        .activity-list {
+            padding: 0 24px 16px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-sm);
+            background: var(--gray-100);
+            color: var(--navy);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .activity-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 1.85;
+        }
+
+        .activity-title {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        .activity-date {
+            font-size: 12px;
+            color: var(--gray-400);
+            margin-top: 2px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <!-- =========================================================
+             DESKTOP & MOBILE SIDEBAR DRAWER
+        ========================================================== -->
+        <aside class="sidebar" id="sidebar">
+            <a href="dashboard.html" class="logo">
+                <img src="assets/images/hello_solar.png" alt="Hello Solar">
+            </a>
+
+            <div class="nav-label">Customer Portal</div>
+
+            <nav class="nav" aria-label="Portal navigation">
+                <a href="dashboard.html" class="nav-link active" aria-current="page">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                    Dashboard
+                </a>
+
+                <a href="my-system.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="4" />
+                        <path d="M12 2v2" />
+                        <path d="M12 20v2" />
+                        <path d="m4.93 4.93 1.41 1.41" />
+                        <path d="m17.66 17.66 1.41 1.41" />
+                        <path d="M2 12h2" />
+                        <path d="M20 12h2" />
+                        <path d="m6.34 17.66-1.41 1.41" />
+                        <path d="m19.07 4.93-1.41 1.41" />
+                    </svg>
+                    My System
+                </a>
+
+                <a href="energy.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                    </svg>
+                    Energy
+                </a>
+
+                <a href="payments.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <path d="M2 10h20" />
+                        <path d="M6 15h4" />
+                    </svg>
+                    My Payments
+                </a>
+
+                <a href="install-status.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <path d="m8 12 2.5 2.5L16 9" />
+                    </svg>
+                    Install Status
+                </a>
+
+                <a href="support.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 11a9 9 0 0 1 18 0" />
+                        <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                        <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                        <path d="M17 17c0 2-2 3-5 3" />
+                    </svg>
+                    Support
+                </a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="sidebar-status-card">
+                    <div class="sidebar-status-info">
+                        <span class="sidebar-status-label">System Size</span>
+                        <span class="sidebar-status-val">4.82 kW Hybrid</span>
+                    </div>
+                    <span class="status-dot pulsing" title="System Online"></span>
+                </div>
+
+                <div class="sidebar-divider"></div>
+
+                <button class="logout-button" id="logoutButton" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Mobile Backdrop -->
+        <div class="mobile-backdrop" id="mobileBackdrop"></div>
+
+        <!-- =========================================================
+             MAIN VIEWPORT
+        ========================================================== -->
+        <main class="main">
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="mobile-header">
+                    <button class="mobile-menu-button" id="mobileMenuButton" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
+                        <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                            <line x1="4" y1="6" x2="20" y2="6" />
+                            <line x1="4" y1="12" x2="20" y2="12" />
+                            <line x1="4" y1="18" x2="20" y2="18" />
+                        </svg>
+                    </button>
+
+                    <a href="dashboard.html" class="mobile-logo">
+                        <img src="assets/images/hello_solar.png" alt="Hello Solar">
+                    </a>
+                </div>
+
+                <div class="topbar-right">
+                    <a href="support.html" class="quick-support-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 11a9 9 0 0 1 18 0"/><path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2"/><path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2"/><path d="M17 17c0 2-2 3-5 3"/></svg>
+                        Need Help?
+                    </a>
+
+                    <div class="profile">
+                        <div class="profile-text">
+                            <span class="profile-name" id="profileName">Juan Dela Cruz</span>
+                            <span class="profile-role">Customer Account</span>
+                        </div>
+                        <div class="profile-avatar" id="profileAvatar">JD</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- PAGE CONTENT -->
+            <div class="content">
+                <section class="page-intro">
+                    <div>
+                        <p class="eyebrow">Customer Dashboard</p>
+                        <h1>Good day, <span id="customerName">Juan</span>.</h1>
+                        <p>Here's how your solar system is performing and saving you money today.</p>
+                    </div>
+
+                    <div class="cta-group">
+                        <a href="payments.html" class="btn btn-primary" id="dashPrimaryCta">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /><path d="M6 15h4" />
+                            </svg>
+                            <span>View Next Bill (₱9,067)</span>
+                        </a>
+                        <a href="my-system.html" class="btn btn-outline">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" />
+                            </svg>
+                            <span>System Specs</span>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- STATS SUMMARY -->
+                <section class="summary-grid" aria-label="System summary">
+                    <!-- Status -->
+                    <article class="summary-card">
+                        <div class="summary-top">
+                            <span class="summary-label">System Status</span>
+                            <div class="summary-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                    <polyline points="22 4 12 14.01 9 11.01" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="summary-value">Online</div>
+                        <div class="summary-meta">
+                            <span class="status-dot pulsing"></span>
+                            Generating normally
+                        </div>
+                    </article>
+
+                    <!-- Energy -->
+                    <article class="summary-card">
+                        <div class="summary-top">
+                            <span class="summary-label">Energy Produced</span>
+                            <div class="summary-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="summary-value">428 kWh</div>
+                        <div class="summary-meta">This month to date</div>
+                    </article>
+
+                    <!-- Savings -->
+                    <article class="summary-card">
+                        <div class="summary-top">
+                            <span class="summary-label">Estimated Savings</span>
+                            <div class="summary-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                                    <path d="M2 10h20" />
+                                    <path d="M12 13v4" />
+                                    <path d="M10 15h4" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="summary-value">₱3,240</div>
+                        <div class="summary-meta">Lower electric bill</div>
+                    </article>
+
+                    <!-- System Capacity -->
+                    <article class="summary-card">
+                        <div class="summary-top">
+                            <span class="summary-label">System Capacity</span>
+                            <div class="summary-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="4" />
+                                    <path d="M12 2v2" /><path d="M12 20v2" /><path d="M2 12h2" /><path d="M20 12h2" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="summary-value">4.82 kW</div>
+                        <div class="summary-meta">12 high-output panels</div>
+                    </article>
+                </section>
+
+                <!-- DASHBOARD GRID -->
+                <div class="dashboard-grid">
+                    <!-- LEFT COLUMN -->
+                    <div class="left-column">
+                        <!-- CHART PANEL -->
+                        <section class="panel">
+                            <div class="panel-header">
+                                <div>
+                                    <h2 class="panel-title">Energy Production</h2>
+                                    <p class="panel-subtitle">Solar generation trends and output</p>
+                                </div>
+
+                                <div class="chart-tabs" role="tablist">
+                                    <button class="chart-tab active" type="button" data-period="today">Today</button>
+                                    <button class="chart-tab" type="button" data-period="week">Week</button>
+                                    <button class="chart-tab" type="button" data-period="month">Month</button>
+                                </div>
+                            </div>
+
+                            <div class="chart-area">
+                                <svg class="chart-svg" id="energyChart" viewBox="0 0 700 250" preserveAspectRatio="none" aria-label="Energy production chart">
+                                    <defs>
+                                        <linearGradient id="solarGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#ff8a00" stop-opacity="0.7"/>
+                                            <stop offset="100%" stop-color="#ffb300" stop-opacity="0.05"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <!-- Grid Lines -->
+                                    <line class="chart-grid-line" x1="45" y1="30" x2="680" y2="30" />
+                                    <line class="chart-grid-line" x1="45" y1="80" x2="680" y2="80" />
+                                    <line class="chart-grid-line" x1="45" y1="130" x2="680" y2="130" />
+                                    <line class="chart-grid-line" x1="45" y1="180" x2="680" y2="180" />
+                                    <line class="chart-grid-line" x1="45" y1="220" x2="680" y2="220" />
+
+                                    <!-- Labels -->
+                                    <text class="chart-label" x="7" y="34">8 kWh</text>
+                                    <text class="chart-label" x="7" y="84">6 kWh</text>
+                                    <text class="chart-label" x="7" y="134">4 kWh</text>
+                                    <text class="chart-label" x="7" y="184">2 kWh</text>
+                                    <text class="chart-label" x="10" y="224">0</text>
+
+                                    <!-- Rendered Paths -->
+                                    <path id="chartFill" class="chart-area-fill"></path>
+                                    <path id="chartLine" class="chart-line"></path>
+                                    <g id="chartPoints"></g>
+                                    <g id="chartLabels"></g>
+                                </svg>
+                            </div>
+
+                            <div class="chart-legend">
+                                <span class="legend-dot"></span>
+                                Solar energy generated (kWh)
+                            </div>
+
+                            <!-- Production Highlights Ribbon -->
+                            <div class="chart-summary-ribbon">
+                                <div class="ribbon-item">
+                                    <span class="ribbon-label">Today's Peak</span>
+                                    <span class="ribbon-val highlight">7.2 kWh</span>
+                                    <span class="ribbon-sub">At 1:15 PM</span>
+                                </div>
+                                <div class="ribbon-item">
+                                    <span class="ribbon-label">Daily Avg Yield</span>
+                                    <span class="ribbon-val">24.6 kWh</span>
+                                    <span class="ribbon-sub">+12% vs last week</span>
+                                </div>
+                                <div class="ribbon-item">
+                                    <span class="ribbon-label">CO₂ Avoided</span>
+                                    <span class="ribbon-val" style="color: #059669;">24.2 kg</span>
+                                    <span class="ribbon-sub">~1.2 trees planted</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- ACTIVITY PANEL (Placed inside left column for perfect symmetry) -->
+                        <section class="panel activity-panel" style="margin-top: 0;">
+                            <div class="panel-header">
+                                <div>
+                                    <h2 class="panel-title">Recent Activity</h2>
+                                    <p class="panel-subtitle">Latest system events, statements, and milestones</p>
+                                </div>
+                            </div>
+
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                                        </svg>
+                                    </div>
+                                    <div class="activity-info">
+                                        <p class="activity-title">Daily production peak reached (7.2 kWh)</p>
+                                        <p class="activity-date">Today at 1:15 PM</p>
+                                    </div>
+                                </div>
+
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="2" y="5" width="20" height="14" rx="2" />
+                                            <path d="M2 10h20" />
+                                            <path d="m8 12 2.5 2.5L16 9" />
+                                        </svg>
+                                    </div>
+                                    <div class="activity-info">
+                                        <p class="activity-title">Payment received — Period: Aug 2026</p>
+                                        <p class="activity-date">August 28, 2026</p>
+                                    </div>
+                                </div>
+
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                            <polyline points="14 2 14 8 20 8" />
+                                        </svg>
+                                    </div>
+                                    <div class="activity-info">
+                                        <p class="activity-title">Monthly energy performance statement ready</p>
+                                        <p class="activity-date">September 1, 2026</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- RIGHT COLUMN -->
+                    <div class="right-column">
+                        <!-- Live Telemetry Master Panel -->
+                        <section class="panel status-panel" aria-label="Real-time system telemetry">
+                            <div class="status-heading">
+                                <div class="status-title-group">
+                                    <h2>
+                                        Live Telemetry
+                                        <span class="telemetry-live-badge">
+                                            <span class="telemetry-pulse-dot"></span>
+                                            LIVE
+                                        </span>
+                                    </h2>
+                                </div>
+                                <button type="button" class="telemetry-sync-btn" id="telemetrySyncBtn" title="Sync live inverter stream">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                                    </svg>
+                                    <span id="syncBtnLabel">Sync</span>
+                                </button>
+                            </div>
+
+                            <!-- Interactive Energy Flow Stage -->
+                            <div class="power-flow-stage">
+                                <!-- Animated Flow Pipelines SVG -->
+                                <svg class="flow-svg-overlay" viewBox="0 0 300 210" preserveAspectRatio="none" aria-hidden="true">
+                                    <!-- Solar to Inverter (Vertical Top-Down) -->
+                                    <line class="flow-line flow-line-solar" x1="150" y1="48" x2="150" y2="82" />
+                                    <!-- Inverter to Battery (Horizontal Center to Left) -->
+                                    <line class="flow-line flow-line-battery" x1="102" y1="105" x2="72" y2="105" />
+                                    <!-- Inverter to Home (Horizontal Center to Right) -->
+                                    <line class="flow-line flow-line-home" x1="198" y1="105" x2="228" y2="105" />
+                                    <!-- Inverter to Grid (Vertical Center to Bottom) -->
+                                    <line class="flow-line flow-line-grid" x1="150" y1="128" x2="150" y2="162" />
+                                </svg>
+
+                                <div class="power-flow-grid">
+                                    <!-- TOP: Rooftop Solar Array -->
+                                    <div class="node-top">
+                                        <div class="energy-node node-solar" id="nodeSolar" title="Solar Array: Trina Solar 420W x 12 panels">
+                                            <div class="node-icon-circle">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                                    <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+                                                </svg>
+                                            </div>
+                                            <span class="node-name">Solar Array</span>
+                                            <span class="node-wattage" id="liveSolarWatts">3.48 kW</span>
+                                            <span class="node-state">Producing</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- LEFT: Battery Reserve Storage -->
+                                    <div class="node-left">
+                                        <div class="energy-node node-battery" id="nodeBattery" title="10 kWh Lithium-ion Reserve Battery">
+                                            <div class="node-icon-circle">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect x="2" y="7" width="16" height="12" rx="2"/><path d="M22 11v4"/><path d="M6 11v4"/><path d="M10 11v4"/>
+                                                </svg>
+                                            </div>
+                                            <span class="node-name">Battery</span>
+                                            <span class="node-wattage" id="liveBatteryWatts">1.15 kW</span>
+                                            <span class="node-state" id="liveBatterySoc">88% (Charge)</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- CENTER: Hybrid Inverter -->
+                                    <div class="node-center">
+                                        <div class="energy-node node-inverter" id="nodeInverter" title="Solis 5kW Hybrid Inverter (Grid-Tied)">
+                                            <div class="node-icon-circle">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                                    <rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v3"/><path d="M15 1v3"/><path d="M9 20v3"/><path d="M15 20v3"/>
+                                                </svg>
+                                            </div>
+                                            <span class="node-name">Hybrid Inverter</span>
+                                            <span class="node-wattage" id="liveInverterWatts">3.48 kW</span>
+                                            <span class="node-state" style="color: var(--solar-orange-dark);">98.4% Eff</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- RIGHT: Home Household Load -->
+                                    <div class="node-right">
+                                        <div class="energy-node node-home" id="nodeHome" title="Home Appliances Consumption">
+                                            <div class="node-icon-circle">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                                                </svg>
+                                            </div>
+                                            <span class="node-name">Home Load</span>
+                                            <span class="node-wattage" id="liveHomeWatts">1.85 kW</span>
+                                            <span class="node-state">Consuming</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- BOTTOM: Grid Net-Metering -->
+                                    <div class="node-bottom">
+                                        <div class="energy-node node-grid" id="nodeGrid" title="Net Metering: Clean solar export to grid">
+                                            <div class="node-icon-circle">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/>
+                                                </svg>
+                                            </div>
+                                            <span class="node-name">Grid Export</span>
+                                            <span class="node-wattage" id="liveGridWatts">+0.48 kW</span>
+                                            <span class="node-state">Net Metering</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Vital Real-time Telemetry Readouts -->
+                            <div class="telemetry-vitals">
+                                <div class="vital-chip">
+                                    <span class="vital-label">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6z"/></svg>
+                                        Grid Sync
+                                    </span>
+                                    <span class="vital-val" id="liveGridSync">231.8 V · 60.0 Hz</span>
+                                    <span class="vital-meta">Luzon Grid Locked · PF 0.99</span>
+                                </div>
+
+                                <div class="vital-chip">
+                                    <span class="vital-label">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                        Solar Independence
+                                    </span>
+                                    <span class="vital-val" style="color: #059669;" id="liveIndependence">100% Solar Powered</span>
+                                    <span class="vital-meta">Zero grid import now</span>
+                                </div>
+
+                                <div class="vital-chip">
+                                    <span class="vital-label">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/></svg>
+                                        PV Arrays
+                                    </span>
+                                    <span class="vital-val" id="livePvStrings">PV1: 342V · PV2: 338V</span>
+                                    <span class="vital-meta">Dual MPPT balanced</span>
+                                </div>
+
+                                <div class="vital-chip">
+                                    <span class="vital-label">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+                                        Inverter Temp
+                                    </span>
+                                    <span class="vital-val" id="liveInverterTemp">41.2°C (Optimal)</span>
+                                    <span class="vital-meta">Passive heatsink cool</span>
+                                </div>
+                            </div>
+
+                            <!-- Telemetry Footer Status -->
+                            <div class="telemetry-footer-bar">
+                                <span class="telemetry-status-msg">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    All 12 panels operating at peak yield
+                                </span>
+                                <span class="telemetry-timestamp" id="telemetryTimestamp">Sync: 1s ago</span>
+                            </div>
+                        </section>
+
+                        <!-- Installation Snapshot -->
+                        <section class="panel installation-panel">
+                            <div class="installation-header">
+                                <h2>Installation Status</h2>
+                                <span class="badge badge-online">Commissioned</span>
+                            </div>
+
+                            <div class="progress-line">
+                                <div class="progress-fill"></div>
+                            </div>
+
+                            <div class="steps-list">
+                                <div class="step-row">
+                                    <div class="step-left">
+                                        <span class="step-dot-done">✓</span>
+                                        <span>System Commissioned</span>
+                                    </div>
+                                    <span class="badge badge-online">Active</span>
+                                </div>
+                                <div class="step-row">
+                                    <div class="step-left">
+                                        <span class="step-dot-done">✓</span>
+                                        <span>Net Metering Setup</span>
+                                    </div>
+                                    <span class="badge badge-neutral">Approved</span>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <footer class="portal-footer">
+                <span>© 2026 Hello Solar Inc. Clean energy. Lower bills. Brighter future.</span>
+                <span>hellosolarph.com · support@hellosolarph.com</span>
+            </footer>
+        </main>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION (ERGONOMIC 5-PILLAR APP NAV) -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
+        <div class="mobile-bottom-nav-inner">
+            <a href="dashboard.html" class="mobile-nav-item active" aria-current="page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                </svg>
+                <span>Home</span>
+            </a>
+            <a href="payments.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/>
+                </svg>
+                <span>Bills</span>
+            </a>
+            <a href="my-system.html" class="mobile-nav-item mobile-nav-fab-wrap" aria-label="My System Live Telemetry">
+                <div class="mobile-nav-fab">
+                    <img src="assets/images/logofortab.png" alt="System" class="mobile-nav-fab-img">
+                </div>
+                <span>System</span>
+            </a>
+            <a href="install-status.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 12 2.5 2.5L16 9"/>
+                </svg>
+                <span>Status</span>
+            </a>
+            <a href="#" id="bottomNavProfileBtn" class="mobile-nav-item" aria-label="Open Profile & Settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span>Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Core Portal JavaScript -->
+    <script src="assets/js/portal.js"></script>
+
+    <!-- Page Specific Chart & Live Telemetry Logic -->
+    <script>
+        // --------------------------------------------------------------------------
+        // 1. ENERGY PRODUCTION CHART LOGIC
+        // --------------------------------------------------------------------------
+        const energyData = {
+            today: {
+                values: [0, 1.1, 2.4, 4.2, 6.4, 7.2, 6.5, 5.1, 3.3, 1.5, 0.4],
+                labels: ["7 AM", "8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM"]
+            },
+            week: {
+                values: [4.1, 5.8, 6.4, 7.2, 5.9, 7.6, 6.8],
+                labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+            },
+            month: {
+                values: [12, 15, 17, 14, 19, 18, 21, 20, 24, 22, 26, 25],
+                labels: ["1", "4", "7", "10", "13", "16", "19", "22", "25", "28", "30", "31"]
+            }
+        };
+
+        const chartLine = document.getElementById("chartLine");
+        const chartFill = document.getElementById("chartFill");
+        const chartPoints = document.getElementById("chartPoints");
+        const chartLabels = document.getElementById("chartLabels");
+
+        function drawChart(period) {
+            const data = energyData[period];
+            if (!data) return;
+
+            const values = data.values;
+            const labels = data.labels;
+            const chartLeft = 45;
+            const chartRight = 680;
+            const chartTop = 30;
+            const chartBottom = 220;
+            const width = chartRight - chartLeft;
+            const height = chartBottom - chartTop;
+            const maxValue = Math.max(...values);
+            const safeMax = maxValue === 0 ? 1 : maxValue * 1.15;
+
+            const points = values.map((value, index) => {
+                const x = chartLeft + (index / Math.max(values.length - 1, 1)) * width;
+                const y = chartBottom - (value / safeMax) * height;
+                return { x, y, value };
+            });
+
+            const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+            const fillPath = `${linePath} L ${points[points.length - 1].x} ${chartBottom} L ${points[0].x} ${chartBottom} Z`;
+
+            chartLine.setAttribute("d", linePath);
+            chartFill.setAttribute("d", fillPath);
+            chartPoints.innerHTML = "";
+            chartLabels.innerHTML = "";
+
+            points.forEach((point, index) => {
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", point.x);
+                circle.setAttribute("cy", point.y);
+                circle.setAttribute("r", "4.5");
+                circle.setAttribute("class", "chart-point");
+                circle.setAttribute("data-label", labels[index]);
+                circle.setAttribute("data-val", point.value);
+                circle.setAttribute("title", `${labels[index]}: ${point.value} kWh generated`);
+
+                circle.addEventListener("mouseenter", () => {
+                    circle.setAttribute("r", "7");
+                    if (window.HelloSolar && window.HelloSolar.toast) {
+                        // Quick informative micro-status
+                    }
+                });
+
+                circle.addEventListener("mouseleave", () => {
+                    circle.setAttribute("r", "4.5");
+                });
+
+                chartPoints.appendChild(circle);
+
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", point.x);
+                text.setAttribute("y", "242");
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("class", "chart-label");
+                text.textContent = labels[index];
+                chartLabels.appendChild(text);
+            });
+        }
+
+        // Initialize Chart
+        drawChart("today");
+
+        // Period tabs
+        const chartTabs = document.querySelectorAll(".chart-tab");
+        chartTabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                chartTabs.forEach(t => t.classList.remove("active"));
+                tab.classList.add("active");
+                drawChart(tab.dataset.period);
+            });
+        });
+
+        // --------------------------------------------------------------------------
+        // 2. LIVE TELEMETRY STREAM ENGINE
+        // --------------------------------------------------------------------------
+        const liveSolarWattsEl = document.getElementById("liveSolarWatts");
+        const liveBatteryWattsEl = document.getElementById("liveBatteryWatts");
+        const liveBatterySocEl = document.getElementById("liveBatterySoc");
+        const liveInverterWattsEl = document.getElementById("liveInverterWatts");
+        const liveHomeWattsEl = document.getElementById("liveHomeWatts");
+        const liveGridWattsEl = document.getElementById("liveGridWatts");
+        const liveGridSyncEl = document.getElementById("liveGridSync");
+        const livePvStringsEl = document.getElementById("livePvStrings");
+        const liveInverterTempEl = document.getElementById("liveInverterTemp");
+        const telemetryTimestampEl = document.getElementById("telemetryTimestamp");
+        const telemetrySyncBtn = document.getElementById("telemetrySyncBtn");
+        const syncBtnLabel = document.getElementById("syncBtnLabel");
+
+        let secondsSinceSync = 1;
+        let baseSolar = 3.48;
+        let baseHome = 1.85;
+        let baseBattery = 1.15;
+        let batterySoc = 88;
+
+        function updateTelemetryDisplay() {
+            // Natural micro-fluctuation (+- 1.5% to simulate live clouds & appliance cycle)
+            const solarJitter = (Math.random() * 0.12 - 0.06);
+            const homeJitter = (Math.random() * 0.08 - 0.04);
+            const batteryJitter = (Math.random() * 0.04 - 0.02);
+
+            const currentSolar = Math.max(2.8, +(baseSolar + solarJitter).toFixed(2));
+            const currentHome = Math.max(1.2, +(baseHome + homeJitter).toFixed(2));
+            const currentBattery = Math.max(0.5, +(baseBattery + batteryJitter).toFixed(2));
+
+            // Conservation of energy: Grid Export = Solar - Home - Battery
+            const currentGrid = +(currentSolar - currentHome - currentBattery).toFixed(2);
+
+            if (liveSolarWattsEl) liveSolarWattsEl.textContent = `${currentSolar.toFixed(2)} kW`;
+            if (liveInverterWattsEl) liveInverterWattsEl.textContent = `${currentSolar.toFixed(2)} kW`;
+            if (liveHomeWattsEl) liveHomeWattsEl.textContent = `${currentHome.toFixed(2)} kW`;
+            if (liveBatteryWattsEl) liveBatteryWattsEl.textContent = `${currentBattery.toFixed(2)} kW`;
+
+            if (liveGridWattsEl) {
+                if (currentGrid >= 0) {
+                    liveGridWattsEl.textContent = `+${currentGrid.toFixed(2)} kW`;
+                    liveGridWattsEl.style.color = "var(--navy)";
+                } else {
+                    liveGridWattsEl.textContent = `${currentGrid.toFixed(2)} kW`;
+                    liveGridWattsEl.style.color = "#d97706";
+                }
+            }
+
+            // Inverter vitals jitter
+            const gridV = (231.4 + Math.random() * 0.8).toFixed(1);
+            const pv1V = Math.round(341 + Math.random() * 3);
+            const pv2V = Math.round(337 + Math.random() * 3);
+            const temp = (41.1 + Math.random() * 0.3).toFixed(1);
+
+            if (liveGridSyncEl) liveGridSyncEl.textContent = `${gridV} V · 60.0 Hz`;
+            if (livePvStringsEl) livePvStringsEl.textContent = `PV1: ${pv1V}V · PV2: ${pv2V}V`;
+            if (liveInverterTempEl) liveInverterTempEl.textContent = `${temp}°C (Optimal)`;
+
+            secondsSinceSync = 1;
+            if (telemetryTimestampEl) telemetryTimestampEl.textContent = `Sync: 1s ago`;
+        }
+
+        // Live ticker every 3.5 seconds
+        setInterval(updateTelemetryDisplay, 3500);
+
+        // Seconds ticker
+        setInterval(() => {
+            secondsSinceSync++;
+            if (telemetryTimestampEl) {
+                telemetryTimestampEl.textContent = `Sync: ${secondsSinceSync}s ago`;
+            }
+        }, 1000);
+
+        // Manual Sync Click Handler
+        if (telemetrySyncBtn) {
+            telemetrySyncBtn.addEventListener("click", () => {
+                telemetrySyncBtn.classList.add("syncing");
+                if (syncBtnLabel) syncBtnLabel.textContent = "Syncing...";
+
+                setTimeout(() => {
+                    updateTelemetryDisplay();
+                    telemetrySyncBtn.classList.remove("syncing");
+                    if (syncBtnLabel) syncBtnLabel.textContent = "Synced";
+
+                    if (window.HelloSolar && window.HelloSolar.toast) {
+                        window.HelloSolar.toast(
+                            "Inverter Telemetry Synchronized",
+                            "All 12 panels reporting normal. 231.8V Luzon Grid lock verified."
+                        );
+                    }
+
+                    setTimeout(() => {
+                        if (syncBtnLabel) syncBtnLabel.textContent = "Sync";
+                    }, 1800);
+                }, 550);
+            });
+        }
+    </script>
+</body>
+
+</html>

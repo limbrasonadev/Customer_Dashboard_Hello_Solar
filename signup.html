@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Create your Hello Solar customer account to monitor your solar production, energy savings, and system health.">
+    <title>Hello Solar — Sign Up</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="assets/css/portal.css">
+
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 36px 20px;
+            background: radial-gradient(circle at 12% 15%, rgba(255, 179, 0, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 88% 85%, rgba(255, 138, 0, 0.09) 0%, transparent 50%),
+                linear-gradient(135deg, #ffffff 0%, #fffdfa 50%, #fff9ef 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 460px;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            padding: 38px 34px;
+            box-shadow: 0 20px 60px rgba(16, 26, 46, 0.08);
+            position: relative;
+            z-index: 2;
+        }
+
+        .auth-logo {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 22px;
+            text-decoration: none;
+        }
+
+        .auth-logo img {
+            height: 38px;
+            width: auto;
+        }
+
+        .auth-header {
+            margin-bottom: 24px;
+        }
+
+        .auth-header .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--solar-orange-dark);
+            background: rgba(255, 138, 0, 0.08);
+            padding: 4px 10px;
+            border-radius: 999px;
+            margin-bottom: 10px;
+        }
+
+        .auth-header h1 {
+            font-size: 27px;
+            font-weight: 800;
+            color: var(--navy);
+            letter-spacing: -0.02em;
+            line-height: 1.25;
+            margin: 0;
+        }
+
+        .auth-header h1 span {
+            color: var(--solar-orange);
+        }
+
+        .auth-header p {
+            font-size: 13.5px;
+            color: var(--gray-500);
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        .input-icon-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon-wrap>svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--gray-400);
+            pointer-events: none;
+            z-index: 1;
+            transition: color 0.2s ease;
+        }
+
+        .input-icon-wrap .form-input {
+            width: 100%;
+            padding-left: 42px;
+            padding-right: 14px;
+            height: 48px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--navy);
+            background: var(--white);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .input-icon-wrap .form-input.has-toggle {
+            padding-right: 44px;
+        }
+
+        .input-icon-wrap .form-input:focus {
+            outline: none;
+            border-color: var(--solar-orange);
+            box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.15);
+        }
+
+        .input-icon-wrap .form-input:focus+svg,
+        .input-icon-wrap:focus-within>svg {
+            color: var(--solar-orange);
+        }
+
+        .form-group.invalid .form-input {
+            border-color: var(--red);
+            background-color: #fffaf9;
+        }
+
+        .form-group.invalid .input-icon-wrap>svg {
+            color: var(--red);
+        }
+
+        .error-message {
+            display: none;
+            font-size: 12px;
+            color: var(--red);
+            margin-top: 3px;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+
+        .form-group.invalid .error-message {
+            display: flex;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--gray-400);
+            padding: 6px;
+            border-radius: var(--radius-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.15s ease;
+        }
+
+        .password-toggle-btn svg {
+            position: static;
+            transform: none;
+            width: 20px;
+            height: 20px;
+            color: currentColor;
+            pointer-events: none;
+        }
+
+        .password-toggle-btn:hover {
+            color: var(--navy);
+        }
+
+        .password-toggle-btn:focus-visible {
+            outline: 2px solid var(--solar-orange);
+            outline-offset: 1px;
+        }
+
+        /* Password Strength Indicator (Inline with Label - Zero Layout Shift) */
+        .password-strength-compact {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .password-strength-compact.active {
+            opacity: 1;
+        }
+
+        .strength-bars-compact {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .strength-segment {
+            width: 14px;
+            height: 3.5px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            transition: background 0.25s ease;
+        }
+
+        .strength-text {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--gray-500);
+        }
+
+        .password-meter-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            width: 0%;
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+            background: #ef4444;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .auth-btn {
+            width: 100%;
+            height: 48px;
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 4px;
+            border-radius: var(--radius-sm);
+            background: var(--solar-gradient);
+            color: var(--white);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(255, 138, 0, 0.3);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+        }
+
+        .auth-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(255, 138, 0, 0.38);
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.85;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quick-fill-btn {
+            width: 100%;
+            height: 38px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-600);
+            background: var(--gray-50);
+            border: 1px dashed var(--gray-300);
+            border-radius: var(--radius-sm);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .quick-fill-btn:hover {
+            color: var(--solar-orange-dark);
+            border-color: var(--solar-orange);
+            background: #fffdf9;
+        }
+
+        .auth-footer {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 13.5px;
+            color: var(--gray-500);
+        }
+
+        .auth-footer a {
+            color: var(--solar-orange-dark);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .terms-note {
+            margin-top: 14px;
+            text-align: center;
+            font-size: 11.5px;
+            color: var(--gray-400);
+            line-height: 1.4;
+        }
+
+        .terms-note a {
+            color: var(--gray-500);
+            text-decoration: underline;
+        }
+
+        .terms-note a:hover {
+            color: var(--navy);
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .signup-perks {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .perk-tag {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--navy);
+            background: rgba(16, 26, 46, 0.04);
+            border: 1px solid var(--gray-200);
+            padding: 4px 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .password-match-badge {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11px;
+            font-weight: 700;
+            color: #059669;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            padding: 2px 8px;
+            border-radius: 999px;
+            display: none;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .password-match-badge.visible {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 28px 20px;
+                border-radius: var(--radius-lg);
+            }
+
+            .auth-header h1 {
+                font-size: 23px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .auth-page {
+                padding: 16px 10px;
+            }
+
+            .auth-card {
+                padding: 22px 14px;
+            }
+
+            .auth-header h1 {
+                font-size: 21px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="auth-page">
+        <section class="auth-card" aria-labelledby="signupHeading">
+            <!-- Brand Logo -->
+            <a href="login.html" class="auth-logo" title="Hello Solar Customer Portal">
+                <img src="assets/images/hello_solar.png" alt="Hello Solar">
+            </a>
+
+            <!-- Header -->
+            <header class="auth-header">
+                <span class="eyebrow">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    Customer Registration
+                </span>
+                <h1 id="signupHeading">Create your <span>account.</span></h1>
+                <p>Register to view your live rooftop solar production, track daily savings, and manage billing.</p>
+            </header>
+
+            <!-- Value Prop Perks
+            <div class="signup-perks">
+                <span class="perk-tag">⚡ Live Telemetry</span>
+                <span class="perk-tag">🛡️ 25-Yr Warranty</span>
+                <span class="perk-tag">💳 GCash & Maya Ready</span>
+            </div> -->
+
+            <!-- Sign Up Form -->
+            <form class="auth-form" id="signupForm" novalidate>
+                <!-- Full Name -->
+                <div class="form-group" id="fullNameGroup">
+                    <label class="form-label" for="fullName">Full Name</label>
+                    <div class="input-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <input class="form-input" id="fullName" name="fullName" type="text"
+                            placeholder="e.g. Maria Santos" autocomplete="name" required>
+                    </div>
+                    <div class="error-message" id="fullNameError">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        Please enter your full name.
+                    </div>
+                </div>
+
+                <!-- Mobile Phone -->
+                <div class="form-group" id="phoneGroup">
+                    <label class="form-label" for="phone">Mobile Phone (GCash & SMS Alerts)</label>
+                    <div class="input-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path
+                                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                        </svg>
+                        <input class="form-input" id="phone" name="phone" type="tel" placeholder="0917 555 0199"
+                            autocomplete="tel" required>
+                    </div>
+                    <div class="error-message" id="phoneError">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        Please enter your mobile phone number.
+                    </div>
+                </div>
+
+                <!-- Email Address -->
+                <div class="form-group" id="emailGroup">
+                    <label class="form-label" for="email">Email Address</label>
+                    <div class="input-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                        </svg>
+                        <input class="form-input" id="email" name="email" type="email"
+                            placeholder="e.g. maria.santos@gmail.com" autocomplete="email" required>
+                    </div>
+                    <div class="error-message" id="emailError">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        Please enter a valid email address.
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group" id="passwordGroup">
+                    <div class="label-row">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="password-strength-compact" id="passwordStrengthWrap" aria-live="polite">
+                            <div class="strength-bars-compact">
+                                <span class="strength-segment" id="strSeg1"></span>
+                                <span class="strength-segment" id="strSeg2"></span>
+                                <span class="strength-segment" id="strSeg3"></span>
+                                <span class="strength-segment" id="strSeg4"></span>
+                            </div>
+                            <span class="strength-text" id="strengthText">Weak</span>
+                        </div>
+                    </div>
+                    <div class="input-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input class="form-input has-toggle" id="password" name="password" type="password"
+                            placeholder="Create password (min. 6 characters)" autocomplete="new-password" required>
+                        <button type="button" class="password-toggle-btn" id="passwordToggle"
+                            aria-label="Toggle password visibility">
+                            <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </button>
+                        <div class="password-meter-line" id="passwordMeterLine"></div>
+                    </div>
+
+                    <div class="error-message" id="passwordError">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        Password must be at least 6 characters.
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group" id="confirmPasswordGroup">
+                    <label class="form-label" for="confirmPassword">Confirm Password</label>
+                    <div class="input-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input class="form-input" id="confirmPassword" name="confirmPassword" type="password"
+                            placeholder="Re-enter your password" autocomplete="new-password" required>
+                        <span class="password-match-badge" id="matchBadge">✓ Passwords match</span>
+                    </div>
+                    <div class="error-message" id="confirmPasswordError">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        Passwords do not match.
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="auth-btn" id="signupButton">
+                    <span id="signupBtnText">Create Account</span>
+                    <svg id="signupArrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14"></path>
+                        <path d="m12 5 7 7-7 7"></path>
+                    </svg>
+                </button>
+
+                <!-- One-click Demo Sample Data -->
+                <button type="button" class="quick-fill-btn" id="quickFillBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m18 15-6-6-6 6" />
+                    </svg>
+                    Auto-Fill Sample Customer
+                </button>
+            </form>
+
+            <p class="terms-note">
+                By creating an account, you agree to Hello Solar's
+                <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+            </p>
+
+            <p class="auth-footer">
+                Already have an account?
+                <a href="login.html">Log in</a>
+            </p>
+        </section>
+    </main>
+
+    <!-- Core Portal JavaScript -->
+    <script src="assets/js/portal.js"></script>
+
+    <script>
+        const signupForm = document.getElementById("signupForm");
+        const fullNameInput = document.getElementById("fullName");
+        const phoneInput = document.getElementById("phone");
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+        const confirmPasswordInput = document.getElementById("confirmPassword");
+        const matchBadge = document.getElementById("matchBadge");
+        const passwordToggle = document.getElementById("passwordToggle");
+        const eyeIcon = document.getElementById("eyeIcon");
+        const signupButton = document.getElementById("signupButton");
+        const signupBtnText = document.getElementById("signupBtnText");
+        const signupArrow = document.getElementById("signupArrow");
+        const quickFillBtn = document.getElementById("quickFillBtn");
+
+        const fullNameGroup = document.getElementById("fullNameGroup");
+        const phoneGroup = document.getElementById("phoneGroup");
+        const emailGroup = document.getElementById("emailGroup");
+        const passwordGroup = document.getElementById("passwordGroup");
+        const confirmPasswordGroup = document.getElementById("confirmPasswordGroup");
+        const passwordStrengthWrap = document.getElementById("passwordStrengthWrap");
+        const strengthText = document.getElementById("strengthText");
+        const passwordMeterLine = document.getElementById("passwordMeterLine");
+        const strSeg1 = document.getElementById("strSeg1");
+        const strSeg2 = document.getElementById("strSeg2");
+        const strSeg3 = document.getElementById("strSeg3");
+        const strSeg4 = document.getElementById("strSeg4");
+
+        // ------------------------------------------------------------------
+        // Password Visibility Toggle
+        // ------------------------------------------------------------------
+        passwordToggle.addEventListener("click", (e) => {
+            e.preventDefault();
+            const isPassword = passwordInput.type === "password";
+            passwordInput.type = isPassword ? "text" : "password";
+            confirmPasswordInput.type = isPassword ? "text" : "password";
+            passwordToggle.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
+            passwordToggle.setAttribute("aria-pressed", isPassword ? "true" : "false");
+
+            if (eyeIcon) {
+                if (isPassword) {
+                    eyeIcon.innerHTML = `
+                        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+                        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
+                        <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/>
+                        <line x1="2" y1="2" x2="22" y2="22"/>
+                    `;
+                } else {
+                    eyeIcon.innerHTML = `
+                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    `;
+                }
+            }
+        });
+
+        // ------------------------------------------------------------------
+        // Password Strength Calculation & Confirmation Matching
+        // ------------------------------------------------------------------
+        function checkPasswordMatch() {
+            const pass = passwordInput.value;
+            const conf = confirmPasswordInput.value;
+            if (conf && pass === conf) {
+                matchBadge.classList.add("visible");
+                confirmPasswordGroup.classList.remove("invalid");
+            } else {
+                matchBadge.classList.remove("visible");
+            }
+        }
+
+        passwordInput.addEventListener("input", () => {
+            const val = passwordInput.value;
+            if (!val) {
+                passwordStrengthWrap.classList.remove("active");
+                if (passwordMeterLine) passwordMeterLine.style.width = "0%";
+                matchBadge.classList.remove("visible");
+                return;
+            }
+
+            passwordStrengthWrap.classList.add("active");
+            let score = 0;
+            if (val.length >= 6) score++;
+            if (val.length >= 9) score++;
+            if (/[0-9]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val) || /[A-Z]/.test(val)) score++;
+
+            const colors = {
+                1: "#ef4444", // red
+                2: "#f59e0b", // amber
+                3: "#3b82f6", // blue
+                4: "#10b981"  // green
+            };
+
+            const labels = {
+                1: "Weak",
+                2: "Fair",
+                3: "Good",
+                4: "Strong"
+            };
+
+            const widths = {
+                1: "25%",
+                2: "50%",
+                3: "75%",
+                4: "100%"
+            };
+
+            [strSeg1, strSeg2, strSeg3, strSeg4].forEach((seg, idx) => {
+                if (seg) {
+                    if (idx < score) {
+                        seg.style.background = colors[score] || "#ef4444";
+                    } else {
+                        seg.style.background = "var(--gray-200)";
+                    }
+                }
+            });
+
+            if (passwordMeterLine) {
+                passwordMeterLine.style.width = widths[score] || "25%";
+                passwordMeterLine.style.background = colors[score] || "#ef4444";
+            }
+
+            strengthText.textContent = labels[score] || "Weak";
+            strengthText.style.color = colors[score] || "var(--gray-500)";
+
+            if (val.length >= 6) {
+                passwordGroup.classList.remove("invalid");
+            }
+
+            checkPasswordMatch();
+        });
+
+        confirmPasswordInput.addEventListener("input", () => {
+            checkPasswordMatch();
+        });
+
+        // Clear error on input
+        fullNameInput.addEventListener("input", () => {
+            if (fullNameInput.value.trim()) fullNameGroup.classList.remove("invalid");
+        });
+
+        phoneInput.addEventListener("input", () => {
+            if (phoneInput.value.trim()) phoneGroup.classList.remove("invalid");
+        });
+
+        emailInput.addEventListener("input", () => {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (regex.test(emailInput.value.trim())) emailGroup.classList.remove("invalid");
+        });
+
+        // ------------------------------------------------------------------
+        // Auto-Fill Sample Customer
+        // ------------------------------------------------------------------
+        quickFillBtn.addEventListener("click", () => {
+            fullNameInput.value = "Maria Santos";
+            phoneInput.value = "0917 555 0199";
+            emailInput.value = "maria.santos@hellosolar.ph";
+            passwordInput.value = "SolarPower2026!";
+            confirmPasswordInput.value = "SolarPower2026!";
+            passwordInput.dispatchEvent(new Event("input"));
+            confirmPasswordInput.dispatchEvent(new Event("input"));
+            fullNameGroup.classList.remove("invalid");
+            phoneGroup.classList.remove("invalid");
+            emailGroup.classList.remove("invalid");
+            passwordGroup.classList.remove("invalid");
+            confirmPasswordGroup.classList.remove("invalid");
+
+            if (window.HelloSolar && window.HelloSolar.toast) {
+                window.HelloSolar.toast("Demo Loaded", "Sample customer credentials filled in.");
+            }
+        });
+
+        // ------------------------------------------------------------------
+        // Form Submission & Account Creation
+        // ------------------------------------------------------------------
+        signupForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const nameVal = fullNameInput.value.trim();
+            const phoneVal = phoneInput.value.trim();
+            const emailVal = emailInput.value.trim();
+            const passVal = passwordInput.value;
+            const confirmVal = confirmPasswordInput.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            let isValid = true;
+
+            if (!nameVal) {
+                fullNameGroup.classList.add("invalid");
+                isValid = false;
+            } else {
+                fullNameGroup.classList.remove("invalid");
+            }
+
+            if (!phoneVal) {
+                phoneGroup.classList.add("invalid");
+                isValid = false;
+            } else {
+                phoneGroup.classList.remove("invalid");
+            }
+
+            if (!emailVal || !emailRegex.test(emailVal)) {
+                emailGroup.classList.add("invalid");
+                isValid = false;
+            } else {
+                emailGroup.classList.remove("invalid");
+            }
+
+            if (!passVal || passVal.length < 6) {
+                passwordGroup.classList.add("invalid");
+                isValid = false;
+            } else {
+                passwordGroup.classList.remove("invalid");
+            }
+
+            if (passVal !== confirmVal) {
+                confirmPasswordGroup.classList.add("invalid");
+                isValid = false;
+            } else {
+                confirmPasswordGroup.classList.remove("invalid");
+            }
+
+            if (!isValid) {
+                if (!nameVal) fullNameInput.focus();
+                else if (!phoneVal) phoneInput.focus();
+                else if (!emailVal || !emailRegex.test(emailVal)) emailInput.focus();
+                else if (!passVal || passVal.length < 6) passwordInput.focus();
+                else confirmPasswordInput.focus();
+                return;
+            }
+
+            // Loading state
+            signupButton.disabled = true;
+            signupBtnText.innerHTML = `
+                <span style="display: inline-flex; align-items: center; gap: 8px;">
+                    <span class="spinner"></span>
+                    Creating your account...
+                </span>
+            `;
+            signupArrow.style.display = "none";
+
+            // Generate automatic realistic Solar Account
+            const randomAccountNum = Math.floor(10000 + Math.random() * 90000);
+            const newAccountNo = `HS-${randomAccountNum}`;
+
+            const newCustomerProfile = {
+                name: nameVal,
+                email: emailVal,
+                phone: phoneVal,
+                accountNo: newAccountNo,
+                status: "Online",
+                systemSize: "4.82 kW",
+                installationDate: new Date().toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" }),
+                panelsCount: 12,
+                panelsModel: "Trina Solar Vertex S+ 420W",
+                inverterModel: "Solis 5kW Hybrid Inverter",
+                batteryCapacity: "10 kWh Lithium-ion Reserve",
+                address: "Quezon City, Metro Manila",
+                inverterSerial: `SOLIS-5K-${new Date().getFullYear()}-${randomAccountNum.toString().slice(-4)}`,
+                plan: "5-Year Amortization",
+                nextDue: "Oct 1, 2026",
+                nextAmount: "₱9,067",
+                role: "Solar Customer",
+                installerName: "Carlos Villanueva",
+                installerPhone: "+63 917 555 0101",
+                preferredPayment: "gcash",
+                paymentAccount: phoneVal
+            };
+
+            setTimeout(() => {
+                // Save customer data in store
+                localStorage.setItem("hello_solar_user", JSON.stringify(newCustomerProfile));
+                localStorage.setItem("hello_solar_logged_in", "true");
+
+                // Success visual state
+                signupBtnText.textContent = "Account Created!";
+                signupArrow.style.display = "inline-flex";
+                signupArrow.innerHTML = `
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                `;
+
+                if (window.HelloSolar && window.HelloSolar.toast) {
+                    window.HelloSolar.toast("Welcome to Hello Solar!", `Account ${newAccountNo} successfully created.`);
+                }
+
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 700);
+            }, 800);
+        });
+    </script>
+</body>
+
+</html>

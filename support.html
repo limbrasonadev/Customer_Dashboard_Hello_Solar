@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hello Solar — Submit customer support requests, report inverter issues, and access installer dispatch.">
+    <title>Hello Solar — Support</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="assets/css/portal.css">
+
+    <style>
+        .support-layout {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            gap: 20px;
+        }
+
+        .routing-banner {
+            background: #fff8ec;
+            border: 1px solid #fed7aa;
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .routing-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .routing-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: #ffedd5;
+            color: var(--solar-orange-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .routing-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+        }
+
+        .routing-text-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        .routing-text-sub {
+            font-size: 12.5px;
+            color: #9a3412;
+        }
+
+        /* Form styling */
+        .support-card {
+            padding: 28px 26px;
+        }
+
+        .support-card h2 {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 6px;
+        }
+
+        .support-card p.subtitle {
+            font-size: 13.5px;
+            color: var(--gray-500);
+            margin-bottom: 22px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .ticket-success-alert {
+            display: none;
+            background: var(--green-bg);
+            border: 1px solid var(--green-border);
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+            margin-top: 20px;
+            color: #065f46;
+        }
+
+        .ticket-success-alert.visible {
+            display: block;
+        }
+
+        .ticket-success-title {
+            font-size: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .ticket-success-msg {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        /* FAQ Accordion */
+        .faq-card {
+            padding: 24px;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--gray-100);
+            padding: 14px 0;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .faq-question {
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--navy);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .faq-question:hover {
+            color: var(--solar-orange-dark);
+        }
+
+        .faq-arrow {
+            transition: transform var(--transition-fast);
+            color: var(--gray-400);
+            flex-shrink: 0;
+        }
+
+        .faq-item.open .faq-arrow {
+            transform: rotate(180deg);
+            color: var(--solar-orange-dark);
+        }
+
+        .faq-answer {
+            display: none;
+            font-size: 13px;
+            color: var(--gray-500);
+            line-height: 1.5;
+            margin-top: 8px;
+            padding-right: 16px;
+        }
+
+        .faq-item.open .faq-answer {
+            display: block;
+        }
+
+        /* Channels sidebar */
+        .contact-channels {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .channel-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+        }
+
+        .channel-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--white);
+            color: var(--solar-orange-dark);
+            border: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .support-layout {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .routing-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <a href="dashboard.html" class="logo">
+                <img src="assets/images/hello_solar.png" alt="Hello Solar">
+            </a>
+
+            <div class="nav-label">Customer Portal</div>
+
+            <nav class="nav" aria-label="Portal navigation">
+                <a href="dashboard.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                    Dashboard
+                </a>
+
+                <a href="my-system.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="4" />
+                        <path d="M12 2v2" /><path d="M12 20v2" />
+                        <path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" />
+                        <path d="M2 12h2" /><path d="M20 12h2" />
+                    </svg>
+                    My System
+                </a>
+
+                <a href="energy.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                    </svg>
+                    Energy
+                </a>
+
+                <a href="payments.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /><path d="M6 15h4" />
+                    </svg>
+                    My Payments
+                </a>
+
+                <a href="install-status.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" /><path d="m8 12 2.5 2.5L16 9" />
+                    </svg>
+                    Install Status
+                </a>
+
+                <a href="support.html" class="nav-link active" aria-current="page">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 11a9 9 0 0 1 18 0" />
+                        <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                        <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                        <path d="M17 17c0 2-2 3-5 3" />
+                    </svg>
+                    Support
+                </a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="sidebar-status-card">
+                    <div class="sidebar-status-info">
+                        <span class="sidebar-status-label">Assigned Installer</span>
+                        <span class="sidebar-status-val">Carlos Villanueva</span>
+                    </div>
+                    <span class="status-dot pulsing" title="Installer available"></span>
+                </div>
+
+                <div class="sidebar-divider"></div>
+
+                <button class="logout-button" id="logoutButton" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Mobile Backdrop -->
+        <div class="mobile-backdrop" id="mobileBackdrop"></div>
+
+        <!-- MAIN VIEW -->
+        <main class="main">
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="mobile-header">
+                    <button class="mobile-menu-button" id="mobileMenuButton" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
+                        <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                            <line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="18" x2="20" y2="18" />
+                        </svg>
+                    </button>
+                    <a href="dashboard.html" class="mobile-logo">
+                        <img src="assets/images/hello_solar.png" alt="Hello Solar">
+                    </a>
+                </div>
+
+                <div class="topbar-right">
+                    <a href="support.html" class="quick-support-link active" style="color: var(--solar-orange-dark); font-weight: 700;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 11a9 9 0 0 1 18 0"/><path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2"/><path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2"/><path d="M17 17c0 2-2 3-5 3"/></svg>
+                        Need Help?
+                    </a>
+
+                    <div class="profile">
+                        <div class="profile-text">
+                            <span class="profile-name" id="profileName">Juan Dela Cruz</span>
+                            <span class="profile-role">Customer Account</span>
+                        </div>
+                        <div class="profile-avatar" id="profileAvatar">JD</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- CONTENT -->
+            <div class="content">
+                <section class="page-intro">
+                    <div>
+                        <p class="eyebrow">Customer Care</p>
+                        <h1>Support <span>Request</span></h1>
+                        <p>Need technical assistance or routine maintenance? Your ticket is auto-routed to your installer.</p>
+                    </div>
+                    <div class="cta-group">
+                        <a href="tel:09175550101" class="btn btn-primary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                            </svg>
+                            Hotline (+63 917 555 0101)
+                        </a>
+                        <a href="dashboard.html" class="btn btn-secondary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </div>
+                </section>
+
+                <!-- AUTO-ROUTING BANNER -->
+                <div class="routing-banner">
+                    <div class="routing-info">
+                        <div class="routing-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="8.5" cy="7" r="4" /><polyline points="17 11 19 13 23 9" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="routing-text-title">Smart Installer Routing Enabled</div>
+                            <div class="routing-text-sub">
+                                Tickets route straight to <strong>Carlos Villanueva (Assigned Installer · +63 917 555 0101)</strong>. Hello Solar Support HQ is copied on all dispatches.
+                            </div>
+                        </div>
+                    </div>
+                    <span class="badge badge-online">
+                        <span class="status-dot pulsing"></span> Auto-Routed
+                    </span>
+                </div>
+
+                <!-- SUPPORT LAYOUT -->
+                <div class="support-layout">
+                    <!-- Support Form -->
+                    <section class="panel support-card">
+                        <h2>Submit a Service Request</h2>
+                        <p class="subtitle">Please provide details so we can triage and schedule on-site support quickly.</p>
+
+                        <form id="supportTicketForm" novalidate>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="categorySelect">Issue Category</label>
+                                    <select class="form-select" id="categorySelect" required>
+                                        <option value="inverter">Inverter Warning / Fault Code</option>
+                                        <option value="app">Mobile App / Monitoring Gateway</option>
+                                        <option value="battery">Battery Storage / Backup Duration</option>
+                                        <option value="cleaning">Panel Cleaning / Physical Inspection</option>
+                                        <option value="billing">Billing or Net-Metering Question</option>
+                                        <option value="other">Other Inquiries</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="prioritySelect">Urgency Level</label>
+                                    <select class="form-select" id="prioritySelect" required>
+                                        <option value="normal">Normal (Response within 24 hours)</option>
+                                        <option value="urgent">Urgent — Inverter offline / No power</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="ticketSubject">Subject Summary</label>
+                                <input class="form-input" id="ticketSubject" type="text" placeholder="e.g. Inverter LED blinking yellow, reading 0W" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="ticketDescription">Detailed Description</label>
+                                <textarea class="form-textarea" id="ticketDescription" placeholder="Describe the symptom, what time it occurred, or any error code displayed on your Solis screen..." required></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" id="submitTicketBtn" style="padding: 12px 24px;">
+                                <span id="submitBtnText">Send Service Request</span>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
+                                </svg>
+                            </button>
+                        </form>
+
+                        <div class="ticket-success-alert" id="ticketSuccessAlert" role="status">
+                            <div class="ticket-success-title">
+                                <span>✓</span>
+                                <span id="ticketNumberDisplay">Ticket #HS-SR-9042 Created</span>
+                            </div>
+                            <p class="ticket-success-msg" id="ticketSuccessMsg">
+                                Demo Mode: Your request has been logged locally. In production, Carlos Villanueva and Hello Solar support dispatch receive immediate SMS notifications with an estimated on-site arrival within 24 hours.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- Sidebar: FAQs and Hotline -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <section class="panel panel-body">
+                            <h3 style="font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 12px;">Direct Hello Solar Contacts</h3>
+                            <div class="contact-channels">
+                                <div class="channel-row">
+                                    <div class="channel-icon">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <strong style="font-size: 13.5px; color: var(--navy);">Dispatch Hotline</strong>
+                                        <div style="font-size: 12px; color: var(--gray-500);">+63 917 555 0101 (Carlos)</div>
+                                    </div>
+                                </div>
+
+                                <div class="channel-row">
+                                    <div class="channel-icon">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <strong style="font-size: 13.5px; color: var(--navy);">Email Support</strong>
+                                        <div style="font-size: 12px; color: var(--gray-500);">support@hellosolarph.com</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Common Troubleshooting FAQs -->
+                        <section class="panel faq-card">
+                            <h3 style="font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 12px;">Quick Troubleshooting</h3>
+
+                            <div class="faq-item">
+                                <button type="button" class="faq-question">
+                                    <span>Why is the inverter reading 0W at night?</span>
+                                    <span class="faq-arrow">▼</span>
+                                </button>
+                                <div class="faq-answer">
+                                    This is completely normal. Solar photovoltaic panels require sunlight to produce electricity. At dusk and nighttime, the Solis inverter enters standby mode.
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <button type="button" class="faq-question">
+                                    <span>What happens during a brownout?</span>
+                                    <span class="faq-arrow">▼</span>
+                                </button>
+                                <div class="faq-answer">
+                                    Your 10 kWh lithium-ion battery and Automatic Transfer Switch (ATS) instantly power your dedicated backup circuits within 10 milliseconds without flickering your appliances.
+                                </div>
+                            </div>
+
+                            <div class="faq-item">
+                                <button type="button" class="faq-question">
+                                    <span>How often should panels be cleaned?</span>
+                                    <span class="faq-arrow">▼</span>
+                                </button>
+                                <div class="faq-answer">
+                                    In the Philippines, periodic rainfall washes off light dust. We recommend a professional gentle rinse every 4 to 6 months to maintain peak 21.8% cell efficiency.
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <footer class="portal-footer">
+                <span>© 2026 Hello Solar Inc. Clean energy. Lower bills. Brighter future.</span>
+                <span>hellosolarph.com · support@hellosolarph.com</span>
+            </footer>
+        </main>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION (ERGONOMIC 5-PILLAR APP NAV) -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
+        <div class="mobile-bottom-nav-inner">
+            <a href="dashboard.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                </svg>
+                <span>Home</span>
+            </a>
+            <a href="payments.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/>
+                </svg>
+                <span>Bills</span>
+            </a>
+            <a href="my-system.html" class="mobile-nav-item mobile-nav-fab-wrap" aria-label="My System Live Telemetry">
+                <div class="mobile-nav-fab">
+                    <img src="assets/images/logofortab.png" alt="System" class="mobile-nav-fab-img">
+                </div>
+                <span>System</span>
+            </a>
+            <a href="install-status.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 12 2.5 2.5L16 9"/>
+                </svg>
+                <span>Status</span>
+            </a>
+            <a href="#" id="bottomNavProfileBtn" class="mobile-nav-item" aria-label="Open Profile & Settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span>Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Core Portal JavaScript -->
+    <script src="assets/js/portal.js"></script>
+
+    <script>
+        const supportTicketForm = document.getElementById("supportTicketForm");
+        const submitTicketBtn = document.getElementById("submitTicketBtn");
+        const submitBtnText = document.getElementById("submitBtnText");
+        const ticketSuccessAlert = document.getElementById("ticketSuccessAlert");
+        const ticketNumberDisplay = document.getElementById("ticketNumberDisplay");
+        const ticketSubject = document.getElementById("ticketSubject");
+        const ticketDescription = document.getElementById("ticketDescription");
+
+        supportTicketForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            if (!ticketSubject.value.trim() || !ticketDescription.value.trim()) {
+                window.HelloSolar.toast("Incomplete Form", "Please provide a subject and description of your issue.");
+                return;
+            }
+
+            submitTicketBtn.disabled = true;
+            submitBtnText.textContent = "Routing to Carlos...";
+
+            setTimeout(() => {
+                const randomId = Math.floor(1000 + Math.random() * 9000);
+                ticketNumberDisplay.textContent = `Ticket #HS-SR-${randomId} Logged`;
+                ticketSuccessAlert.classList.add("visible");
+                submitBtnText.textContent = "Request Dispatched ✓";
+
+                window.HelloSolar.toast(
+                    "Support Ticket Logged (Demo)",
+                    `Ticket #HS-SR-${randomId} created. In production, an alert is sent directly to Carlos Villanueva.`
+                );
+
+                supportTicketForm.reset();
+
+                setTimeout(() => {
+                    submitTicketBtn.disabled = false;
+                    submitBtnText.textContent = "Send Service Request";
+                }, 3500);
+            }, 750);
+        });
+
+        // FAQ Toggle
+        document.querySelectorAll(".faq-question").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const item = btn.closest(".faq-item");
+                item.classList.toggle("open");
+            });
+        });
+    </script>
+</body>
+
+</html>

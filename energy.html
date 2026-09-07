@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hello Solar — Energy performance, generation trends, bill savings, and battery backup status.">
+    <title>Hello Solar — Energy</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="assets/css/portal.css">
+
+    <style>
+        .energy-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .chart-tabs {
+            display: flex;
+            background: var(--gray-100);
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            gap: 4px;
+        }
+
+        .chart-tab {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-500);
+            transition: all var(--transition-fast);
+        }
+
+        .chart-tab:hover {
+            color: var(--navy);
+        }
+
+        .chart-tab.active {
+            background: var(--white);
+            color: var(--navy);
+            box-shadow: var(--shadow-xs);
+        }
+
+        .chart-area {
+            height: 250px;
+            padding: 10px 16px;
+            position: relative;
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .chart-grid-line {
+            stroke: var(--gray-200);
+            stroke-dasharray: 4;
+            stroke-width: 1;
+        }
+
+        .chart-label {
+            font-size: 11px;
+            fill: var(--gray-400);
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .chart-line {
+            fill: none;
+            stroke: var(--solar-orange);
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .chart-area-fill {
+            fill: url(#energyGradient);
+            opacity: 0.25;
+        }
+
+        .chart-point {
+            fill: var(--white);
+            stroke: var(--solar-orange);
+            stroke-width: 2.5;
+            transition: r var(--transition-fast);
+        }
+
+        .chart-point:hover {
+            r: 6;
+            cursor: pointer;
+        }
+
+        .chart-legend {
+            padding: 12px 24px 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--gray-500);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: var(--radius-full);
+            background: var(--solar-orange);
+        }
+
+        /* Performance breakdown */
+        .performance-list {
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .performance-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .performance-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .performance-label {
+            color: var(--gray-500);
+            font-weight: 600;
+        }
+
+        .performance-value {
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        .performance-bar {
+            height: 7px;
+            background: var(--gray-100);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .performance-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--solar-gradient);
+        }
+
+        .performance-fill.green {
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+        }
+
+        .performance-fill.blue {
+            background: linear-gradient(90deg, #38bdf8 0%, #0284c7 100%);
+        }
+
+        /* Eco Impact Card */
+        .eco-card {
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+            color: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .eco-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        .eco-stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+        }
+
+        .eco-stat-val {
+            font-size: 20px;
+            font-weight: 800;
+            color: #a7f3d0;
+        }
+
+        .eco-stat-desc {
+            font-size: 11.5px;
+            color: #e2e8f0;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 1024px) {
+            .energy-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <a href="dashboard.html" class="logo">
+                <img src="assets/images/hello_solar.png" alt="Hello Solar">
+            </a>
+
+            <div class="nav-label">Customer Portal</div>
+
+            <nav class="nav" aria-label="Portal navigation">
+                <a href="dashboard.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                    Dashboard
+                </a>
+
+                <a href="my-system.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="4" />
+                        <path d="M12 2v2" /><path d="M12 20v2" />
+                        <path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" />
+                        <path d="M2 12h2" /><path d="M20 12h2" />
+                    </svg>
+                    My System
+                </a>
+
+                <a href="energy.html" class="nav-link active" aria-current="page">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                    </svg>
+                    Energy
+                </a>
+
+                <a href="payments.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /><path d="M6 15h4" />
+                    </svg>
+                    My Payments
+                </a>
+
+                <a href="install-status.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" /><path d="m8 12 2.5 2.5L16 9" />
+                    </svg>
+                    Install Status
+                </a>
+
+                <a href="support.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 11a9 9 0 0 1 18 0" />
+                        <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                        <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                        <path d="M17 17c0 2-2 3-5 3" />
+                    </svg>
+                    Support
+                </a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="sidebar-status-card">
+                    <div class="sidebar-status-info">
+                        <span class="sidebar-status-label">Peak Today</span>
+                        <span class="sidebar-status-val">7.2 kWh</span>
+                    </div>
+                    <span class="status-dot pulsing"></span>
+                </div>
+
+                <div class="sidebar-divider"></div>
+
+                <button class="logout-button" id="logoutButton" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Mobile Backdrop -->
+        <div class="mobile-backdrop" id="mobileBackdrop"></div>
+
+        <!-- MAIN VIEW -->
+        <main class="main">
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="mobile-header">
+                    <button class="mobile-menu-button" id="mobileMenuButton" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
+                        <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                            <line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="18" x2="20" y2="18" />
+                        </svg>
+                    </button>
+                    <a href="dashboard.html" class="mobile-logo">
+                        <img src="assets/images/hello_solar.png" alt="Hello Solar">
+                    </a>
+                </div>
+
+                <div class="topbar-right">
+                    <a href="support.html" class="quick-support-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 11a9 9 0 0 1 18 0"/><path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2"/><path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2"/><path d="M17 17c0 2-2 3-5 3"/></svg>
+                        Need Help?
+                    </a>
+
+                    <div class="profile">
+                        <div class="profile-text">
+                            <span class="profile-name" id="profileName">Juan Dela Cruz</span>
+                            <span class="profile-role">Customer Account</span>
+                        </div>
+                        <div class="profile-avatar" id="profileAvatar">JD</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- CONTENT -->
+            <div class="content">
+                <section class="page-intro">
+                    <div>
+                        <p class="eyebrow">Generation & Savings</p>
+                        <h1>Energy <span>Performance</span></h1>
+                        <p>Detailed solar production records, utility bill savings, and battery reserve telemetry.</p>
+                    </div>
+                    <div class="cta-group">
+                        <button type="button" class="btn btn-primary" onclick="alert('Exporting your solar generation and consumption history (CSV)...');">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Export Energy Data
+                        </button>
+                        <a href="payments.html" class="btn btn-secondary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+                            </svg>
+                            View Savings
+                        </a>
+                    </div>
+                </section>
+
+                <!-- 4 SUMMARY CARDS -->
+                <section class="summary-grid" aria-label="Energy overview stats">
+                    <article class="summary-card">
+                        <div class="summary-top">
+                            <span class="summary-label">Energy Generated</span>
+                            <div class="summary-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="summary-value">7.1 kWh</div>
+                        <div class="summary-meta">Generated today so far</div>
+                    </article>
+
+                    <article class="summary-card">
+                        <div class="summary-top">
+                            <span class="summary-label">Bill Saved</span>
+                            <div class="summary-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                                    <path d="M2 10h20" />
+                                    <path d="M12 13v4" /><path d="M10 15h4" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="summary-value">₱1,180</div>
+                        <div class="summary-meta">Estimated monthly reduction</div>
+                    </article>
+
+                    <article class="summary-card">
+                        <div class="summary-top">
+                            <span class="summary-label">Battery Reserve</span>
+                            <div class="summary-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="7" width="17" height="10" rx="2" />
+                                    <path d="M20 10h2v4h-2" /><path d="M7 10v4" /><path d="M10 10v4" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="summary-value">10 kWh</div>
+                        <div class="summary-meta">96% State of Charge (Ready)</div>
+                    </article>
+
+                    <article class="summary-card">
+                        <div class="summary-top">
+                            <span class="summary-label">Brownout Backup</span>
+                            <div class="summary-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="summary-value">18 hrs</div>
+                        <div class="summary-meta">Estimated critical circuits</div>
+                    </article>
+                </section>
+
+                <!-- GRID: CHART & METRICS -->
+                <div class="energy-grid">
+                    <!-- Energy Production Chart -->
+                    <section class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <h2 class="panel-title">Production History</h2>
+                                <p class="panel-subtitle">Interactive generation curve (kWh output)</p>
+                            </div>
+
+                            <div class="chart-tabs" role="tablist">
+                                <button class="chart-tab" type="button" data-period="today">Today</button>
+                                <button class="chart-tab active" type="button" data-period="week">Last 7 Days</button>
+                                <button class="chart-tab" type="button" data-period="month">Monthly</button>
+                            </div>
+                        </div>
+
+                        <div class="chart-area">
+                            <svg class="chart-svg" id="energyChart" viewBox="0 0 700 250" preserveAspectRatio="none" aria-label="Energy production history chart">
+                                <defs>
+                                    <linearGradient id="energyGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#ff8a00" stop-opacity="0.75"/>
+                                        <stop offset="100%" stop-color="#ffb300" stop-opacity="0.05"/>
+                                    </linearGradient>
+                                </defs>
+
+                                <line class="chart-grid-line" x1="45" y1="30" x2="680" y2="30" />
+                                <line class="chart-grid-line" x1="45" y1="80" x2="680" y2="80" />
+                                <line class="chart-grid-line" x1="45" y1="130" x2="680" y2="130" />
+                                <line class="chart-grid-line" x1="45" y1="180" x2="680" y2="180" />
+                                <line class="chart-grid-line" x1="45" y1="220" x2="680" y2="220" />
+
+                                <text class="chart-label" x="7" y="34">8 kWh</text>
+                                <text class="chart-label" x="7" y="84">6 kWh</text>
+                                <text class="chart-label" x="7" y="134">4 kWh</text>
+                                <text class="chart-label" x="7" y="184">2 kWh</text>
+                                <text class="chart-label" x="10" y="224">0</text>
+
+                                <path id="chartFill" class="chart-area-fill"></path>
+                                <path id="chartLine" class="chart-line"></path>
+                                <g id="chartPoints"></g>
+                                <g id="chartLabels"></g>
+                            </svg>
+                        </div>
+
+                        <div class="chart-legend">
+                            <span class="legend-dot"></span>
+                            Clean solar generation (kWh)
+                        </div>
+                    </section>
+
+                    <!-- Right Column: Breakdown & Environmental Impact -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <section class="panel">
+                            <div class="panel-header">
+                                <h2 class="panel-title" style="font-size: 16px;">Power Distribution</h2>
+                                <span class="badge badge-online">Live</span>
+                            </div>
+
+                            <div class="performance-list">
+                                <div class="performance-item">
+                                    <div class="performance-row">
+                                        <span class="performance-label">Home Direct Consumption</span>
+                                        <span class="performance-value">4.6 kWh (65%)</span>
+                                    </div>
+                                    <div class="performance-bar">
+                                        <div class="performance-fill" style="width: 65%;"></div>
+                                    </div>
+                                </div>
+
+                                <div class="performance-item">
+                                    <div class="performance-row">
+                                        <span class="performance-label">Battery Storage Charged</span>
+                                        <span class="performance-value">2.5 kWh (35%)</span>
+                                    </div>
+                                    <div class="performance-bar">
+                                        <div class="performance-fill green" style="width: 35%;"></div>
+                                    </div>
+                                </div>
+
+                                <div class="performance-item">
+                                    <div class="performance-row">
+                                        <span class="performance-label">Exported to Grid (Net Metering)</span>
+                                        <span class="performance-value">0.8 kWh</span>
+                                    </div>
+                                    <div class="performance-bar">
+                                        <div class="performance-fill blue" style="width: 18%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Eco Impact -->
+                        <section class="eco-card">
+                            <div>
+                                <span class="eyebrow" style="color: #6ee7b7;">Environmental Impact</span>
+                                <h3 style="font-size: 17px; font-weight: 800; margin-top: 4px;">Clean Green Energy</h3>
+                                <p style="font-size: 12.5px; opacity: 0.9; margin-top: 2px;">Your rooftop system directly eliminates fossil fuel greenhouse emissions.</p>
+                            </div>
+
+                            <div class="eco-stats">
+                                <div class="eco-stat-box">
+                                    <div class="eco-stat-val">214 kg</div>
+                                    <div class="eco-stat-desc">CO₂ Emissions Avoided</div>
+                                </div>
+                                <div class="eco-stat-box">
+                                    <div class="eco-stat-val">11 Trees</div>
+                                    <div class="eco-stat-desc">Planting Equivalent</div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <footer class="portal-footer">
+                <span>© 2026 Hello Solar Inc. Clean energy. Lower bills. Brighter future.</span>
+                <span>hellosolarph.com · support@hellosolarph.com</span>
+            </footer>
+        </main>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION (ERGONOMIC 5-PILLAR APP NAV) -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
+        <div class="mobile-bottom-nav-inner">
+            <a href="dashboard.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                </svg>
+                <span>Home</span>
+            </a>
+            <a href="payments.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/>
+                </svg>
+                <span>Bills</span>
+            </a>
+            <a href="my-system.html" class="mobile-nav-item mobile-nav-fab-wrap" aria-label="My System Live Telemetry">
+                <div class="mobile-nav-fab">
+                    <img src="assets/images/logofortab.png" alt="System" class="mobile-nav-fab-img">
+                </div>
+                <span>System</span>
+            </a>
+            <a href="install-status.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 12 2.5 2.5L16 9"/>
+                </svg>
+                <span>Status</span>
+            </a>
+            <a href="#" id="bottomNavProfileBtn" class="mobile-nav-item" aria-label="Open Profile & Settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span>Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Core Portal JavaScript -->
+    <script src="assets/js/portal.js"></script>
+
+    <!-- Chart Script -->
+    <script>
+        const energyData = {
+            today: {
+                values: [0, 1.1, 2.4, 4.2, 6.4, 7.2, 6.5, 5.1, 3.3, 1.5, 0.4],
+                labels: ["7 AM", "8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM"]
+            },
+            week: {
+                values: [4.1, 5.8, 6.4, 7.2, 5.9, 7.6, 6.8],
+                labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+            },
+            month: {
+                values: [12, 15, 17, 14, 19, 18, 21, 20, 24, 22, 26, 25],
+                labels: ["1", "4", "7", "10", "13", "16", "19", "22", "25", "28", "30", "31"]
+            }
+        };
+
+        const chartLine = document.getElementById("chartLine");
+        const chartFill = document.getElementById("chartFill");
+        const chartPoints = document.getElementById("chartPoints");
+        const chartLabels = document.getElementById("chartLabels");
+
+        function drawChart(period) {
+            const data = energyData[period];
+            if (!data) return;
+
+            const values = data.values;
+            const labels = data.labels;
+            const chartLeft = 45;
+            const chartRight = 680;
+            const chartTop = 30;
+            const chartBottom = 220;
+            const width = chartRight - chartLeft;
+            const height = chartBottom - chartTop;
+            const maxValue = Math.max(...values);
+            const safeMax = maxValue === 0 ? 1 : maxValue * 1.15;
+
+            const points = values.map((value, index) => {
+                const x = chartLeft + (index / Math.max(values.length - 1, 1)) * width;
+                const y = chartBottom - (value / safeMax) * height;
+                return { x, y, value };
+            });
+
+            const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+            const fillPath = `${linePath} L ${points[points.length - 1].x} ${chartBottom} L ${points[0].x} ${chartBottom} Z`;
+
+            chartLine.setAttribute("d", linePath);
+            chartFill.setAttribute("d", fillPath);
+            chartPoints.innerHTML = "";
+            chartLabels.innerHTML = "";
+
+            points.forEach((point, index) => {
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", point.x);
+                circle.setAttribute("cy", point.y);
+                circle.setAttribute("r", "4");
+                circle.setAttribute("class", "chart-point");
+                chartPoints.appendChild(circle);
+
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", point.x);
+                text.setAttribute("y", "242");
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("class", "chart-label");
+                text.textContent = labels[index];
+                chartLabels.appendChild(text);
+            });
+        }
+
+        // Initialize with 7-day period
+        drawChart("week");
+
+        const chartTabs = document.querySelectorAll(".chart-tab");
+        chartTabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                chartTabs.forEach(t => t.classList.remove("active"));
+                tab.classList.add("active");
+                drawChart(tab.dataset.period);
+            });
+        });
+    </script>
+</body>
+
+</html>

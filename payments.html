@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hello Solar — View payment schedule, account amortization status, bank channels, and upload proof of payment.">
+    <title>Hello Solar — My Payments</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="assets/css/portal.css">
+
+    <style>
+        .payments-layout {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 20px;
+        }
+
+        .payment-methods-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .payment-method-box {
+            padding: 16px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .method-tag {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--solar-orange-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .method-detail {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        .method-sub {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        /* Upload Zone */
+        .upload-dropzone {
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--radius-md);
+            padding: 28px 20px;
+            text-align: center;
+            background: #fffdf9;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .upload-dropzone:hover, .upload-dropzone.dragover {
+            border-color: var(--solar-orange);
+            background: #fff8eb;
+        }
+
+        .upload-icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #fff0d4;
+            color: var(--solar-orange-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-icon-circle svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2;
+        }
+
+        .upload-file-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .selected-file-badge {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: var(--green-bg);
+            border: 1px solid var(--green-border);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--green);
+            margin-top: 12px;
+            word-break: break-all;
+        }
+
+        .selected-file-badge.visible {
+            display: inline-flex;
+        }
+
+        .due-callout {
+            background: #fff5e5;
+            border-left: 4px solid var(--solar-orange);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .due-amount-large {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        @media (max-width: 1024px) {
+            .payments-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .payment-methods-grid {
+                grid-template-columns: 1fr;
+            }
+            .due-callout {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <a href="dashboard.html" class="logo">
+                <img src="assets/images/hello_solar.png" alt="Hello Solar">
+            </a>
+
+            <div class="nav-label">Customer Portal</div>
+
+            <nav class="nav" aria-label="Portal navigation">
+                <a href="dashboard.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                    Dashboard
+                </a>
+
+                <a href="my-system.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="4" />
+                        <path d="M12 2v2" /><path d="M12 20v2" />
+                        <path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" />
+                        <path d="M2 12h2" /><path d="M20 12h2" />
+                    </svg>
+                    My System
+                </a>
+
+                <a href="energy.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                    </svg>
+                    Energy
+                </a>
+
+                <a href="payments.html" class="nav-link active" aria-current="page">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /><path d="M6 15h4" />
+                    </svg>
+                    My Payments
+                </a>
+
+                <a href="install-status.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" /><path d="m8 12 2.5 2.5L16 9" />
+                    </svg>
+                    Install Status
+                </a>
+
+                <a href="support.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 11a9 9 0 0 1 18 0" />
+                        <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                        <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                        <path d="M17 17c0 2-2 3-5 3" />
+                    </svg>
+                    Support
+                </a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="sidebar-status-card">
+                    <div class="sidebar-status-info">
+                        <span class="sidebar-status-label">Next Bill Due</span>
+                        <span class="sidebar-status-val">Sep 1, 2026</span>
+                    </div>
+                    <span class="badge badge-upcoming">₱9,067</span>
+                </div>
+
+                <div class="sidebar-divider"></div>
+
+                <button class="logout-button" id="logoutButton" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Mobile Backdrop -->
+        <div class="mobile-backdrop" id="mobileBackdrop"></div>
+
+        <!-- MAIN VIEW -->
+        <main class="main">
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="mobile-header">
+                    <button class="mobile-menu-button" id="mobileMenuButton" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
+                        <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                            <line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="18" x2="20" y2="18" />
+                        </svg>
+                    </button>
+                    <a href="dashboard.html" class="mobile-logo">
+                        <img src="assets/images/hello_solar.png" alt="Hello Solar">
+                    </a>
+                </div>
+
+                <div class="topbar-right">
+                    <a href="support.html" class="quick-support-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 11a9 9 0 0 1 18 0"/><path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2"/><path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2"/><path d="M17 17c0 2-2 3-5 3"/></svg>
+                        Billing Help
+                    </a>
+
+                    <div class="profile">
+                        <div class="profile-text">
+                            <span class="profile-name" id="profileName">Juan Dela Cruz</span>
+                            <span class="profile-role">Customer Account</span>
+                        </div>
+                        <div class="profile-avatar" id="profileAvatar">JD</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- CONTENT -->
+            <div class="content">
+                <section class="page-intro">
+                    <div>
+                        <p class="eyebrow">Billing & Statements</p>
+                        <h1>My <span>Payments</span></h1>
+                        <p>View your amortization schedule, verified receipts, payment channels, and submit proof.</p>
+                    </div>
+                    <div class="cta-group">
+                        <a href="#submitProofSection" class="btn btn-primary" id="payPrimaryCta">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <span>Upload Proof of Payment</span>
+                        </a>
+                        <button type="button" class="btn btn-outline" id="downloadReceiptBtn" onclick="if(window.HelloSolar&&window.HelloSolar.toast)window.HelloSolar.toast('Receipt Generated','Official statement downloaded.');">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            <span>Download Statement</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- SUMMARY STATS -->
+                <section class="summary-grid" aria-label="Payment summary cards">
+                    <article class="summary-card">
+                        <div class="summary-top">
+                            <span class="summary-label">Next Payment</span>
+                            <div class="summary-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /><path d="M6 15h4" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="summary-value">₱9,067</div>
+                        <div class="summary-meta">Due on September 1, 2026</div>
+                    </article>
+
+                    <article class="summary-card">
+                        <div class="summary-top">
+                            <span class="summary-label">Amortization Plan</span>
+                            <div class="summary-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="summary-value">5 Years</div>
+                        <div class="summary-meta">Fixed monthly payment</div>
+                    </article>
+
+                    <article class="summary-card">
+                        <div class="summary-top">
+                            <span class="summary-label">Paid Installments</span>
+                            <div class="summary-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 14 14" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="summary-value">4 of 60</div>
+                        <div class="summary-meta">₱36,268 total paid</div>
+                    </article>
+
+                    <article class="summary-card">
+                        <div class="summary-top">
+                            <span class="summary-label">Account Standing</span>
+                            <div class="summary-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="summary-value">Good</div>
+                        <div class="summary-meta"><span class="status-dot"></span>Account up to date</div>
+                    </article>
+                </section>
+
+                <!-- LAYOUT: TABLE & UPLOAD FORM -->
+                <div class="payments-layout">
+                    <!-- Payment Schedule Table -->
+                    <section class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <h2 class="panel-title">Payment Schedule & History</h2>
+                                <p class="panel-subtitle">Monthly installment status for system #HS-88219</p>
+                            </div>
+                            <span class="badge badge-neutral">5-Year Term</span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="portal-table" aria-label="Payment history and schedule">
+                                <thead>
+                                    <tr>
+                                        <th>Billing Period</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>May 2026</strong></td>
+                                        <td>May 1, 2026</td>
+                                        <td><span class="badge badge-paid">Paid</span></td>
+                                        <td><strong>₱9,067</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Jun 2026</strong></td>
+                                        <td>Jun 1, 2026</td>
+                                        <td><span class="badge badge-paid">Paid</span></td>
+                                        <td><strong>₱9,067</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Jul 2026</strong></td>
+                                        <td>Jul 1, 2026</td>
+                                        <td><span class="badge badge-paid">Paid</span></td>
+                                        <td><strong>₱9,067</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Aug 2026</strong></td>
+                                        <td>Aug 1, 2026</td>
+                                        <td><span class="badge badge-paid">Paid</span></td>
+                                        <td><strong>₱9,067</strong></td>
+                                    </tr>
+                                    <tr style="background: #fffbf2;">
+                                        <td><strong>Sep 2026 (Current)</strong></td>
+                                        <td>Sep 1, 2026</td>
+                                        <td><span class="badge badge-due">Due Soon</span></td>
+                                        <td style="color: var(--solar-orange-dark);"><strong>₱9,067</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Oct 2026</strong></td>
+                                        <td>Oct 1, 2026</td>
+                                        <td><span class="badge badge-upcoming">Upcoming</span></td>
+                                        <td><strong>₱9,067</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- Make Payment / Upload Proof Column -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <section class="panel panel-body">
+                            <div class="due-callout">
+                                <div>
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--solar-orange-dark); text-transform: uppercase;">Amount Due</div>
+                                    <div class="due-amount-large">₱9,067</div>
+                                </div>
+                                <div style="font-size: 13px; text-align: right; color: var(--navy);">
+                                    Period: <strong>Sep 1, 2026</strong><br>
+                                    <span style="font-size: 11.5px; color: var(--gray-500);">Ref: HS-88219-0926</span>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <h3 style="font-size: 15px; font-weight: 800; margin: 0; color: var(--navy);">Official Payment Channels</h3>
+                                <button type="button" onclick="window.HelloSolar && window.HelloSolar.openProfileSettings()" style="background: none; border: none; font-size: 12px; color: var(--solar-orange-dark); font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px;">
+                                    Change Preferred ⚙
+                                </button>
+                            </div>
+                            <div class="payment-methods-grid">
+                                <div class="payment-method-box" id="channelGcashMaya">
+                                    <span class="method-tag">GCash / Maya</span>
+                                    <span class="method-detail">+63 917 000 1111</span>
+                                    <span class="method-sub">Hello Solar Official</span>
+                                </div>
+                                <div class="payment-method-box" id="channelBdo">
+                                    <span class="method-tag">BDO Bank Transfer</span>
+                                    <span class="method-detail">0082-1234-5678</span>
+                                    <span class="method-sub">Hello Solar Inc.</span>
+                                </div>
+                            </div>
+
+                            <!-- Upload Proof -->
+                            <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 8px; color: var(--navy);">Submit Payment Receipt</h3>
+                            <p style="font-size: 12.5px; color: var(--gray-500); margin-bottom: 14px;">
+                                Upload your transaction screenshot or deposit slip for Hello Solar verification.
+                            </p>
+
+                            <input type="file" id="proofFileInput" class="upload-file-input" accept="image/png,image/jpeg,application/pdf">
+                            <div class="upload-dropzone" id="uploadDropzone" role="button" tabindex="0" aria-label="Click or drag file to upload payment proof">
+                                <div class="upload-icon-circle">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="17 8 12 3 7 8" />
+                                        <line x1="12" y1="3" x2="12" y2="15" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <strong style="font-size: 13.5px; color: var(--navy);">Click to upload receipt</strong>
+                                    <p style="font-size: 11.5px; color: var(--gray-400); margin-top: 2px;">PNG, JPG, or PDF up to 10MB</p>
+                                </div>
+                            </div>
+
+                            <div class="selected-file-badge" id="selectedFileBadge">
+                                <span>📄</span>
+                                <span id="selectedFileName">receipt.png</span>
+                            </div>
+
+                            <button type="button" class="btn btn-primary" id="uploadProofBtn" style="width: 100%; margin-top: 16px;" disabled>
+                                Submit Proof of Payment
+                            </button>
+
+                            <p style="font-size: 11.5px; color: var(--gray-400); margin-top: 12px; text-align: center;">
+                                Demo mode: Files are verified locally without transmitting to external servers.
+                            </p>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <footer class="portal-footer">
+                <span>© 2026 Hello Solar Inc. Clean energy. Lower bills. Brighter future.</span>
+                <span>hellosolarph.com · support@hellosolarph.com</span>
+            </footer>
+        </main>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION (ERGONOMIC 5-PILLAR APP NAV) -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
+        <div class="mobile-bottom-nav-inner">
+            <a href="dashboard.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                </svg>
+                <span>Home</span>
+            </a>
+            <a href="payments.html" class="mobile-nav-item active" aria-current="page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/>
+                </svg>
+                <span>Bills</span>
+            </a>
+            <a href="my-system.html" class="mobile-nav-item mobile-nav-fab-wrap" aria-label="My System Live Telemetry">
+                <div class="mobile-nav-fab">
+                    <img src="assets/images/logofortab.png" alt="System" class="mobile-nav-fab-img">
+                </div>
+                <span>System</span>
+            </a>
+            <a href="install-status.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 12 2.5 2.5L16 9"/>
+                </svg>
+                <span>Status</span>
+            </a>
+            <a href="#" id="bottomNavProfileBtn" class="mobile-nav-item" aria-label="Open Profile & Settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span>Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Core Portal JavaScript -->
+    <script src="assets/js/portal.js"></script>
+
+    <script>
+        const proofFileInput = document.getElementById("proofFileInput");
+        const uploadDropzone = document.getElementById("uploadDropzone");
+        const selectedFileBadge = document.getElementById("selectedFileBadge");
+        const selectedFileName = document.getElementById("selectedFileName");
+        const uploadProofBtn = document.getElementById("uploadProofBtn");
+
+        uploadDropzone.addEventListener("click", () => proofFileInput.click());
+        uploadDropzone.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                proofFileInput.click();
+            }
+        });
+
+        uploadDropzone.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            uploadDropzone.classList.add("dragover");
+        });
+
+        uploadDropzone.addEventListener("dragleave", () => {
+            uploadDropzone.classList.remove("dragover");
+        });
+
+        uploadDropzone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            uploadDropzone.classList.remove("dragover");
+            if (e.dataTransfer.files.length > 0) {
+                handleFileSelected(e.dataTransfer.files[0]);
+            }
+        });
+
+        proofFileInput.addEventListener("change", () => {
+            if (proofFileInput.files.length > 0) {
+                handleFileSelected(proofFileInput.files[0]);
+            }
+        });
+
+        function handleFileSelected(file) {
+            selectedFileName.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+            selectedFileBadge.classList.add("visible");
+            uploadProofBtn.disabled = false;
+        }
+
+        uploadProofBtn.addEventListener("click", () => {
+            uploadProofBtn.disabled = true;
+            uploadProofBtn.textContent = "Processing submission...";
+
+            setTimeout(() => {
+                uploadProofBtn.textContent = "Proof Submitted ✓";
+                window.HelloSolar.toast(
+                    "Receipt Submitted (Demo)",
+                    `Your transfer proof (${selectedFileName.textContent}) has been recorded. In production, finance confirms within 24 hours.`
+                );
+
+                setTimeout(() => {
+                    uploadProofBtn.disabled = false;
+                    uploadProofBtn.textContent = "Submit Proof of Payment";
+                }, 3000);
+            }, 800);
+        });
+    </script>
+</body>
+
+</html>

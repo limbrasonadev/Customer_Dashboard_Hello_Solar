@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Solar Customer Portal</title>
+    <style>
+        * {
+            background-image: url('assets/images/landing_page_bg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+    <script>
+        // Automatic routing based on authentication state
+        if (localStorage.getItem("hello_solar_logged_in") === "true") {
+            window.location.replace("dashboard.html");
+        } else {
+            window.location.replace("login.html");
+        }
+    </script>
+</head>
+
+<body
+    style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #fafafa; color: #101a2e;">
+    <p>Redirecting to <a href="login.html" style="color: #ff8a00; font-weight: bold;">Hello Solar Portal</a>...</p>
+</body>
+
+</html>

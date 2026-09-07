@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Log in to your Hello Solar customer portal account to view solar production, savings, and payments.">
+    <title>Hello Solar — Login</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="assets/css/portal.css">
+
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 20px;
+            background: radial-gradient(circle at 10% 10%, rgba(255, 179, 0, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(255, 138, 0, 0.08) 0%, transparent 45%),
+                linear-gradient(135deg, #ffffff 0%, #fffdfa 50%, #fff9ef 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 440px;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            padding: 40px 36px;
+            box-shadow: 0 20px 60px rgba(16, 26, 46, 0.08);
+            position: relative;
+            z-index: 2;
+        }
+
+        .auth-logo {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .auth-logo img {
+            height: 38px;
+            width: auto;
+        }
+
+        .auth-header {
+            margin-bottom: 26px;
+        }
+
+        .auth-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--navy);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            margin-top: 4px;
+        }
+
+        .auth-header h1 span {
+            color: var(--solar-orange);
+        }
+
+        .auth-header p {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-top: 6px;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .input-icon-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon-wrap>svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--gray-400);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .input-icon-wrap .form-input {
+            width: 100%;
+            padding-left: 42px;
+            padding-right: 44px;
+            height: 48px;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--gray-400);
+            padding: 6px;
+            border-radius: var(--radius-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.15s ease;
+        }
+
+        .password-toggle-btn svg {
+            position: static;
+            transform: none;
+            width: 20px;
+            height: 20px;
+            color: currentColor;
+            pointer-events: none;
+        }
+
+        .password-toggle-btn:hover {
+            color: var(--navy);
+        }
+
+        .password-toggle-btn:focus-visible {
+            outline: 2px solid var(--solar-orange);
+            outline-offset: 1px;
+        }
+
+        .auth-options {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .auth-options a {
+            color: var(--solar-orange-dark);
+            font-weight: 600;
+        }
+
+        .auth-options a:hover {
+            text-decoration: underline;
+        }
+
+        .auth-btn {
+            width: 100%;
+            height: 48px;
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .quick-demo-btn {
+            width: 100%;
+            margin-top: 10px;
+            height: 42px;
+            font-size: 13.5px;
+            font-weight: 600;
+        }
+
+        .auth-footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 13.5px;
+            color: var(--gray-500);
+        }
+
+        .auth-footer a {
+            color: var(--solar-orange-dark);
+            font-weight: 700;
+        }
+
+        .demo-credentials-box {
+            margin-top: 20px;
+            padding: 12px 14px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            color: var(--gray-600);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .demo-credentials-box strong {
+            color: var(--navy);
+        }
+
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 28px 20px;
+                border-radius: var(--radius-lg);
+            }
+
+            .auth-header h1 {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .auth-page {
+                padding: 16px 10px;
+            }
+
+            .auth-card {
+                padding: 22px 14px;
+            }
+
+            .auth-header h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="auth-page">
+        <section class="auth-card" aria-labelledby="loginHeading">
+            <a href="login.html" class="auth-logo">
+                <img src="assets/images/hello_solar.png" alt="Hello Solar">
+            </a>
+
+            <header class="auth-header">
+                <!-- <p class="eyebrow">Customer Portal</p> -->
+                <h1 id="loginHeading">Welcome <span>back.</span></h1>
+                <p>Log in to access your system dashboard, live production, and billing details.</p>
+            </header>
+
+            <form class="auth-form" id="loginForm" novalidate>
+                <div class="form-group">
+                    <label class="form-label" for="username">Email or Account ID</label>
+                    <div class="input-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <input class="form-input" id="username" name="username" type="text"
+                            placeholder="e.g. juan@hellosolar.ph" autocomplete="username" value="customer@hellosolar.ph"
+                            required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label class="form-label" for="password">Password</label>
+                        <a href="#" id="forgotPasswordLink"
+                            style="font-size: 12.5px; color: var(--solar-orange-dark); font-weight: 600;">Forgot
+                            Password?</a>
+                    </div>
+                    <div class="input-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input class="form-input" id="password" name="password" type="password"
+                            placeholder="Enter password" autocomplete="current-password" value="••••••••" required>
+                        <button type="button" class="password-toggle-btn" id="passwordToggle"
+                            aria-label="Toggle password visibility">
+                            <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary auth-btn" id="loginBtn">
+                    <span id="loginBtnText">Log In</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14"></path>
+                        <path d="m12 5 7 7-7 7"></path>
+                    </svg>
+                </button>
+
+                <button type="button" class="btn btn-outline quick-demo-btn" id="quickDemoBtn">
+                    One-Click Demo Customer Access
+                </button>
+            </form>
+
+            <div class="demo-credentials-box">
+                <div><strong>Demo Mode:</strong> Pre-filled with demo account.</div>
+                <div>Account: <code>customer@hellosolar.ph</code> · Any password</div>
+            </div>
+
+            <p class="auth-footer">
+                Don't have an account yet?
+                <a href="signup.html">Sign up</a>
+            </p>
+        </section>
+    </main>
+
+    <!-- Core Portal JavaScript -->
+    <script src="assets/js/portal.js"></script>
+
+    <script>
+        const loginForm = document.getElementById("loginForm");
+        const loginBtn = document.getElementById("loginBtn");
+        const loginBtnText = document.getElementById("loginBtnText");
+        const quickDemoBtn = document.getElementById("quickDemoBtn");
+        const passwordInput = document.getElementById("password");
+        const passwordToggle = document.getElementById("passwordToggle");
+        const usernameInput = document.getElementById("username");
+        const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+
+        // Toggle password visibility
+        passwordToggle.addEventListener("click", (e) => {
+            e.preventDefault();
+            const isPassword = passwordInput.type === "password";
+            passwordInput.type = isPassword ? "text" : "password";
+            passwordToggle.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
+            passwordToggle.setAttribute("aria-pressed", isPassword ? "true" : "false");
+
+            const eyeIcon = document.getElementById("eyeIcon");
+            if (eyeIcon) {
+                if (isPassword) {
+                    // Password revealed -> show eye-off (slashed eye)
+                    eyeIcon.innerHTML = `
+                        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+                        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
+                        <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/>
+                        <line x1="2" y1="2" x2="22" y2="22"/>
+                    `;
+                } else {
+                    // Password hidden -> show regular open eye
+                    eyeIcon.innerHTML = `
+                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    `;
+                }
+            }
+        });
+
+        forgotPasswordLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.HelloSolar.toast("Password Reset Demo", "A reset link simulation has been sent to your registered email address.");
+        });
+
+        function performLogin(customerName = null) {
+            loginBtn.disabled = true;
+            loginBtnText.textContent = "Authenticating...";
+
+            setTimeout(() => {
+                localStorage.setItem("hello_solar_logged_in", "true");
+
+                if (customerName) {
+                    localStorage.setItem("hello_solar_user", customerName);
+                } else {
+                    const rawUser = usernameInput.value.trim();
+                    if (rawUser && !rawUser.includes("@")) {
+                        localStorage.setItem("hello_solar_user", rawUser);
+                    } else if (!localStorage.getItem("hello_solar_user")) {
+                        localStorage.setItem("hello_solar_user", "Juan Dela Cruz");
+                    }
+                }
+
+                loginBtnText.textContent = "Access Granted ✓";
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 300);
+            }, 600);
+        }
+
+        loginForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            performLogin();
+        });
+
+        quickDemoBtn.addEventListener("click", () => {
+            usernameInput.value = "Juan Dela Cruz";
+            performLogin("Juan Dela Cruz");
+        });
+    </script>
+</body>
+
+</html>
