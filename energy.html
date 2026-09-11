@@ -4,13 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Hello Solar — Energy performance, generation trends, bill savings, and battery backup status.">
+    <meta name="description"
+        content="Hello Solar — Energy performance, generation trends, bill savings, and battery backup status.">
     <title>Hello Solar — Energy</title>
+
+    <!-- Immediate Authentication Guard -->
+    <script>
+        if (localStorage.getItem("hello_solar_logged_in") !== "true") {
+            window.location.replace("login.html");
+        }
+    </script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Favicon / Tab Icon -->
+    <link rel="icon" type="image/png" href="assets/images/logofortab.png">
 
     <!-- Design System CSS -->
     <link rel="stylesheet" href="assets/css/portal.css">
@@ -211,60 +223,56 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="assets/css/notifications.css">
 </head>
 
 <body>
     <div class="app">
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
-            <a href="dashboard.html" class="logo">
+            <a href="mysystem.html" class="logo">
                 <img src="assets/images/hello_solar.png" alt="Hello Solar">
             </a>
 
             <div class="nav-label">Customer Portal</div>
 
             <nav class="nav" aria-label="Portal navigation">
-                <a href="dashboard.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
-                        <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-                    </svg>
-                    Dashboard
-                </a>
-
-                <a href="my-system.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <a href="mysystem.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <circle cx="12" cy="12" r="4" />
-                        <path d="M12 2v2" /><path d="M12 20v2" />
-                        <path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" />
-                        <path d="M2 12h2" /><path d="M20 12h2" />
+                        <path d="M12 2v2" />
+                        <path d="M12 20v2" />
+                        <path d="m4.93 4.93 1.41 1.41" />
+                        <path d="m17.66 17.66 1.41 1.41" />
+                        <path d="M2 12h2" />
+                        <path d="M20 12h2" />
                     </svg>
                     My System
                 </a>
 
                 <a href="energy.html" class="nav-link active" aria-current="page">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
                     </svg>
                     Energy
                 </a>
 
                 <a href="payments.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /><path d="M6 15h4" />
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <path d="M2 10h20" />
+                        <path d="M6 15h4" />
                     </svg>
                     My Payments
                 </a>
 
-                <a href="install-status.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="18" height="18" rx="2" /><path d="m8 12 2.5 2.5L16 9" />
-                    </svg>
-                    Install Status
-                </a>
 
                 <a href="support.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <path d="M3 11a9 9 0 0 1 18 0" />
                         <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
                         <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
@@ -286,9 +294,11 @@
                 <div class="sidebar-divider"></div>
 
                 <button class="logout-button" id="logoutButton" type="button">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
                     </svg>
                     Logout
                 </button>
@@ -303,19 +313,19 @@
             <!-- TOPBAR -->
             <header class="topbar">
                 <div class="mobile-header">
-                    <button class="mobile-menu-button" id="mobileMenuButton" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
-                        <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                            <line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="18" x2="20" y2="18" />
-                        </svg>
-                    </button>
-                    <a href="dashboard.html" class="mobile-logo">
+                    <a href="mysystem.html" class="mobile-logo">
                         <img src="assets/images/hello_solar.png" alt="Hello Solar">
                     </a>
                 </div>
 
                 <div class="topbar-right">
                     <a href="support.html" class="quick-support-link">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 11a9 9 0 0 1 18 0"/><path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2"/><path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2"/><path d="M17 17c0 2-2 3-5 3"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M3 11a9 9 0 0 1 18 0" />
+                            <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                            <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                            <path d="M17 17c0 2-2 3-5 3" />
+                        </svg>
                         Need Help?
                     </a>
 
@@ -338,15 +348,21 @@
                         <p>Detailed solar production records, utility bill savings, and battery reserve telemetry.</p>
                     </div>
                     <div class="cta-group">
-                        <button type="button" class="btn btn-primary" onclick="alert('Exporting your solar generation and consumption history (CSV)...');">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                        <div class="package-selector-slot" id="pagePackageSelector"></div>
+                        <button type="button" class="btn btn-primary" id="exportEnergyBtn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
                             </svg>
                             Export Energy Data
                         </button>
                         <a href="payments.html" class="btn btn-secondary">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="5" width="20" height="14" rx="2" />
+                                <line x1="2" y1="10" x2="22" y2="10" />
                             </svg>
                             View Savings
                         </a>
@@ -359,56 +375,63 @@
                         <div class="summary-top">
                             <span class="summary-label">Energy Generated</span>
                             <div class="summary-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round">
                                     <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
                                 </svg>
                             </div>
                         </div>
-                        <div class="summary-value">7.1 kWh</div>
-                        <div class="summary-meta">Generated today so far</div>
+                        <div class="summary-value" id="energyGeneratedVal">7.1 kWh</div>
+                        <div class="summary-meta" id="energyGeneratedMeta">Generated today so far</div>
                     </article>
 
                     <article class="summary-card">
                         <div class="summary-top">
                             <span class="summary-label">Bill Saved</span>
                             <div class="summary-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round">
                                     <rect x="2" y="5" width="20" height="14" rx="2" />
                                     <path d="M2 10h20" />
-                                    <path d="M12 13v4" /><path d="M10 15h4" />
+                                    <path d="M12 13v4" />
+                                    <path d="M10 15h4" />
                                 </svg>
                             </div>
                         </div>
-                        <div class="summary-value">₱1,180</div>
-                        <div class="summary-meta">Estimated monthly reduction</div>
+                        <div class="summary-value" id="billSavedVal">₱3,650</div>
+                        <div class="summary-meta" id="billSavedMeta">Estimated monthly reduction</div>
                     </article>
 
                     <article class="summary-card">
                         <div class="summary-top">
                             <span class="summary-label">Battery Reserve</span>
                             <div class="summary-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round">
                                     <rect x="3" y="7" width="17" height="10" rx="2" />
-                                    <path d="M20 10h2v4h-2" /><path d="M7 10v4" /><path d="M10 10v4" />
+                                    <path d="M20 10h2v4h-2" />
+                                    <path d="M7 10v4" />
+                                    <path d="M10 10v4" />
                                 </svg>
                             </div>
                         </div>
-                        <div class="summary-value">10 kWh</div>
-                        <div class="summary-meta">96% State of Charge (Ready)</div>
+                        <div class="summary-value" id="batteryReserveVal">10 kWh</div>
+                        <div class="summary-meta" id="batteryReserveMeta">92% State of Charge (Ready)</div>
                     </article>
 
                     <article class="summary-card">
                         <div class="summary-top">
                             <span class="summary-label">Brownout Backup</span>
                             <div class="summary-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="10" />
                                     <polyline points="12 6 12 12 16 14" />
                                 </svg>
                             </div>
                         </div>
-                        <div class="summary-value">18 hrs</div>
-                        <div class="summary-meta">Estimated critical circuits</div>
+                        <div class="summary-value" id="brownoutBackupVal">18 hrs</div>
+                        <div class="summary-meta" id="brownoutBackupMeta">Estimated critical circuits</div>
                     </article>
                 </section>
 
@@ -419,22 +442,24 @@
                         <div class="panel-header">
                             <div>
                                 <h2 class="panel-title">Production History</h2>
-                                <p class="panel-subtitle">Interactive generation curve (kWh output)</p>
+                                <p class="panel-subtitle" id="chartSubtitle">Interactive generation curve (kWh output)
+                                </p>
                             </div>
 
-                            <div class="chart-tabs" role="tablist">
+                            <div class="chart-tabs" id="chartTabsList" role="tablist">
                                 <button class="chart-tab" type="button" data-period="today">Today</button>
                                 <button class="chart-tab active" type="button" data-period="week">Last 7 Days</button>
                                 <button class="chart-tab" type="button" data-period="month">Monthly</button>
                             </div>
                         </div>
 
-                        <div class="chart-area">
-                            <svg class="chart-svg" id="energyChart" viewBox="0 0 700 250" preserveAspectRatio="none" aria-label="Energy production history chart">
+                        <div class="chart-area" id="chartAreaContainer">
+                            <svg class="chart-svg" id="energyChart" viewBox="0 0 700 250" preserveAspectRatio="none"
+                                aria-label="Energy production history chart">
                                 <defs>
                                     <linearGradient id="energyGradient" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stop-color="#ff8a00" stop-opacity="0.75"/>
-                                        <stop offset="100%" stop-color="#ffb300" stop-opacity="0.05"/>
+                                        <stop offset="0%" stop-color="#ff8a00" stop-opacity="0.75" />
+                                        <stop offset="100%" stop-color="#ffb300" stop-opacity="0.05" />
                                     </linearGradient>
                                 </defs>
 
@@ -444,10 +469,10 @@
                                 <line class="chart-grid-line" x1="45" y1="180" x2="680" y2="180" />
                                 <line class="chart-grid-line" x1="45" y1="220" x2="680" y2="220" />
 
-                                <text class="chart-label" x="7" y="34">8 kWh</text>
-                                <text class="chart-label" x="7" y="84">6 kWh</text>
-                                <text class="chart-label" x="7" y="134">4 kWh</text>
-                                <text class="chart-label" x="7" y="184">2 kWh</text>
+                                <text class="chart-label" id="chartYMax" x="7" y="34">8 kWh</text>
+                                <text class="chart-label" id="chartY75" x="7" y="84">6 kWh</text>
+                                <text class="chart-label" id="chartY50" x="7" y="134">4 kWh</text>
+                                <text class="chart-label" id="chartY25" x="7" y="184">2 kWh</text>
                                 <text class="chart-label" x="10" y="224">0</text>
 
                                 <path id="chartFill" class="chart-area-fill"></path>
@@ -455,11 +480,47 @@
                                 <g id="chartPoints"></g>
                                 <g id="chartLabels"></g>
                             </svg>
+
+                            <!-- Clean Empty State when Package has no readings -->
+                            <div id="chartEmptyState" class="portal-empty-state"
+                                style="display: none; min-height: 200px;">
+                                <div class="portal-empty-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                                    </svg>
+                                </div>
+                                <h3 class="portal-empty-title">No Readings Recorded Yet</h3>
+                                <p class="portal-empty-desc">
+                                    Solar telemetry will begin populating once this installation is fully energized and
+                                    grid synchronization is confirmed.
+                                </p>
+                            </div>
                         </div>
 
-                        <div class="chart-legend">
+                        <div class="chart-legend" id="chartLegend">
                             <span class="legend-dot"></span>
                             Clean solar generation (kWh)
+                        </div>
+
+                        <!-- Accessible Readable Metrics Row (Mobile & Summary) -->
+                        <div class="chart-readable-metrics" id="chartReadableMetrics">
+                            <div class="chart-metric-pill">
+                                <span>Period:</span>
+                                <strong id="chartMetricPeriod">Last 7 Days</strong>
+                            </div>
+                            <div class="chart-metric-pill">
+                                <span>Total:</span>
+                                <strong id="chartMetricTotal">44.6 kWh</strong>
+                            </div>
+                            <div class="chart-metric-pill">
+                                <span>Peak:</span>
+                                <strong id="chartMetricPeak">7.6 kWh (Sat)</strong>
+                            </div>
+                            <div class="chart-metric-pill">
+                                <span>Daily Avg:</span>
+                                <strong id="chartMetricAvg">6.37 kWh/d</strong>
+                            </div>
                         </div>
                     </section>
 
@@ -468,37 +529,39 @@
                         <section class="panel">
                             <div class="panel-header">
                                 <h2 class="panel-title" style="font-size: 16px;">Power Distribution</h2>
-                                <span class="badge badge-online">Live</span>
+                                <span class="badge badge-online" id="breakdownBadge">Live</span>
                             </div>
 
                             <div class="performance-list">
                                 <div class="performance-item">
                                     <div class="performance-row">
                                         <span class="performance-label">Home Direct Consumption</span>
-                                        <span class="performance-value">4.6 kWh (65%)</span>
+                                        <span class="performance-value" id="breakdownSolarVal">64%</span>
                                     </div>
                                     <div class="performance-bar">
-                                        <div class="performance-fill" style="width: 65%;"></div>
+                                        <div class="performance-fill" id="breakdownSolarFill" style="width: 64%;"></div>
                                     </div>
                                 </div>
 
                                 <div class="performance-item">
                                     <div class="performance-row">
                                         <span class="performance-label">Battery Storage Charged</span>
-                                        <span class="performance-value">2.5 kWh (35%)</span>
+                                        <span class="performance-value" id="breakdownBatteryVal">26%</span>
                                     </div>
                                     <div class="performance-bar">
-                                        <div class="performance-fill green" style="width: 35%;"></div>
+                                        <div class="performance-fill green" id="breakdownBatteryFill"
+                                            style="width: 26%;"></div>
                                     </div>
                                 </div>
 
                                 <div class="performance-item">
                                     <div class="performance-row">
                                         <span class="performance-label">Exported to Grid (Net Metering)</span>
-                                        <span class="performance-value">0.8 kWh</span>
+                                        <span class="performance-value" id="breakdownGridVal">10%</span>
                                     </div>
                                     <div class="performance-bar">
-                                        <div class="performance-fill blue" style="width: 18%;"></div>
+                                        <div class="performance-fill blue" id="breakdownGridFill" style="width: 10%;">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -509,16 +572,17 @@
                             <div>
                                 <span class="eyebrow" style="color: #6ee7b7;">Environmental Impact</span>
                                 <h3 style="font-size: 17px; font-weight: 800; margin-top: 4px;">Clean Green Energy</h3>
-                                <p style="font-size: 12.5px; opacity: 0.9; margin-top: 2px;">Your rooftop system directly eliminates fossil fuel greenhouse emissions.</p>
+                                <p style="font-size: 12.5px; opacity: 0.9; margin-top: 2px;">Your rooftop system
+                                    directly eliminates fossil fuel greenhouse emissions.</p>
                             </div>
 
                             <div class="eco-stats">
                                 <div class="eco-stat-box">
-                                    <div class="eco-stat-val">214 kg</div>
+                                    <div class="eco-stat-val" id="ecoCo2Val">312 kg</div>
                                     <div class="eco-stat-desc">CO₂ Emissions Avoided</div>
                                 </div>
                                 <div class="eco-stat-box">
-                                    <div class="eco-stat-val">11 Trees</div>
+                                    <div class="eco-stat-val" id="ecoTreesVal">14 Trees</div>
                                     <div class="eco-stat-desc">Planting Equivalent</div>
                                 </div>
                             </div>
@@ -535,39 +599,47 @@
         </main>
     </div>
 
-    <!-- MOBILE BOTTOM NAVIGATION (ERGONOMIC 5-PILLAR APP NAV) -->
+    <!-- MOBILE BOTTOM NAVIGATION (5-PILLAR CUSTOMER APP NAV) -->
     <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
         <div class="mobile-bottom-nav-inner">
-            <a href="dashboard.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                    <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            <a href="mysystem.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2v2" />
+                    <path d="M12 20v2" />
+                    <path d="m4.93 4.93 1.41 1.41" />
+                    <path d="m17.66 17.66 1.41 1.41" />
+                    <path d="M2 12h2" />
+                    <path d="M20 12h2" />
                 </svg>
-                <span>Home</span>
+                <span>My System</span>
+            </a>
+            <a href="energy.html" class="mobile-nav-item active" aria-current="page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                </svg>
+                <span>Energy</span>
             </a>
             <a href="payments.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                    <path d="M2 10h20" />
+                    <path d="M6 15h4" />
                 </svg>
-                <span>Bills</span>
+                <span>Payments</span>
             </a>
-            <a href="my-system.html" class="mobile-nav-item mobile-nav-fab-wrap" aria-label="My System Live Telemetry">
-                <div class="mobile-nav-fab">
-                    <img src="assets/images/logofortab.png" alt="System" class="mobile-nav-fab-img">
-                </div>
-                <span>System</span>
-            </a>
-            <a href="install-status.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 12 2.5 2.5L16 9"/>
+            <a href="support.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M3 11a9 9 0 0 1 18 0" />
+                    <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                    <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                    <path d="M17 17c0 2-2 3-5 3" />
                 </svg>
-                <span>Status</span>
-            </a>
-            <a href="#" id="bottomNavProfileBtn" class="mobile-nav-item" aria-label="Open Profile & Settings">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                </svg>
-                <span>Profile</span>
+                <span>Support</span>
             </a>
         </div>
     </nav>
@@ -575,87 +647,335 @@
     <!-- Core Portal JavaScript -->
     <script src="assets/js/portal.js"></script>
 
-    <!-- Chart Script -->
+    <!-- Chart & Energy Performance Controller -->
     <script>
-        const energyData = {
-            today: {
-                values: [0, 1.1, 2.4, 4.2, 6.4, 7.2, 6.5, 5.1, 3.3, 1.5, 0.4],
-                labels: ["7 AM", "8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM"]
-            },
-            week: {
-                values: [4.1, 5.8, 6.4, 7.2, 5.9, 7.6, 6.8],
-                labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-            },
-            month: {
-                values: [12, 15, 17, 14, 19, 18, 21, 20, 24, 22, 26, 25],
-                labels: ["1", "4", "7", "10", "13", "16", "19", "22", "25", "28", "30", "31"]
+        (function () {
+            "use strict";
+
+            const chartLine = document.getElementById("chartLine");
+            const chartFill = document.getElementById("chartFill");
+            const chartPoints = document.getElementById("chartPoints");
+            const chartLabels = document.getElementById("chartLabels");
+            const chartSvg = document.getElementById("energyChart");
+            const chartEmptyState = document.getElementById("chartEmptyState");
+            const chartLegend = document.getElementById("chartLegend");
+            const chartSubtitle = document.getElementById("chartSubtitle");
+
+            const chartYMax = document.getElementById("chartYMax");
+            const chartY75 = document.getElementById("chartY75");
+            const chartY50 = document.getElementById("chartY50");
+            const chartY25 = document.getElementById("chartY25");
+
+            const energyGeneratedVal = document.getElementById("energyGeneratedVal");
+            const energyGeneratedMeta = document.getElementById("energyGeneratedMeta");
+            const billSavedVal = document.getElementById("billSavedVal");
+            const billSavedMeta = document.getElementById("billSavedMeta");
+            const batteryReserveVal = document.getElementById("batteryReserveVal");
+            const batteryReserveMeta = document.getElementById("batteryReserveMeta");
+            const brownoutBackupVal = document.getElementById("brownoutBackupVal");
+            const brownoutBackupMeta = document.getElementById("brownoutBackupMeta");
+
+            const breakdownSolarVal = document.getElementById("breakdownSolarVal");
+            const breakdownSolarFill = document.getElementById("breakdownSolarFill");
+            const breakdownBatteryVal = document.getElementById("breakdownBatteryVal");
+            const breakdownBatteryFill = document.getElementById("breakdownBatteryFill");
+            const breakdownGridVal = document.getElementById("breakdownGridVal");
+            const breakdownGridFill = document.getElementById("breakdownGridFill");
+            const breakdownBadge = document.getElementById("breakdownBadge");
+
+            const ecoCo2Val = document.getElementById("ecoCo2Val");
+            const ecoTreesVal = document.getElementById("ecoTreesVal");
+            const exportEnergyBtn = document.getElementById("exportEnergyBtn");
+
+            const chartMetricPeriod = document.getElementById("chartMetricPeriod");
+            const chartMetricTotal = document.getElementById("chartMetricTotal");
+            const chartMetricPeak = document.getElementById("chartMetricPeak");
+            const chartMetricAvg = document.getElementById("chartMetricAvg");
+
+            let currentPackage = null;
+            let currentPeriod = "week";
+            let renderGenerationToken = 0;
+
+            function updateReadableMetrics(period, data) {
+                if (!chartMetricPeriod || !chartMetricTotal || !chartMetricPeak || !chartMetricAvg) return;
+
+                if (!data || !data.values || data.values.length === 0) {
+                    chartMetricPeriod.textContent = period === "today" ? "Today" : (period === "month" ? "Last 30 Days" : "Last 7 Days");
+                    chartMetricTotal.textContent = "No data";
+                    chartMetricPeak.textContent = "N/A";
+                    chartMetricAvg.textContent = "N/A";
+                    return;
+                }
+
+                const periodLabel = period === "today" ? "Today (Hourly)" : (period === "month" ? "Last 30 Days" : "Last 7 Days");
+                const total = data.values.reduce((sum, v) => sum + (Number(v) || 0), 0);
+                let peakVal = -1;
+                let peakLabel = "";
+
+                data.values.forEach((v, idx) => {
+                    if (v > peakVal) {
+                        peakVal = v;
+                        peakLabel = data.labels[idx] || "";
+                    }
+                });
+
+                const unit = period === "today" ? "kW" : "kWh";
+                const avg = data.values.length > 0 ? (total / data.values.length) : 0;
+
+                chartMetricPeriod.textContent = periodLabel;
+                chartMetricTotal.textContent = `${total.toFixed(1)} kWh`;
+                chartMetricPeak.textContent = peakVal >= 0 ? `${peakVal} ${unit}${peakLabel ? ` (${peakLabel})` : ""}` : "N/A";
+                chartMetricAvg.textContent = period === "today" ? `${avg.toFixed(2)} kW avg` : `${avg.toFixed(2)} kWh/d`;
             }
-        };
 
-        const chartLine = document.getElementById("chartLine");
-        const chartFill = document.getElementById("chartFill");
-        const chartPoints = document.getElementById("chartPoints");
-        const chartLabels = document.getElementById("chartLabels");
+            function drawChart(period) {
+                if (!currentPackage || !currentPackage.energy || !currentPackage.energy.hasReadings || !currentPackage.energy.chart) {
+                    if (chartSvg) chartSvg.style.display = "none";
+                    if (chartLegend) chartLegend.style.display = "none";
+                    if (chartEmptyState) chartEmptyState.style.display = "flex";
+                    updateReadableMetrics(period, null);
+                    return;
+                }
 
-        function drawChart(period) {
-            const data = energyData[period];
-            if (!data) return;
+                const data = currentPackage.energy.chart[period];
+                if (!data) {
+                    updateReadableMetrics(period, null);
+                    return;
+                }
 
-            const values = data.values;
-            const labels = data.labels;
-            const chartLeft = 45;
-            const chartRight = 680;
-            const chartTop = 30;
-            const chartBottom = 220;
-            const width = chartRight - chartLeft;
-            const height = chartBottom - chartTop;
-            const maxValue = Math.max(...values);
-            const safeMax = maxValue === 0 ? 1 : maxValue * 1.15;
+                if (chartSvg) chartSvg.style.display = "block";
+                if (chartLegend) chartLegend.style.display = "flex";
+                if (chartEmptyState) chartEmptyState.style.display = "none";
 
-            const points = values.map((value, index) => {
-                const x = chartLeft + (index / Math.max(values.length - 1, 1)) * width;
-                const y = chartBottom - (value / safeMax) * height;
-                return { x, y, value };
+                updateReadableMetrics(period, data);
+
+                const values = data.values;
+                const labels = data.labels;
+                const chartLeft = 45;
+                const chartRight = 680;
+                const chartTop = 30;
+                const chartBottom = 220;
+                const width = chartRight - chartLeft;
+                const height = chartBottom - chartTop;
+                const maxValue = Math.max(...values);
+                const safeMax = maxValue <= 0 ? 1 : maxValue * 1.15;
+
+                // Update Y Axis labels
+                if (chartYMax) chartYMax.textContent = `${Math.round(safeMax)} kWh`;
+                if (chartY75) chartY75.textContent = `${Math.round(safeMax * 0.75)} kWh`;
+                if (chartY50) chartY50.textContent = `${Math.round(safeMax * 0.5)} kWh`;
+                if (chartY25) chartY25.textContent = `${Math.round(safeMax * 0.25)} kWh`;
+
+                const points = values.map((value, index) => {
+                    const x = chartLeft + (index / Math.max(values.length - 1, 1)) * width;
+                    const y = chartBottom - (value / safeMax) * height;
+                    return { x, y, value };
+                });
+
+                const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+                const fillPath = `${linePath} L ${points[points.length - 1].x} ${chartBottom} L ${points[0].x} ${chartBottom} Z`;
+
+                if (chartLine) chartLine.setAttribute("d", linePath);
+                if (chartFill) chartFill.setAttribute("d", fillPath);
+                if (chartPoints) chartPoints.innerHTML = "";
+                if (chartLabels) chartLabels.innerHTML = "";
+
+                points.forEach((point, index) => {
+                    if (chartPoints) {
+                        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                        circle.setAttribute("cx", point.x);
+                        circle.setAttribute("cy", point.y);
+                        circle.setAttribute("r", "4");
+                        circle.setAttribute("class", "chart-point");
+                        circle.setAttribute("tabindex", "0");
+                        circle.setAttribute("role", "graphics-symbol");
+                        circle.setAttribute("aria-label", `${labels[index]}: ${point.value} kWh`);
+                        chartPoints.appendChild(circle);
+                    }
+
+                    if (chartLabels) {
+                        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                        text.setAttribute("x", point.x);
+                        text.setAttribute("y", "242");
+                        text.setAttribute("text-anchor", "middle");
+                        text.setAttribute("class", "chart-label");
+                        text.textContent = labels[index];
+                        chartLabels.appendChild(text);
+                    }
+                });
+            }
+
+            function renderEnergyPage(pkg) {
+                if (!pkg) return;
+                renderGenerationToken++;
+                const thisToken = renderGenerationToken;
+
+                currentPackage = pkg;
+
+                // 1. Reset & Update 4 Summary Cards
+                if (pkg.energy && pkg.energy.hasReadings) {
+                    if (energyGeneratedVal) energyGeneratedVal.textContent = pkg.energy.todayGenerated || "0 kWh";
+                    if (energyGeneratedMeta) energyGeneratedMeta.textContent = "Generated today so far";
+
+                    if (billSavedVal) billSavedVal.textContent = pkg.energy.billSaved || "₱0";
+                    if (billSavedMeta) billSavedMeta.textContent = `Estimated ${pkg.energy.savingsPeriod ? pkg.energy.savingsPeriod.toLowerCase() : "monthly"} reduction`;
+
+                    if (pkg.hasBattery === false) {
+                        if (batteryReserveVal) batteryReserveVal.textContent = "Battery not included";
+                        if (batteryReserveMeta) batteryReserveMeta.textContent = "Grid-tied direct solar system";
+
+                        if (brownoutBackupVal) brownoutBackupVal.textContent = "Not supported";
+                        if (brownoutBackupMeta) brownoutBackupMeta.textContent = "Requires battery storage unit";
+                    } else {
+                        if (batteryReserveVal) batteryReserveVal.textContent = pkg.energy.batteryReserve || "0 kWh";
+                        if (batteryReserveMeta) batteryReserveMeta.textContent = `${pkg.energy.batterySoc || 0}% State of Charge (Ready)`;
+
+                        if (brownoutBackupVal) brownoutBackupVal.textContent = pkg.energy.backupHours || "0 hrs";
+                        if (brownoutBackupMeta) brownoutBackupMeta.textContent = "Estimated critical circuits";
+                    }
+                } else {
+                    // Distinguish missing data from zero
+                    if (energyGeneratedVal) energyGeneratedVal.textContent = "No readings";
+                    if (energyGeneratedMeta) energyGeneratedMeta.textContent = "Pending system telemetry";
+
+                    if (billSavedVal) billSavedVal.textContent = "No data yet";
+                    if (billSavedMeta) billSavedMeta.textContent = "Awaiting first generation cycle";
+
+                    if (pkg.hasBattery === false) {
+                        if (batteryReserveVal) batteryReserveVal.textContent = "Battery not included";
+                        if (batteryReserveMeta) batteryReserveMeta.textContent = "Grid-tied commercial system";
+
+                        if (brownoutBackupVal) brownoutBackupVal.textContent = "Not supported";
+                        if (brownoutBackupMeta) brownoutBackupMeta.textContent = "Direct grid-tied inverter";
+                    } else {
+                        if (batteryReserveVal) batteryReserveVal.textContent = "Unavailable";
+                        if (batteryReserveMeta) batteryReserveMeta.textContent = "Storage telemetry offline";
+
+                        if (brownoutBackupVal) brownoutBackupVal.textContent = "Unavailable";
+                        if (brownoutBackupMeta) brownoutBackupMeta.textContent = "Pending battery test";
+                    }
+                }
+
+                // 2. Update Subtitle
+                if (chartSubtitle) {
+                    chartSubtitle.textContent = (pkg.energy && pkg.energy.hasReadings)
+                        ? `Interactive generation curve for ${pkg.name} (${pkg.capacity})`
+                        : `No monitoring readings recorded yet for ${pkg.name}`;
+                }
+
+                // 3. Render Chart
+                if (thisToken === renderGenerationToken) {
+                    drawChart(currentPeriod);
+                }
+
+                // 4. Update Power Distribution
+                if (pkg.energy && pkg.energy.breakdown) {
+                    if (breakdownSolarVal) breakdownSolarVal.textContent = pkg.energy.breakdown.solarDirect;
+                    if (breakdownSolarFill) breakdownSolarFill.style.width = pkg.energy.breakdown.solarDirect;
+
+                    if (pkg.hasBattery === false) {
+                        if (breakdownBatteryVal) breakdownBatteryVal.textContent = "N/A (No battery)";
+                        if (breakdownBatteryFill) breakdownBatteryFill.style.width = "0%";
+                    } else {
+                        if (breakdownBatteryVal) breakdownBatteryVal.textContent = pkg.energy.breakdown.batteryStorage;
+                        if (breakdownBatteryFill) breakdownBatteryFill.style.width = pkg.energy.breakdown.batteryStorage;
+                    }
+
+                    if (breakdownGridVal) breakdownGridVal.textContent = pkg.energy.breakdown.gridExport;
+                    if (breakdownGridFill) breakdownGridFill.style.width = pkg.energy.breakdown.gridExport;
+
+                    if (breakdownBadge) {
+                        breakdownBadge.className = "badge badge-online";
+                        breakdownBadge.textContent = "Live";
+                    }
+                } else {
+                    if (breakdownSolarVal) breakdownSolarVal.textContent = "No data yet";
+                    if (breakdownSolarFill) breakdownSolarFill.style.width = "0%";
+
+                    if (breakdownBatteryVal) breakdownBatteryVal.textContent = pkg.hasBattery === false ? "N/A (No battery)" : "No data yet";
+                    if (breakdownBatteryFill) breakdownBatteryFill.style.width = "0%";
+
+                    if (breakdownGridVal) breakdownGridVal.textContent = "No data yet";
+                    if (breakdownGridFill) breakdownGridFill.style.width = "0%";
+
+                    if (breakdownBadge) {
+                        breakdownBadge.className = "badge badge-neutral";
+                        breakdownBadge.textContent = "Standby";
+                    }
+                }
+
+                // 5. Update Eco Impact
+                if (pkg.energy && pkg.energy.ecoImpact) {
+                    if (ecoCo2Val) ecoCo2Val.textContent = `${pkg.energy.ecoImpact.co2Kg} kg`;
+                    if (ecoTreesVal) ecoTreesVal.textContent = `${pkg.energy.ecoImpact.trees} Trees`;
+                } else {
+                    if (ecoCo2Val) ecoCo2Val.textContent = "Pending";
+                    if (ecoTreesVal) ecoTreesVal.textContent = "Pending";
+                }
+            }
+
+            // Export CTA Handler
+            if (exportEnergyBtn) {
+                exportEnergyBtn.addEventListener("click", () => {
+                    const pkg = currentPackage || (window.HelloSolar && window.HelloSolar.getActivePackage());
+                    if (!pkg) return;
+
+                    if (pkg.energy && pkg.energy.hasReadings) {
+                        if (window.HelloSolar && window.HelloSolar.toast) {
+                            window.HelloSolar.toast(
+                                "Energy Report Exported",
+                                `CSV statement generated for ${pkg.name} (${pkg.accountNo || pkg.capacity}).`
+                            );
+                        } else {
+                            alert(`Exporting solar generation and consumption history for ${pkg.name} (${pkg.accountNo})...`);
+                        }
+                    } else {
+                        if (window.HelloSolar && window.HelloSolar.toast) {
+                            window.HelloSolar.toast(
+                                "No Records to Export",
+                                `No solar generation readings exist yet for ${pkg.name} (${pkg.accountNo || pkg.id}).`
+                            );
+                        } else {
+                            alert(`No energy readings recorded yet for ${pkg.name}.`);
+                        }
+                    }
+                });
+            }
+
+            // Chart Period Tab Buttons
+            const chartTabs = document.querySelectorAll(".chart-tab");
+            chartTabs.forEach(tab => {
+                tab.addEventListener("click", () => {
+                    chartTabs.forEach(t => t.classList.remove("active"));
+                    tab.classList.add("active");
+                    currentPeriod = tab.dataset.period || "week";
+                    drawChart(currentPeriod);
+                });
             });
 
-            const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
-            const fillPath = `${linePath} L ${points[points.length - 1].x} ${chartBottom} L ${points[0].x} ${chartBottom} Z`;
+            // Initial Render
+            const initialPkg = (window.HelloSolar && window.HelloSolar.getActivePackage)
+                ? window.HelloSolar.getActivePackage()
+                : null;
+            if (initialPkg) renderEnergyPage(initialPkg);
 
-            chartLine.setAttribute("d", linePath);
-            chartFill.setAttribute("d", fillPath);
-            chartPoints.innerHTML = "";
-            chartLabels.innerHTML = "";
-
-            points.forEach((point, index) => {
-                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circle.setAttribute("cx", point.x);
-                circle.setAttribute("cy", point.y);
-                circle.setAttribute("r", "4");
-                circle.setAttribute("class", "chart-point");
-                chartPoints.appendChild(circle);
-
-                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                text.setAttribute("x", point.x);
-                text.setAttribute("y", "242");
-                text.setAttribute("text-anchor", "middle");
-                text.setAttribute("class", "chart-label");
-                text.textContent = labels[index];
-                chartLabels.appendChild(text);
+            // Listen for package changes from other tabs / sources
+            window.addEventListener("helloSolarPackageChanged", (e) => {
+                if (e.detail && e.detail.package) {
+                    renderEnergyPage(e.detail.package);
+                }
             });
-        }
 
-        // Initialize with 7-day period
-        drawChart("week");
-
-        const chartTabs = document.querySelectorAll(".chart-tab");
-        chartTabs.forEach(tab => {
-            tab.addEventListener("click", () => {
-                chartTabs.forEach(t => t.classList.remove("active"));
-                tab.classList.add("active");
-                drawChart(tab.dataset.period);
+            // Listen for dataset async load completion
+            window.addEventListener("helloSolarDataLoaded", () => {
+                const active = window.HelloSolar ? window.HelloSolar.getActivePackage() : null;
+                if (active) {
+                    renderEnergyPage(active);
+                }
             });
-        });
+        })();
     </script>
+    <script src="assets/js/notifications.js"></script>
 </body>
 
 </html>

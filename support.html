@@ -4,13 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Hello Solar — Submit customer support requests, report inverter issues, and access installer dispatch.">
+    <meta name="description"
+        content="Hello Solar — Submit customer support requests, report inverter issues, and access installer dispatch.">
     <title>Hello Solar — Support</title>
+
+    <!-- Immediate Authentication Guard -->
+    <script>
+        if (localStorage.getItem("hello_solar_logged_in") !== "true") {
+            window.location.replace("login.html");
+        }
+    </script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Favicon / Tab Icon -->
+    <link rel="icon" type="image/png" href="assets/images/logofortab.png">
 
     <!-- Design System CSS -->
     <link rel="stylesheet" href="assets/css/portal.css">
@@ -211,6 +223,7 @@
             .support-layout {
                 grid-template-columns: 1fr;
             }
+
             .form-row {
                 grid-template-columns: 1fr;
             }
@@ -223,60 +236,56 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="assets/css/notifications.css">
 </head>
 
 <body>
     <div class="app">
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
-            <a href="dashboard.html" class="logo">
+            <a href="mysystem.html" class="logo">
                 <img src="assets/images/hello_solar.png" alt="Hello Solar">
             </a>
 
             <div class="nav-label">Customer Portal</div>
 
             <nav class="nav" aria-label="Portal navigation">
-                <a href="dashboard.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
-                        <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-                    </svg>
-                    Dashboard
-                </a>
-
-                <a href="my-system.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <a href="mysystem.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <circle cx="12" cy="12" r="4" />
-                        <path d="M12 2v2" /><path d="M12 20v2" />
-                        <path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" />
-                        <path d="M2 12h2" /><path d="M20 12h2" />
+                        <path d="M12 2v2" />
+                        <path d="M12 20v2" />
+                        <path d="m4.93 4.93 1.41 1.41" />
+                        <path d="m17.66 17.66 1.41 1.41" />
+                        <path d="M2 12h2" />
+                        <path d="M20 12h2" />
                     </svg>
                     My System
                 </a>
 
                 <a href="energy.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
                     </svg>
                     Energy
                 </a>
 
                 <a href="payments.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /><path d="M6 15h4" />
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <path d="M2 10h20" />
+                        <path d="M6 15h4" />
                     </svg>
                     My Payments
                 </a>
 
-                <a href="install-status.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="18" height="18" rx="2" /><path d="m8 12 2.5 2.5L16 9" />
-                    </svg>
-                    Install Status
-                </a>
 
                 <a href="support.html" class="nav-link active" aria-current="page">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <path d="M3 11a9 9 0 0 1 18 0" />
                         <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
                         <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
@@ -298,9 +307,11 @@
                 <div class="sidebar-divider"></div>
 
                 <button class="logout-button" id="logoutButton" type="button">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
                     </svg>
                     Logout
                 </button>
@@ -315,19 +326,20 @@
             <!-- TOPBAR -->
             <header class="topbar">
                 <div class="mobile-header">
-                    <button class="mobile-menu-button" id="mobileMenuButton" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
-                        <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                            <line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="18" x2="20" y2="18" />
-                        </svg>
-                    </button>
-                    <a href="dashboard.html" class="mobile-logo">
+                    <a href="mysystem.html" class="mobile-logo">
                         <img src="assets/images/hello_solar.png" alt="Hello Solar">
                     </a>
                 </div>
 
                 <div class="topbar-right">
-                    <a href="support.html" class="quick-support-link active" style="color: var(--solar-orange-dark); font-weight: 700;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 11a9 9 0 0 1 18 0"/><path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2"/><path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2"/><path d="M17 17c0 2-2 3-5 3"/></svg>
+                    <a href="support.html" class="quick-support-link active"
+                        style="color: var(--solar-orange-dark); font-weight: 700;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M3 11a9 9 0 0 1 18 0" />
+                            <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                            <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                            <path d="M17 17c0 2-2 3-5 3" />
+                        </svg>
                         Need Help?
                     </a>
 
@@ -347,21 +359,31 @@
                     <div>
                         <p class="eyebrow">Customer Care</p>
                         <h1>Support <span>Request</span></h1>
-                        <p>Need technical assistance or routine maintenance? Your ticket is auto-routed to your installer.</p>
+                        <p>Need technical assistance or routine maintenance? Your ticket is auto-routed to your
+                            installer.</p>
                     </div>
                     <div class="cta-group">
-                        <a href="tel:09175550101" class="btn btn-primary">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                        <div class="package-selector-slot" id="pagePackageSelector"></div>
+                        <a href="tel:09175550101" class="btn btn-primary" id="supportHotlineBtn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                             </svg>
-                            Hotline (+63 917 555 0101)
+                            <span id="supportHotlineText">Hotline (+63 917 555 0101)</span>
                         </a>
-                        <a href="dashboard.html" class="btn btn-secondary">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                        <a href="mysystem.html" class="btn btn-secondary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="4" />
+                                <path d="M12 2v2" />
+                                <path d="M12 20v2" />
+                                <path d="m4.93 4.93 1.41 1.41" />
+                                <path d="m17.66 17.66 1.41 1.41" />
+                                <path d="M2 12h2" />
+                                <path d="M20 12h2" />
                             </svg>
-                            Dashboard
+                            My System
                         </a>
                     </div>
                 </section>
@@ -370,15 +392,19 @@
                 <div class="routing-banner">
                     <div class="routing-info">
                         <div class="routing-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                stroke-linejoin="round">
                                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                                <circle cx="8.5" cy="7" r="4" /><polyline points="17 11 19 13 23 9" />
+                                <circle cx="8.5" cy="7" r="4" />
+                                <polyline points="17 11 19 13 23 9" />
                             </svg>
                         </div>
                         <div>
                             <div class="routing-text-title">Smart Installer Routing Enabled</div>
-                            <div class="routing-text-sub">
-                                Tickets route straight to <strong>Carlos Villanueva (Assigned Installer · +63 917 555 0101)</strong>. Hello Solar Support HQ is copied on all dispatches.
+                            <div class="routing-text-sub" id="routingBannerSubText">
+                                Tickets route straight to <strong id="routingBannerLeadHighlight">Carlos Villanueva
+                                    (Assigned Installer · +63 917 555 0101)</strong>. Hello Solar Support HQ is copied
+                                on all dispatches.
                             </div>
                         </div>
                     </div>
@@ -389,89 +415,167 @@
 
                 <!-- SUPPORT LAYOUT -->
                 <div class="support-layout">
-                    <!-- Support Form -->
-                    <section class="panel support-card">
-                        <h2>Submit a Service Request</h2>
-                        <p class="subtitle">Please provide details so we can triage and schedule on-site support quickly.</p>
-
-                        <form id="supportTicketForm" novalidate>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label" for="categorySelect">Issue Category</label>
-                                    <select class="form-select" id="categorySelect" required>
-                                        <option value="inverter">Inverter Warning / Fault Code</option>
-                                        <option value="app">Mobile App / Monitoring Gateway</option>
-                                        <option value="battery">Battery Storage / Backup Duration</option>
-                                        <option value="cleaning">Panel Cleaning / Physical Inspection</option>
-                                        <option value="billing">Billing or Net-Metering Question</option>
-                                        <option value="other">Other Inquiries</option>
-                                    </select>
+                    <!-- Left Column: Form & Ticket History -->
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <!-- Support Form -->
+                        <section class="panel support-card">
+                            <div
+                                style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+                                <div>
+                                    <h2 style="margin-bottom: 4px;">Submit a Service Request</h2>
+                                    <p class="subtitle" style="margin-bottom: 0;">Provide details for triage and
+                                        scheduling on-site support.</p>
                                 </div>
-
-                                <div class="form-group">
-                                    <label class="form-label" for="prioritySelect">Urgency Level</label>
-                                    <select class="form-select" id="prioritySelect" required>
-                                        <option value="normal">Normal (Response within 24 hours)</option>
-                                        <option value="urgent">Urgent — Inverter offline / No power</option>
-                                    </select>
+                                <div
+                                    style="display: inline-flex; align-items: center; gap: 8px; background: #fff5e5; border: 1px solid #ffd8a8; padding: 6px 12px; border-radius: var(--radius-sm); font-size: 12.5px;">
+                                    <span style="color: var(--gray-500);">System:</span>
+                                    <strong style="color: var(--navy);" id="ticketTargetPackageLabel">Home — 5.4 kW
+                                        (#HS-88219)</strong>
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-label" for="ticketSubject">Subject Summary</label>
-                                <input class="form-input" id="ticketSubject" type="text" placeholder="e.g. Inverter LED blinking yellow, reading 0W" required>
+                            <form id="supportTicketForm" novalidate>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label" for="categorySelect">Issue Category</label>
+                                        <select class="form-select" id="categorySelect" required>
+                                            <option value="inverter">Inverter Warning / Fault Code</option>
+                                            <option value="app">Mobile App / Monitoring Gateway</option>
+                                            <option value="battery">Battery Storage / Backup Duration</option>
+                                            <option value="cleaning">Panel Cleaning / Physical Inspection</option>
+                                            <option value="billing">Billing or Net-Metering Question</option>
+                                            <option value="other">Other Inquiries</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="prioritySelect">Urgency Level</label>
+                                        <select class="form-select" id="prioritySelect" required>
+                                            <option value="normal">Normal (Response within 24 hours)</option>
+                                            <option value="urgent">Urgent — Inverter offline / No power</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="ticketSubject">Subject Summary</label>
+                                    <input class="form-input" id="ticketSubject" type="text"
+                                        placeholder="e.g. Inverter LED blinking yellow, reading 0W" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="ticketDescription">Detailed Description</label>
+                                    <textarea class="form-textarea" id="ticketDescription"
+                                        placeholder="Describe the symptom, what time it occurred, or any error code displayed on your screen..."
+                                        required></textarea>
+                                </div>
+
+                                <div
+                                    style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; align-items: center;">
+                                    <button type="submit" class="btn btn-primary" id="submitTicketBtn"
+                                        style="padding: 12px 24px;">
+                                        <span id="submitBtnText">Send Service Request</span>
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <line x1="22" y1="2" x2="11" y2="13" />
+                                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="saveDraftBtn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z">
+                                            </path>
+                                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                            <polyline points="7 3 7 8 15 8"></polyline>
+                                        </svg>
+                                        <span>Save Draft</span>
+                                    </button>
+                                    <button type="button" class="btn btn-outline" id="downloadDraftBtn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="7 10 12 15 17 10"></polyline>
+                                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                                        </svg>
+                                        <span>Download Draft</span>
+                                    </button>
+                                </div>
+                                <p
+                                    style="font-size: 11.5px; color: var(--gray-400); margin-top: 10px; line-height: 1.4;">
+                                    Demo Mode: Automatic technician dispatch requires live helpdesk API integration. In
+                                    this environment, requests are logged locally and drafts persist across package
+                                    switches.
+                                </p>
+                            </form>
+
+                            <div class="ticket-success-alert" id="ticketSuccessAlert" role="status">
+                                <div class="ticket-success-title">
+                                    <span>✓</span>
+                                    <span id="ticketNumberDisplay">Ticket #HS-SR-9042 Created</span>
+                                </div>
+                                <p class="ticket-success-msg" id="ticketSuccessMsg">
+                                    Demo Mode: Your request has been logged locally.
+                                </p>
+                            </div>
+                        </section>
+
+                        <!-- System-Specific Ticket History -->
+                        <section class="panel" style="padding: 24px;">
+                            <div class="panel-header"
+                                style="padding: 0 0 16px; border-bottom: 1px solid var(--gray-100); margin-bottom: 16px;">
+                                <div>
+                                    <h3 class="panel-title" style="font-size: 16px;">Ticket History for this System</h3>
+                                    <p class="panel-subtitle" id="ticketHistorySubtitle" style="font-size: 12.5px;">
+                                        Recent maintenance and support records</p>
+                                </div>
+                                <span class="badge badge-neutral" id="ticketCountBadge">2 Tickets</span>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-label" for="ticketDescription">Detailed Description</label>
-                                <textarea class="form-textarea" id="ticketDescription" placeholder="Describe the symptom, what time it occurred, or any error code displayed on your Solis screen..." required></textarea>
+                            <div id="ticketHistoryContainer">
+                                <!-- Populated dynamically via JS -->
                             </div>
-
-                            <button type="submit" class="btn btn-primary" id="submitTicketBtn" style="padding: 12px 24px;">
-                                <span id="submitBtnText">Send Service Request</span>
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
-                                </svg>
-                            </button>
-                        </form>
-
-                        <div class="ticket-success-alert" id="ticketSuccessAlert" role="status">
-                            <div class="ticket-success-title">
-                                <span>✓</span>
-                                <span id="ticketNumberDisplay">Ticket #HS-SR-9042 Created</span>
-                            </div>
-                            <p class="ticket-success-msg" id="ticketSuccessMsg">
-                                Demo Mode: Your request has been logged locally. In production, Carlos Villanueva and Hello Solar support dispatch receive immediate SMS notifications with an estimated on-site arrival within 24 hours.
-                            </p>
-                        </div>
-                    </section>
+                        </section>
+                    </div>
 
                     <!-- Sidebar: FAQs and Hotline -->
                     <div style="display: flex; flex-direction: column; gap: 20px;">
                         <section class="panel panel-body">
-                            <h3 style="font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 12px;">Direct Hello Solar Contacts</h3>
+                            <h3 style="font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 12px;">
+                                Direct Hello Solar Contacts</h3>
                             <div class="contact-channels">
                                 <div class="channel-row">
                                     <div class="channel-icon">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path
+                                                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                                         </svg>
                                     </div>
                                     <div>
                                         <strong style="font-size: 13.5px; color: var(--navy);">Dispatch Hotline</strong>
-                                        <div style="font-size: 12px; color: var(--gray-500);">+63 917 555 0101 (Carlos)</div>
+                                        <div style="font-size: 12px; color: var(--gray-500);" id="sidebarHotlinePhone">
+                                            +63 917 555 0101 (Carlos)</div>
                                     </div>
                                 </div>
 
                                 <div class="channel-row">
                                     <div class="channel-icon">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <rect x="2" y="4" width="20" height="16" rx="2" />
+                                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                                         </svg>
                                     </div>
                                     <div>
                                         <strong style="font-size: 13.5px; color: var(--navy);">Email Support</strong>
-                                        <div style="font-size: 12px; color: var(--gray-500);">support@hellosolarph.com</div>
+                                        <div style="font-size: 12px; color: var(--gray-500);">support@hellosolarph.com
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -479,7 +583,8 @@
 
                         <!-- Common Troubleshooting FAQs -->
                         <section class="panel faq-card">
-                            <h3 style="font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 12px;">Quick Troubleshooting</h3>
+                            <h3 style="font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 12px;">
+                                Quick Troubleshooting</h3>
 
                             <div class="faq-item">
                                 <button type="button" class="faq-question">
@@ -487,7 +592,8 @@
                                     <span class="faq-arrow">▼</span>
                                 </button>
                                 <div class="faq-answer">
-                                    This is completely normal. Solar photovoltaic panels require sunlight to produce electricity. At dusk and nighttime, the Solis inverter enters standby mode.
+                                    This is completely normal. Solar photovoltaic panels require sunlight to produce
+                                    electricity. At dusk and nighttime, the Solis inverter enters standby mode.
                                 </div>
                             </div>
 
@@ -497,7 +603,9 @@
                                     <span class="faq-arrow">▼</span>
                                 </button>
                                 <div class="faq-answer">
-                                    Your 10 kWh lithium-ion battery and Automatic Transfer Switch (ATS) instantly power your dedicated backup circuits within 10 milliseconds without flickering your appliances.
+                                    Your 10 kWh lithium-ion battery and Automatic Transfer Switch (ATS) instantly power
+                                    your dedicated backup circuits within 10 milliseconds without flickering your
+                                    appliances.
                                 </div>
                             </div>
 
@@ -507,7 +615,9 @@
                                     <span class="faq-arrow">▼</span>
                                 </button>
                                 <div class="faq-answer">
-                                    In the Philippines, periodic rainfall washes off light dust. We recommend a professional gentle rinse every 4 to 6 months to maintain peak 21.8% cell efficiency.
+                                    In the Philippines, periodic rainfall washes off light dust. We recommend a
+                                    professional gentle rinse every 4 to 6 months to maintain peak 21.8% cell
+                                    efficiency.
                                 </div>
                             </div>
                         </section>
@@ -523,39 +633,47 @@
         </main>
     </div>
 
-    <!-- MOBILE BOTTOM NAVIGATION (ERGONOMIC 5-PILLAR APP NAV) -->
+    <!-- MOBILE BOTTOM NAVIGATION (5-PILLAR CUSTOMER APP NAV) -->
     <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
         <div class="mobile-bottom-nav-inner">
-            <a href="dashboard.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                    <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            <a href="mysystem.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2v2" />
+                    <path d="M12 20v2" />
+                    <path d="m4.93 4.93 1.41 1.41" />
+                    <path d="m17.66 17.66 1.41 1.41" />
+                    <path d="M2 12h2" />
+                    <path d="M20 12h2" />
                 </svg>
-                <span>Home</span>
+                <span>My System</span>
+            </a>
+            <a href="energy.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                </svg>
+                <span>Energy</span>
             </a>
             <a href="payments.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                    <path d="M2 10h20" />
+                    <path d="M6 15h4" />
                 </svg>
-                <span>Bills</span>
+                <span>Payments</span>
             </a>
-            <a href="my-system.html" class="mobile-nav-item mobile-nav-fab-wrap" aria-label="My System Live Telemetry">
-                <div class="mobile-nav-fab">
-                    <img src="assets/images/logofortab.png" alt="System" class="mobile-nav-fab-img">
-                </div>
-                <span>System</span>
-            </a>
-            <a href="install-status.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 12 2.5 2.5L16 9"/>
+            <a href="support.html" class="mobile-nav-item active" aria-current="page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M3 11a9 9 0 0 1 18 0" />
+                    <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                    <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                    <path d="M17 17c0 2-2 3-5 3" />
                 </svg>
-                <span>Status</span>
-            </a>
-            <a href="#" id="bottomNavProfileBtn" class="mobile-nav-item" aria-label="Open Profile & Settings">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                </svg>
-                <span>Profile</span>
+                <span>Support</span>
             </a>
         </div>
     </nav>
@@ -564,53 +682,347 @@
     <script src="assets/js/portal.js"></script>
 
     <script>
-        const supportTicketForm = document.getElementById("supportTicketForm");
-        const submitTicketBtn = document.getElementById("submitTicketBtn");
-        const submitBtnText = document.getElementById("submitBtnText");
-        const ticketSuccessAlert = document.getElementById("ticketSuccessAlert");
-        const ticketNumberDisplay = document.getElementById("ticketNumberDisplay");
-        const ticketSubject = document.getElementById("ticketSubject");
-        const ticketDescription = document.getElementById("ticketDescription");
+        (function () {
+            "use strict";
 
-        supportTicketForm.addEventListener("submit", (e) => {
-            e.preventDefault();
+            const supportTicketForm = document.getElementById("supportTicketForm");
+            const submitTicketBtn = document.getElementById("submitTicketBtn");
+            const submitBtnText = document.getElementById("submitBtnText");
+            const ticketSuccessAlert = document.getElementById("ticketSuccessAlert");
+            const ticketNumberDisplay = document.getElementById("ticketNumberDisplay");
+            const ticketSuccessMsg = document.getElementById("ticketSuccessMsg");
+            const ticketSubject = document.getElementById("ticketSubject");
+            const ticketDescription = document.getElementById("ticketDescription");
+            const categorySelect = document.getElementById("categorySelect");
+            const prioritySelect = document.getElementById("prioritySelect");
 
-            if (!ticketSubject.value.trim() || !ticketDescription.value.trim()) {
-                window.HelloSolar.toast("Incomplete Form", "Please provide a subject and description of your issue.");
-                return;
+            const ticketTargetPackageLabel = document.getElementById("ticketTargetPackageLabel");
+            const routingBannerSubText = document.getElementById("routingBannerSubText");
+            const supportHotlineBtn = document.getElementById("supportHotlineBtn");
+            const supportHotlineText = document.getElementById("supportHotlineText");
+            const sidebarHotlinePhone = document.getElementById("sidebarHotlinePhone");
+
+            const ticketHistoryContainer = document.getElementById("ticketHistoryContainer");
+            const ticketHistorySubtitle = document.getElementById("ticketHistorySubtitle");
+            const ticketCountBadge = document.getElementById("ticketCountBadge");
+
+            let currentPackage = null;
+            let renderToken = 0;
+            const packageTicketDrafts = {};
+
+            // ----------------------------------------------------------------------
+            // 1. UNFINISHED INPUT / DRAFT PROTECTION
+            // ----------------------------------------------------------------------
+            function saveCurrentDraft() {
+                if (!currentPackage) return;
+                const subj = ticketSubject ? ticketSubject.value.trim() : "";
+                const desc = ticketDescription ? ticketDescription.value.trim() : "";
+                if (subj || desc) {
+                    packageTicketDrafts[currentPackage.id] = {
+                        category: categorySelect ? categorySelect.value : "inverter",
+                        priority: prioritySelect ? prioritySelect.value : "normal",
+                        subject: ticketSubject ? ticketSubject.value : "",
+                        description: ticketDescription ? ticketDescription.value : ""
+                    };
+                } else {
+                    delete packageTicketDrafts[currentPackage.id];
+                }
             }
 
-            submitTicketBtn.disabled = true;
-            submitBtnText.textContent = "Routing to Carlos...";
+            function restoreDraft(pkgId) {
+                const draft = packageTicketDrafts[pkgId];
+                if (draft) {
+                    if (categorySelect) categorySelect.value = draft.category || "inverter";
+                    if (prioritySelect) prioritySelect.value = draft.priority || "normal";
+                    if (ticketSubject) ticketSubject.value = draft.subject || "";
+                    if (ticketDescription) ticketDescription.value = draft.description || "";
+                } else {
+                    if (ticketSubject) ticketSubject.value = "";
+                    if (ticketDescription) ticketDescription.value = "";
+                    if (categorySelect) categorySelect.value = "inverter";
+                    if (prioritySelect) prioritySelect.value = "normal";
+                }
+                if (ticketSuccessAlert) ticketSuccessAlert.classList.remove("visible");
+            }
 
-            setTimeout(() => {
-                const randomId = Math.floor(1000 + Math.random() * 9000);
-                ticketNumberDisplay.textContent = `Ticket #HS-SR-${randomId} Logged`;
-                ticketSuccessAlert.classList.add("visible");
-                submitBtnText.textContent = "Request Dispatched ✓";
+            if (window.HelloSolar && window.HelloSolar.registerDirtyCheck) {
+                window.HelloSolar.registerDirtyCheck(() => {
+                    const subj = ticketSubject ? ticketSubject.value.trim() : "";
+                    const desc = ticketDescription ? ticketDescription.value.trim() : "";
+                    if (subj || desc) {
+                        return "a support ticket for this system is being written";
+                    }
+                    return null;
+                });
+            }
 
-                window.HelloSolar.toast(
-                    "Support Ticket Logged (Demo)",
-                    `Ticket #HS-SR-${randomId} created. In production, an alert is sent directly to Carlos Villanueva.`
-                );
+            // ----------------------------------------------------------------------
+            // 2. RENDER SUPPORT FOR ACTIVE PACKAGE
+            // ----------------------------------------------------------------------
+            function renderSupportPage(pkg) {
+                if (!pkg) return;
+                renderToken++;
+                const thisToken = renderToken;
 
-                supportTicketForm.reset();
+                // Save draft for previous package before switching
+                if (currentPackage && currentPackage.id !== pkg.id) {
+                    saveCurrentDraft();
+                }
 
-                setTimeout(() => {
-                    submitTicketBtn.disabled = false;
-                    submitBtnText.textContent = "Send Service Request";
-                }, 3500);
-            }, 750);
-        });
+                currentPackage = pkg;
 
-        // FAQ Toggle
-        document.querySelectorAll(".faq-question").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const item = btn.closest(".faq-item");
-                item.classList.toggle("open");
+                // Restore draft for new package
+                restoreDraft(pkg.id);
+
+                // 1. Update Target System Label
+                if (ticketTargetPackageLabel) {
+                    ticketTargetPackageLabel.textContent = `${pkg.name} (${pkg.capacity}) · #${pkg.accountNo}`;
+                }
+
+                // 2. Update Lead Technician Information & Routing Banner
+                const supp = pkg.support || {
+                    leadTechnician: "Hello Solar Dispatch",
+                    leadPhone: "+63 2 8888 0100",
+                    leadContact: "+63 2 8888 0100 (Dispatch)",
+                    tickets: []
+                };
+
+                const techName = supp.leadTechnician || "Hello Solar Dispatch";
+                const techPhone = supp.leadPhone || "+63 2 8888 0100";
+                const techContact = supp.leadContact || techPhone;
+
+                if (routingBannerSubText) {
+                    routingBannerSubText.innerHTML = `Tickets route straight to <strong>${techContact}</strong>. Hello Solar Support HQ is copied on all dispatches.`;
+                }
+
+                // 3. Update Hotline Call CTA
+                if (supportHotlineBtn) {
+                    supportHotlineBtn.href = `tel:${techPhone.replace(/[^0-9+]/g, '')}`;
+                }
+                if (supportHotlineText) {
+                    supportHotlineText.textContent = `Hotline (${techPhone})`;
+                }
+
+                // 4. Update Sidebar Hotline
+                if (sidebarHotlinePhone) {
+                    sidebarHotlinePhone.textContent = `${techPhone} (${techName.split(' ')[0]})`;
+                }
+
+                // 5. Render Ticket History
+                if (ticketHistoryContainer) {
+                    ticketHistoryContainer.innerHTML = "";
+                    const tickets = supp.tickets || [];
+
+                    if (ticketCountBadge) {
+                        ticketCountBadge.textContent = `${tickets.length} Ticket${tickets.length === 1 ? '' : 's'}`;
+                    }
+                    if (ticketHistorySubtitle) {
+                        ticketHistorySubtitle.textContent = tickets.length > 0
+                            ? `Recent service and dispatch records for ${pkg.name}`
+                            : `No prior service requests for ${pkg.name}`;
+                    }
+
+                    if (tickets.length > 0) {
+                        const tableWrap = document.createElement("div");
+                        tableWrap.className = "table-responsive";
+                        let rowsHtml = "";
+
+                        tickets.forEach(t => {
+                            const badgeClass = (t.status === "Resolved" || t.status === "Closed") ? "badge-paid" : "badge-upcoming";
+                            rowsHtml += `
+                                <tr>
+                                    <td><strong style="color: var(--navy);">${t.id}</strong></td>
+                                    <td><div style="font-weight: 700; color: var(--navy);">${t.subject}</div><div style="font-size: 11.5px; color: var(--gray-400);">${t.category}</div></td>
+                                    <td>${t.date}</td>
+                                    <td><span class="badge ${badgeClass}">${t.status}</span></td>
+                                </tr>
+                            `;
+                        });
+
+                        tableWrap.innerHTML = `
+                            <table class="portal-table" aria-label="Ticket history for active system">
+                                <thead>
+                                    <tr>
+                                        <th>Ticket ID</th>
+                                        <th>Summary & Category</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${rowsHtml}
+                                </tbody>
+                            </table>
+                        `;
+                        ticketHistoryContainer.appendChild(tableWrap);
+                    } else {
+                        // Distinguish missing ticket history cleanly
+                        ticketHistoryContainer.innerHTML = `
+                            <div style="text-align: center; padding: 36px 16px; color: var(--gray-400);">
+                                <div style="font-size: 30px; margin-bottom: 8px;">🛡️</div>
+                                <strong style="color: var(--navy); display: block; margin-bottom: 4px; font-size: 14.5px;">No Service Tickets Yet</strong>
+                                <p style="font-size: 12.5px; color: var(--gray-500); margin: 0 auto; max-width: 420px; line-height: 1.5;">
+                                    No technical incidents or maintenance requests have been logged for ${pkg.name} (#${pkg.accountNo}). Use the form above if you ever need technician assistance.
+                                </p>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            // ----------------------------------------------------------------------
+            // 3. TICKET FORM SUBMISSION
+            // ----------------------------------------------------------------------
+            if (supportTicketForm) {
+                supportTicketForm.addEventListener("submit", (e) => {
+                    e.preventDefault();
+
+                    const subj = ticketSubject ? ticketSubject.value.trim() : "";
+                    const desc = ticketDescription ? ticketDescription.value.trim() : "";
+
+                    if (!subj || !desc) {
+                        if (window.HelloSolar && window.HelloSolar.toast) {
+                            window.HelloSolar.toast("Incomplete Form", "Please provide a subject summary and detailed description.");
+                        } else {
+                            alert("Please fill in both subject and description.");
+                        }
+                        return;
+                    }
+
+                    const pkg = currentPackage || (window.HelloSolar && window.HelloSolar.getActivePackage());
+                    const lead = (pkg && pkg.support && pkg.support.leadTechnician) || "Hello Solar Support";
+                    const firstLeadName = lead.split(" ")[0];
+
+                    if (submitTicketBtn) submitTicketBtn.disabled = true;
+                    if (submitBtnText) submitBtnText.textContent = `Routing to ${firstLeadName}...`;
+
+                    setTimeout(() => {
+                        const randomId = Math.floor(1000 + Math.random() * 9000);
+                        if (ticketNumberDisplay) {
+                            ticketNumberDisplay.textContent = `Ticket #HS-SR-${randomId} Logged for ${pkg ? pkg.name : "System"}`;
+                        }
+                        if (ticketSuccessMsg) {
+                            ticketSuccessMsg.textContent = `Demo Mode: Service request recorded for ${pkg ? pkg.name : "System"} (#${pkg ? pkg.accountNo : ""}). In production, ${lead} receives an instant dispatch notification.`;
+                        }
+                        if (ticketSuccessAlert) ticketSuccessAlert.classList.add("visible");
+                        if (submitBtnText) submitBtnText.textContent = "Request Dispatched ✓";
+
+                        if (window.HelloSolar && window.HelloSolar.toast) {
+                            window.HelloSolar.toast(
+                                "Support Ticket Logged",
+                                `Ticket #HS-SR-${randomId} created for ${pkg.name}. Dispatched to ${lead}.`
+                            );
+                        }
+
+                        // Clear draft and form
+                        if (pkg) delete packageTicketDrafts[pkg.id];
+                        supportTicketForm.reset();
+
+                        setTimeout(() => {
+                            if (submitTicketBtn) submitTicketBtn.disabled = false;
+                            if (submitBtnText) submitBtnText.textContent = "Send Service Request";
+                        }, 3500);
+                    }, 750);
+                });
+            }
+
+            const saveDraftBtn = document.getElementById("saveDraftBtn");
+            const downloadDraftBtn = document.getElementById("downloadDraftBtn");
+
+            if (saveDraftBtn) {
+                saveDraftBtn.addEventListener("click", () => {
+                    saveCurrentDraft();
+                    const pkg = currentPackage || (window.HelloSolar && window.HelloSolar.getActivePackage());
+                    const pkgName = pkg ? pkg.name : "Active System";
+                    if (window.HelloSolar && window.HelloSolar.toast) {
+                        window.HelloSolar.toast(
+                            "Draft Saved",
+                            `Service draft preserved for ${pkgName}. It will remain available when switching packages.`
+                        );
+                    } else {
+                        alert(`Draft saved for ${pkgName}.`);
+                    }
+                });
+            }
+
+            if (downloadDraftBtn) {
+                downloadDraftBtn.addEventListener("click", () => {
+                    saveCurrentDraft();
+                    const pkg = currentPackage || (window.HelloSolar && window.HelloSolar.getActivePackage());
+                    const draft = (pkg && packageTicketDrafts[pkg.id]) || {
+                        category: categorySelect ? categorySelect.value : "inverter",
+                        priority: prioritySelect ? prioritySelect.value : "normal",
+                        subject: ticketSubject ? ticketSubject.value : "",
+                        description: ticketDescription ? ticketDescription.value : ""
+                    };
+
+                    const draftContent = [
+                        `HELLO SOLAR CUSTOMER SERVICE REQUEST DRAFT`,
+                        `Generated: ${new Date().toLocaleString()}`,
+                        `Customer: Juan Dela Cruz`,
+                        `System: ${pkg ? pkg.name : "N/A"} (${pkg ? pkg.accountNo : "N/A"})`,
+                        `Capacity: ${pkg ? pkg.capacity : "N/A"}`,
+                        `----------------------------------------------------`,
+                        `Category: ${draft.category}`,
+                        `Priority: ${draft.priority}`,
+                        `Subject: ${draft.subject || "(No subject entered)"}`,
+                        `----------------------------------------------------`,
+                        `Description:`,
+                        draft.description || "(No description entered)",
+                        `----------------------------------------------------`,
+                        `Assigned Technician: ${(pkg && pkg.support && pkg.support.leadTechnician) || "Hello Solar Dispatch"}`
+                    ].join("\n");
+
+                    const blob = new Blob([draftContent], { type: "text/plain;charset=utf-8" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `hello-solar-support-draft-${(pkg ? pkg.id : "system")}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    if (window.HelloSolar && window.HelloSolar.toast) {
+                        window.HelloSolar.toast(
+                            "Draft Downloaded",
+                            `Service request draft saved as text file for your records.`
+                        );
+                    }
+                });
+            }
+
+            // FAQ Accordion
+            document.querySelectorAll(".faq-question").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const item = btn.closest(".faq-item");
+                    if (item) item.classList.toggle("open");
+                });
             });
-        });
+
+            // Initial render
+            const initialPkg = (window.HelloSolar && window.HelloSolar.getActivePackage)
+                ? window.HelloSolar.getActivePackage()
+                : null;
+            if (initialPkg) renderSupportPage(initialPkg);
+
+            // Listen for package changes from other tabs / sources
+            window.addEventListener("helloSolarPackageChanged", (e) => {
+                if (e.detail && e.detail.package) {
+                    renderSupportPage(e.detail.package);
+                }
+            });
+
+            // Listen for dataset async load completion
+            window.addEventListener("helloSolarDataLoaded", () => {
+                const active = window.HelloSolar ? window.HelloSolar.getActivePackage() : null;
+                if (active) {
+                    renderSupportPage(active);
+                }
+            });
+        })();
     </script>
+    <script src="assets/js/notifications.js"></script>
 </body>
 
 </html>

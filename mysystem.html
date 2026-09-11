@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Hello Solar — My System customer overview, live inverter telemetry, payment status, and brownout readiness.">
+    <title>Hello Solar — My System</title>
+
+    <!-- Immediate Authentication Guard -->
+    <script>
+        if (localStorage.getItem("hello_solar_logged_in") !== "true") {
+            window.location.replace("login.html");
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Favicon / Tab Icon -->
+    <link rel="icon" type="image/png" href="assets/images/logofortab.png">
+
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="assets/css/portal.css">
+    <link rel="stylesheet" href="assets/css/notifications.css">
+</head>
+
+<body>
+    <div class="app">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <a href="mysystem.html" class="logo" aria-label="Hello Solar Home">
+                <img src="assets/images/hello_solar.png" alt="Hello Solar">
+            </a>
+
+            <div class="nav-label">Customer Portal</div>
+
+            <nav class="nav" aria-label="Portal navigation">
+                <a href="mysystem.html" class="nav-link active" aria-current="page">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="4" />
+                        <path d="M12 2v2" />
+                        <path d="M12 20v2" />
+                        <path d="m4.93 4.93 1.41 1.41" />
+                        <path d="m17.66 17.66 1.41 1.41" />
+                        <path d="M2 12h2" />
+                        <path d="M20 12h2" />
+                    </svg>
+                    My System
+                </a>
+
+                <a href="energy.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                    </svg>
+                    Energy
+                </a>
+
+                <a href="payments.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <path d="M2 10h20" />
+                        <path d="M6 15h4" />
+                    </svg>
+                    My Payments
+                </a>
+
+
+                <a href="support.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M3 11a9 9 0 0 1 18 0" />
+                        <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                        <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                        <path d="M17 17c0 2-2 3-5 3" />
+                    </svg>
+                    Support
+                </a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="sidebar-status-card">
+                    <div class="sidebar-status-info">
+                        <span class="sidebar-status-label">System Status</span>
+                        <span class="sidebar-status-val">Online · Normal</span>
+                    </div>
+                    <span class="status-dot pulsing" title="System Online"></span>
+                </div>
+
+                <div class="sidebar-divider"></div>
+
+                <button class="logout-button" id="logoutButton" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Mobile Backdrop -->
+        <div class="mobile-backdrop" id="mobileBackdrop"></div>
+
+        <!-- MAIN VIEWPORT -->
+        <main class="main">
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="mobile-header">
+                    <a href="mysystem.html" class="mobile-logo">
+                        <img src="assets/images/hello_solar.png" alt="Hello Solar">
+                    </a>
+                </div>
+
+                <div class="topbar-right">
+                    <a href="support.html" class="quick-support-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M3 11a9 9 0 0 1 18 0" />
+                            <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                            <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                            <path d="M17 17c0 2-2 3-5 3" />
+                        </svg>
+                        Need Help?
+                    </a>
+
+                    <div class="profile" id="topbarProfileTrigger" style="cursor: pointer;">
+                        <div class="profile-text">
+                            <span class="profile-name" id="profileName">Juan Dela Cruz</span>
+                            <span class="profile-role">Customer Account</span>
+                        </div>
+                        <div class="profile-avatar" id="profileAvatar">JD</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- PAGE CONTENT -->
+            <div class="content">
+                <!-- 1. NEW SYSTEMS OVERVIEW GRID (DEFAULT INITIAL VIEW) -->
+                <section id="systemsOverviewView" class="systems-overview-section" aria-label="My Solar Systems">
+                    <div class="systems-overview-header">
+                        <div class="systems-overview-title-group">
+                            <h1 class="welcome-heading">Good day, <span id="customerGreetingName">Juan Dela Cruz</span>.
+                            </h1>
+                            <p class="welcome-subtitle">Select a solar model to view real-time telemetry, payment
+                                standing, and live energy flow.</p>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Grid of User's Owned Solar Systems -->
+                    <div class="systems-grid" id="systemsGrid" role="region" aria-label="Your Solar Systems Grid">
+                        <!-- Populated dynamically via JavaScript -->
+                    </div>
+                </section>
+
+                <!-- 2. PRESERVED SYSTEM DETAIL VIEW (CLICKED SYSTEM) -->
+                <section id="systemDetailView" class="system-detail-view" aria-label="Solar System Details">
+                    <!-- Top Navigation Bar with Back Action & Model Info -->
+                    <div class="system-detail-topbar">
+                        <button type="button" class="btn-back-systems" id="backToSystemsBtn"
+                            aria-label="Back to My Systems">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 12H5M12 19l-7-7 7-7" />
+                            </svg>
+                            <span class="btn-back-text">Back to My Systems</span>
+                        </button>
+
+                        <div class="system-detail-title-block">
+                            <div class="system-detail-title-row">
+                                <h2 class="system-detail-title" id="detailModelTitle">Home Primary</h2>
+                                <span class="system-card-capacity-pill" id="detailCapacityPill">5.4 kW</span>
+                            </div>
+                            <span id="detailAccountMeta" class="system-detail-account-meta">Quezon City · HS-88219</span>
+                        </div>
+                    </div>
+
+                    <!-- Layout:
+                         Desktop:
+                         First row: Payment Status left, Estimated Savings right
+                         Second row: Live Telemetry spanning full width
+                         Directly below telemetry: Need Help? Contact Support button
+                    -->
+                    <div class="system-detail-content">
+                        <!-- Row 1: Payment Status (Left) & Estimated Savings (Right) -->
+                        <div class="detail-summary-row">
+                            <!-- Payment Status Card -->
+                            <article class="payment-status-compact" aria-label="Billing payment status">
+                                <h3 class="compact-card-heading">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                                        <path d="M2 10h20" />
+                                        <path d="M6 15h4" />
+                                    </svg>
+                                    Payment Status
+                                </h3>
+                                <div class="payment-status-display">
+                                    <span class="payment-status-indicator status-paid" id="paymentStatusDot"></span>
+                                    <span class="payment-status-label" id="paymentStatusLabel">Paid</span>
+                                </div>
+                            </article>
+
+                            <!-- Estimated Savings Card -->
+                            <article class="estimated-savings-compact" aria-label="Estimated monthly savings">
+                                <h3 class="compact-card-heading">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                                    </svg>
+                                    Estimated Savings
+                                </h3>
+                                <div class="savings-amount-display" id="savingsAmountDisplay">₱3,650</div>
+                            </article>
+                        </div>
+
+                        <!-- Row 2: Live Telemetry (Spanning Full Available Width) -->
+                        <div class="detail-telemetry-row">
+                            <section class="panel telemetry-master-panel" aria-label="Real-time system telemetry">
+                                <div class="telemetry-master-header">
+                                    <div class="telemetry-master-title">
+                                        <h2>Live Telemetry</h2>
+                                        <span class="telemetry-live-badge">
+                                            <span class="telemetry-pulse-dot"></span>
+                                            LIVE
+                                        </span>
+                                    </div>
+                                    <button type="button" class="telemetry-sync-btn" id="telemetrySyncBtn"
+                                        title="Synchronize live inverter stream">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                                        </svg>
+                                        <span id="syncBtnLabel">Sync</span>
+                                    </button>
+                                </div>
+
+                                <!-- Interactive Energy Flow Stage -->
+                                <div class="power-flow-stage">
+                                    <!-- Animated Flow Pipelines SVG -->
+                                    <svg class="flow-svg-overlay" viewBox="0 0 300 210" preserveAspectRatio="none"
+                                        aria-hidden="true">
+                                        <!-- Solar to Inverter (Vertical Top-Down) -->
+                                        <line class="flow-line flow-line-solar" x1="150" y1="35" x2="150" y2="105" />
+                                        <!-- Inverter to Battery (Horizontal Center to Left) -->
+                                        <line class="flow-line flow-line-battery" x1="150" y1="105" x2="50" y2="105" />
+                                        <!-- Inverter to Home (Horizontal Center to Right) -->
+                                        <line class="flow-line flow-line-home" x1="150" y1="105" x2="250" y2="105" />
+                                        <!-- Inverter to Grid (Vertical Center to Bottom) -->
+                                        <line class="flow-line flow-line-grid" x1="150" y1="105" x2="150" y2="175" />
+                                    </svg>
+
+                                    <div class="power-flow-grid">
+                                        <!-- TOP: Rooftop Solar Array -->
+                                        <div class="node-top">
+                                            <div class="energy-node node-solar" id="nodeSolar" title="Solar Array">
+                                                <div class="node-icon-circle">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2.2">
+                                                        <circle cx="12" cy="12" r="4" />
+                                                        <path d="M12 2v2" />
+                                                        <path d="M12 20v2" />
+                                                        <path d="m4.93 4.93 1.41 1.41" />
+                                                        <path d="m17.66 17.66 1.41 1.41" />
+                                                        <path d="M2 12h2" />
+                                                        <path d="M20 12h2" />
+                                                        <path d="m6.34 17.66-1.41 1.41" />
+                                                        <path d="m19.07 4.93-1.41 1.41" />
+                                                    </svg>
+                                                </div>
+                                                <span class="node-name">Solar Array</span>
+                                                <span class="node-wattage" id="liveSolarWatts">3.48 kW</span>
+                                                <span class="node-state">Producing</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- LEFT: Battery Reserve Storage -->
+                                        <div class="node-left">
+                                            <div class="energy-node node-battery" id="nodeBattery"
+                                                title="Lithium-ion Reserve Battery">
+                                                <div class="node-icon-circle">
+                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2">
+                                                        <rect x="2" y="7" width="16" height="12" rx="2" />
+                                                        <path d="M22 11v4" />
+                                                        <path d="M6 11v4" />
+                                                        <path d="M10 11v4" />
+                                                    </svg>
+                                                </div>
+                                                <span class="node-name">Battery</span>
+                                                <span class="node-wattage" id="liveBatteryWatts">1.15 kW</span>
+                                                <span class="node-state" id="liveBatterySoc">92% (Charge)</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- CENTER: Hybrid Inverter -->
+                                        <div class="node-center">
+                                            <div class="energy-node node-inverter" id="nodeInverter"
+                                                title="Hybrid Inverter">
+                                                <div class="node-icon-circle">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2.2">
+                                                        <rect x="4" y="4" width="16" height="16" rx="2" />
+                                                        <path d="M9 9h6v6H9z" />
+                                                        <path d="M9 1v3" />
+                                                        <path d="M15 1v3" />
+                                                        <path d="M9 20v3" />
+                                                        <path d="M15 20v3" />
+                                                    </svg>
+                                                </div>
+                                                <span class="node-name">Hybrid Inverter</span>
+                                                <span class="node-wattage" id="liveInverterWatts">3.48 kW</span>
+                                                <span class="node-state" style="color: var(--solar-orange-dark);">98.4%
+                                                    Eff</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- RIGHT: Home Household Load -->
+                                        <div class="node-right">
+                                            <div class="energy-node node-home" id="nodeHome"
+                                                title="Home Appliances Consumption">
+                                                <div class="node-icon-circle">
+                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2">
+                                                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                                                        <polyline points="9 22 9 12 15 12 15 22" />
+                                                    </svg>
+                                                </div>
+                                                <span class="node-name">Home Load</span>
+                                                <span class="node-wattage" id="liveHomeWatts">1.85 kW</span>
+                                                <span class="node-state">Consuming</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- BOTTOM: Grid Net-Metering -->
+                                        <div class="node-bottom">
+                                            <div class="energy-node node-grid" id="nodeGrid"
+                                                title="Net Metering: Grid Export">
+                                                <div class="node-icon-circle">
+                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2">
+                                                        <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                                                    </svg>
+                                                </div>
+                                                <span class="node-name">Grid Export</span>
+                                                <span class="node-wattage" id="liveGridWatts">+0.48 kW</span>
+                                                <span class="node-state">Net Metering</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Vital Real-time Telemetry Readouts -->
+                                <div class="telemetry-vitals">
+                                    <div class="vital-chip">
+                                        <span class="vital-label">
+                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2.5">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <path d="m10 15 5-3-5-3v6z" />
+                                            </svg>
+                                            Grid Sync
+                                        </span>
+                                        <span class="vital-val" id="liveGridSync">231.8 V · 60.0 Hz</span>
+                                        <span class="vital-meta">Luzon Grid Locked · PF 0.99</span>
+                                    </div>
+
+                                    <div class="vital-chip">
+                                        <span class="vital-label">
+                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2.5">
+                                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                                            </svg>
+                                            Solar Independence
+                                        </span>
+                                        <span class="vital-val" style="color: #059669;" id="liveIndependence">100% Solar
+                                            Powered</span>
+                                        <span class="vital-meta">Zero grid import now</span>
+                                    </div>
+
+                                    <div class="vital-chip">
+                                        <span class="vital-label">
+                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2.5">
+                                                <circle cx="12" cy="12" r="4" />
+                                                <path d="M12 2v2" />
+                                                <path d="M12 20v2" />
+                                            </svg>
+                                            PV Arrays
+                                        </span>
+                                        <span class="vital-val" id="livePvStrings">PV1: 342V · PV2: 338V</span>
+                                        <span class="vital-meta">Dual MPPT balanced</span>
+                                    </div>
+
+                                    <div class="vital-chip">
+                                        <span class="vital-label">
+                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2.5">
+                                                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" />
+                                            </svg>
+                                            Inverter Temp
+                                        </span>
+                                        <span class="vital-val" id="liveInverterTemp">41.2°C (Optimal)</span>
+                                        <span class="vital-meta">Passive heatsink cool</span>
+                                    </div>
+                                </div>
+
+                                <!-- Telemetry Footer Status -->
+                                <div class="telemetry-footer-bar">
+                                    <span class="telemetry-status-msg">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a"
+                                            stroke-width="2.5">
+                                            <polyline points="20 6 9 17 4 12" />
+                                        </svg>
+                                        All panels operating at normal yield
+                                    </span>
+                                    <span class="telemetry-timestamp" id="telemetryTimestamp">Sync: 1s ago</span>
+                                </div>
+                            </section>
+                        </div>
+
+                        <!-- Row 3: Support Button Directly Below Live Telemetry -->
+                        <div class="system-support-cta-wrap">
+                            <button type="button" class="btn-system-support" id="openSystemSupportBtn"
+                                aria-haspopup="dialog">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 11a9 9 0 0 1 18 0" />
+                                    <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                                    <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                                    <path d="M17 17c0 2-2 3-5 3" />
+                                </svg>
+                                <span>Need Help? Contact Support</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- FOOTER -->
+            <footer class="portal-footer">
+                <span>© 2026 Hello Solar Inc. Clean energy. Lower bills. Brighter future.</span>
+                <span>hellosolarph.com · support@hellosolarph.com</span>
+            </footer>
+        </main>
+        <!-- ADD ACCOUNT PREVIEW MODAL -->
+        <div class="package-modal-backdrop" id="addAccountModalBackdrop" aria-hidden="true">
+            <div class="package-modal" id="addAccountModal" role="dialog" aria-modal="true"
+                aria-labelledby="addAccountModalTitle">
+                <div class="package-modal-header">
+                    <div class="package-modal-title-wrap">
+                        <div class="package-modal-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="package-modal-title" id="addAccountModalTitle">Link Solar Account</h3>
+                            <p class="package-modal-subtitle">Connect another purchased Hello Solar system</p>
+                        </div>
+                    </div>
+                    <button type="button" class="package-modal-close-btn" id="closeAddAccountModal"
+                        aria-label="Close dialog">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="package-modal-body">
+                    <div class="package-modal-notice">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="16" x2="12" y2="12" />
+                            <line x1="12" y1="8" x2="12.01" y2="8" />
+                        </svg>
+                        <p>
+                            <strong>Feature Preview:</strong> Account linking is currently in preview. Entering an ID at
+                            this time will not verify ownership or link accounts.
+                        </p>
+                    </div>
+                    <div class="form-group" style="margin-top: 16px;">
+                        <label for="serviceAccountIdInput" class="form-label"
+                            style="font-size: 12px; font-weight: 700; color: var(--navy); display: block; margin-bottom: 6px;">Service
+                            Account ID or Serial Number</label>
+                        <input type="text" id="serviceAccountIdInput" class="form-input"
+                            placeholder="e.g. HS-90412 or SOLIS-5K-XXXX" autocomplete="off"
+                            style="width: 100%; padding: 10px 14px; border: 1px solid var(--gray-200); border-radius: 8px; font-family: inherit; font-size: 13.5px;">
+                        <span class="form-hint"
+                            style="font-size: 11.5px; color: var(--gray-400); margin-top: 5px; display: block;">Located
+                            on your Hello Solar installation contract or inverter placard.</span>
+                    </div>
+                </div>
+                <div class="package-modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelAddAccountBtn"
+                        style="padding: 8px 16px; font-size: 13px;">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="submitAddAccountBtn"
+                        style="padding: 8px 18px; font-size: 13px;">Link Account</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- IN-PAGE SUPPORT MODAL (ASSOCIATED WITH SELECTED SYSTEM) -->
+        <div class="support-modal-backdrop" id="systemSupportModalBackdrop" aria-hidden="true">
+            <div class="support-modal" id="systemSupportModal" role="dialog" aria-modal="true"
+                aria-labelledby="supportModalTitle">
+                <div class="support-modal-header">
+                    <div class="support-modal-title-group">
+                        <h3 id="supportModalTitle">Need Help with Your System?</h3>
+                        <div class="support-modal-system-badge">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="4" />
+                                <path d="M12 2v2" />
+                                <path d="M12 20v2" />
+                            </svg>
+                            <span id="supportModalSystemName">Home Primary</span> · <span
+                                id="supportModalAccountNo">HS-88219</span>
+                        </div>
+                    </div>
+                    <button type="button" class="support-modal-close" id="closeSupportModalBtn"
+                        aria-label="Close support dialog">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+                <form id="systemSupportForm" class="support-modal-body">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label for="supportModalCategory" class="form-label"
+                            style="font-size: 12.5px; font-weight: 700; color: var(--navy); display: block; margin-bottom: 6px;">Issue
+                            Category</label>
+                        <select id="supportModalCategory" class="form-select"
+                            style="width: 100%; padding: 10px 14px; border: 1px solid var(--gray-200); border-radius: 8px; font-family: inherit; font-size: 13.5px;"
+                            required>
+                            <option value="inverter">Inverter & Live Telemetry</option>
+                            <option value="solar">Rooftop Solar Array / Yield</option>
+                            <option value="battery">Battery Reserve & Backup</option>
+                            <option value="billing">Billing or Net-Metering Question</option>
+                            <option value="other">General Maintenance</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label for="supportModalUrgency" class="form-label"
+                            style="font-size: 12.5px; font-weight: 700; color: var(--navy); display: block; margin-bottom: 6px;">Urgency
+                            Level</label>
+                        <select id="supportModalUrgency" class="form-select"
+                            style="width: 100%; padding: 10px 14px; border: 1px solid var(--gray-200); border-radius: 8px; font-family: inherit; font-size: 13.5px;"
+                            required>
+                            <option value="normal">Normal (Response within 24 hours)</option>
+                            <option value="urgent">Urgent — Inverter offline / No power</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label for="supportModalSubject" class="form-label"
+                            style="font-size: 12.5px; font-weight: 700; color: var(--navy); display: block; margin-bottom: 6px;">Subject
+                            Summary</label>
+                        <input type="text" id="supportModalSubject" class="form-input"
+                            placeholder="e.g. Telemetry reading 0W after grid fluctuations"
+                            style="width: 100%; padding: 10px 14px; border: 1px solid var(--gray-200); border-radius: 8px; font-family: inherit; font-size: 13.5px;"
+                            required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label for="supportModalDesc" class="form-label"
+                            style="font-size: 12.5px; font-weight: 700; color: var(--navy); display: block; margin-bottom: 6px;">Detailed
+                            Description</label>
+                        <textarea id="supportModalDesc" class="form-textarea" rows="4"
+                            placeholder="Describe any warning indicators or observations..."
+                            style="width: 100%; padding: 10px 14px; border: 1px solid var(--gray-200); border-radius: 8px; font-family: inherit; font-size: 13.5px; resize: vertical;"
+                            required></textarea>
+                    </div>
+                </form>
+                <div class="support-modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelSupportModalBtn"
+                        style="padding: 8px 18px; font-size: 13px;">Cancel</button>
+                    <button type="submit" form="systemSupportForm" class="btn btn-primary" id="submitSupportModalBtn"
+                        style="padding: 8px 22px; font-size: 13px;">Send Service Request</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PER-SYSTEM INSTALLATION & ACTIVATION MODAL -->
+        <div class="activation-modal-backdrop" id="activationModalBackdrop" aria-hidden="true">
+            <div class="activation-modal" id="activationModal" role="dialog" aria-modal="true"
+                aria-labelledby="activationModalTitle">
+                <div class="activation-modal-header">
+                    <div>
+                        <h3 id="activationModalTitle"
+                            style="font-size: 17px; font-weight: 800; color: var(--navy); margin: 0 0 4px;">System
+                            Activation & Commissioning</h3>
+                        <div style="font-size: 12.5px; color: var(--gray-500); font-weight: 600;">
+                            <span id="activationModalModelName">Business Annex</span> · <span
+                                id="activationModalAccountNo">HS-10492</span>
+                        </div>
+                    </div>
+                    <button type="button" class="support-modal-close" id="closeActivationModalBtn"
+                        aria-label="Close activation dialog">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="activation-modal-body">
+                    <div id="activationRequirementsNotice"
+                        style="padding: 12px 16px; background: #fffbeb; border: 1px solid #fed7aa; border-radius: 10px; margin-bottom: 20px; font-size: 13px; color: #9a3412;">
+                        <strong>Activation Notice:</strong> This system requires all 5 installation milestones and
+                        safety sign-off to be completed before grid commissioning and live telemetry activation.
+                    </div>
+
+                    <div class="activation-steps-list" id="activationStepsList">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+                <div class="activation-modal-footer">
+                    <button type="button" class="btn btn-secondary" id="advanceMilestoneBtn"
+                        style="font-size: 12.5px; padding: 8px 16px;">
+                        <span>Complete Current Stage</span>
+                    </button>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" class="btn btn-secondary" id="closeActivationFooterBtn"
+                            style="font-size: 12.5px; padding: 8px 16px;">Close</button>
+                        <button type="button" class="btn btn-primary" id="activateSystemBtn" disabled
+                            style="font-size: 12.5px; padding: 8px 20px;">
+                            <span>Activate System</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- MOBILE BOTTOM NAVIGATION (5-PILLAR CUSTOMER APP NAV) -->
+        <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
+            <div class="mobile-bottom-nav-inner">
+                <a href="mysystem.html" class="mobile-nav-item active" aria-current="page">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="4" />
+                        <path d="M12 2v2" />
+                        <path d="M12 20v2" />
+                        <path d="m4.93 4.93 1.41 1.41" />
+                        <path d="m17.66 17.66 1.41 1.41" />
+                        <path d="M2 12h2" />
+                        <path d="M20 12h2" />
+                    </svg>
+                    <span>My System</span>
+                </a>
+                <a href="energy.html" class="mobile-nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                    </svg>
+                    <span>Energy</span>
+                </a>
+                <a href="payments.html" class="mobile-nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <path d="M2 10h20" />
+                        <path d="M6 15h4" />
+                    </svg>
+                    <span>Payments</span>
+                </a>
+                <a href="support.html" class="mobile-nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M3 11a9 9 0 0 1 18 0" />
+                        <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                        <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                        <path d="M17 17c0 2-2 3-5 3" />
+                    </svg>
+                    <span>Support</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Customer Authentication Logic & Registry -->
+        <script src="assets/js/auth.js"></script>
+
+        <!-- Core Portal JavaScript -->
+        <script src="assets/js/portal.js"></script>
+
+        <!-- Consolidated Overview Controller & Decoupled Data Store -->
+        <script>
+            (function () {
+                "use strict";
+
+                // --------------------------------------------------------------------------
+                // 1. LINKED PACKAGES REPOSITORY & CUSTOMER STATE
+                // --------------------------------------------------------------------------
+                const activeCustomer = (window.HelloSolar && window.HelloSolar.getCustomer)
+                    ? window.HelloSolar.getCustomer()
+                    : { name: "Juan Dela Cruz", accountNo: "HS-88219" };
+
+                const userIdent = (window.HelloSolar && window.HelloSolar.getCustomerIdentifier)
+                    ? window.HelloSolar.getCustomerIdentifier()
+                    : (activeCustomer.accountNo || activeCustomer.email || "customer");
+
+                let packages = (window.HelloSolar && window.HelloSolar.getLinkedPackages)
+                    ? window.HelloSolar.getLinkedPackages()
+                    : [];
+
+                // --------------------------------------------------------------------------
+                // 2. USER OWNED SYSTEMS FILTERING & DYNAMIC ACCOUNT LINKING
+                // --------------------------------------------------------------------------
+                function getUserLinkedAccounts() {
+                    try {
+                        const raw = localStorage.getItem(`hello_solar_user_linked_${userIdent}`);
+                        if (raw) {
+                            const parsed = JSON.parse(raw);
+                            if (Array.isArray(parsed)) return parsed;
+                        }
+                    } catch (e) {
+                        console.warn("Could not read user linked accounts:", e);
+                    }
+                    return [];
+                }
+
+                function saveUserLinkedAccount(newPkg) {
+                    try {
+                        const list = getUserLinkedAccounts();
+                        list.push(newPkg);
+                        localStorage.setItem(`hello_solar_user_linked_${userIdent}`, JSON.stringify(list));
+                    } catch (e) {
+                        console.error("Could not save linked account:", e);
+                    }
+                }
+
+                function getUserPackages() {
+                    const customLinked = getUserLinkedAccounts();
+                    let baseList = [...packages];
+
+                    // Account-specific scoping
+                    if (activeCustomer.accountNo === "HS-72301") {
+                        baseList = baseList.filter(p => p.accountNo === "HS-72301" || p.id === "pkg-maria-6k8");
+                        if (baseList.length === 0) {
+                            baseList = [{
+                                id: "pkg-maria-6k8",
+                                name: "Quezon Residence",
+                                shortLabel: "Residence — 6.8 kW",
+                                capacity: "6.8 kW",
+                                location: "Quezon City · HS-72301",
+                                accountNo: "HS-72301",
+                                status: "Online · Normal",
+                                telemetry: {
+                                    baseSolar: 4.85,
+                                    baseHome: 2.30,
+                                    baseBattery: 1.40,
+                                    batterySoc: 95,
+                                    pvStrings: "PV1: 348V · PV2: 342V",
+                                    gridSync: "231.2 V · 60.0 Hz",
+                                    inverterTemp: "40.8°C (Optimal)"
+                                },
+                                energy: { billSaved: "₱4,580" },
+                                payments: { status: "Paid", standing: "Good" },
+                                install: { completionPct: 100 }
+                            }];
+                        }
+                    }
+
+                    // Merge user-linked accounts
+                    customLinked.forEach(c => {
+                        if (!baseList.some(p => p.id === c.id)) {
+                            baseList.push(c);
+                        }
+                    });
+
+                    return baseList;
+                }
+
+                // --------------------------------------------------------------------------
+                // 3. PER-SYSTEM ACTIVATION STATE PERSISTENCE
+                // --------------------------------------------------------------------------
+                function isSystemActivated(pkg) {
+                    if (!pkg) return false;
+                    const key = `hello_solar_system_activation_${userIdent}_${pkg.id}`;
+                    const stored = localStorage.getItem(key);
+                    if (stored !== null) {
+                        return stored === "true";
+                    }
+                    // Default configuration:
+                    // pkg-biz-6k0 defaults to Deactivated (awaiting activation)
+                    if (pkg.id === "pkg-biz-6k0") {
+                        return false;
+                    }
+                    // Newly added accounts default to Deactivated
+                    if (pkg.isCustomAdded) {
+                        return false;
+                    }
+                    // Existing live packages default to Activated
+                    return true;
+                }
+
+                function setSystemActivated(pkgId, isActivated) {
+                    const key = `hello_solar_system_activation_${userIdent}_${pkgId}`;
+                    localStorage.setItem(key, isActivated ? "true" : "false");
+                }
+
+                // --------------------------------------------------------------------------
+                // 4. PER-SYSTEM INSTALLATION MILESTONES PERSISTENCE
+                // --------------------------------------------------------------------------
+                const DEFAULT_5_MILESTONES = [
+                    { num: "1", title: "1. Site Assessment & Engineering Survey", status: "Scheduled", desc: "Structural audit and solar panel mounting geometry inspection.", date: "Scheduled" },
+                    { num: "2", title: "2. Solar PV Panels Installed", status: "Pending", desc: "Monocrystalline solar PV modules mounted and wired.", date: "Pending Stage 1" },
+                    { num: "3", title: "3. Inverter & Storage Setup", status: "Pending", desc: "Hybrid inverter, electrical safety disconnects, and conduit setup.", date: "Pending Stage 2" },
+                    { num: "4", title: "4. Utility Grid Connection (Net Metering)", status: "Pending", desc: "Distribution utility bi-directional meter testing and grid connection.", date: "Pending Stage 3" },
+                    { num: "5", title: "5. Final Safety Commissioning & Handover", status: "Pending", desc: "Electrical engineering sign-off, live energization, and customer handover.", date: "Pending Stage 4" }
+                ];
+
+                function getSystemMilestones(pkg) {
+                    const key = `hello_solar_install_progress_${userIdent}_${pkg.id}`;
+                    const stored = localStorage.getItem(key);
+                    if (stored) {
+                        try {
+                            const parsed = JSON.parse(stored);
+                            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                        } catch (e) {
+                            console.warn("Could not parse milestones:", e);
+                        }
+                    }
+
+                    if (pkg.install && Array.isArray(pkg.install.milestones) && pkg.install.milestones.length > 0) {
+                        return JSON.parse(JSON.stringify(pkg.install.milestones));
+                    }
+
+                    return JSON.parse(JSON.stringify(DEFAULT_5_MILESTONES));
+                }
+
+                function saveSystemMilestones(pkgId, milestones) {
+                    const key = `hello_solar_install_progress_${userIdent}_${pkgId}`;
+                    localStorage.setItem(key, JSON.stringify(milestones));
+                }
+
+                // --------------------------------------------------------------------------
+                // 5. TELEMETRY DISPLAY & STREAM CONTROLLER
+                // --------------------------------------------------------------------------
+                const liveSolarWattsEl = document.getElementById("liveSolarWatts");
+                const liveBatteryWattsEl = document.getElementById("liveBatteryWatts");
+                const liveBatterySocEl = document.getElementById("liveBatterySoc");
+                const liveInverterWattsEl = document.getElementById("liveInverterWatts");
+                const liveHomeWattsEl = document.getElementById("liveHomeWatts");
+                const liveGridWattsEl = document.getElementById("liveGridWatts");
+                const liveGridSyncEl = document.getElementById("liveGridSync");
+                const livePvStringsEl = document.getElementById("livePvStrings");
+                const liveInverterTempEl = document.getElementById("liveInverterTemp");
+                const telemetryTimestampEl = document.getElementById("telemetryTimestamp");
+                const telemetrySyncBtn = document.getElementById("telemetrySyncBtn");
+                const syncBtnLabel = document.getElementById("syncBtnLabel");
+
+                let currentPackage = null;
+                let currentPackageGeneration = 0;
+                let secondsSinceSync = 1;
+                let baseSolar = 3.85;
+                let baseHome = 1.95;
+                let baseBattery = 1.25;
+                let currentBatterySoc = 92;
+                let telemetryIntervalId = null;
+                let tickerIntervalId = null;
+                let previousScrollY = 0;
+                let lastTriggerElement = null;
+
+                function updateTelemetryDisplay() {
+                    if (!currentPackage) return;
+
+                    if (!currentPackage.telemetry) {
+                        if (liveSolarWattsEl) liveSolarWattsEl.textContent = "Unavailable";
+                        if (liveInverterWattsEl) liveInverterWattsEl.textContent = "Offline";
+                        if (liveHomeWattsEl) liveHomeWattsEl.textContent = "Unavailable";
+                        if (liveBatteryWattsEl) liveBatteryWattsEl.textContent = "Unavailable";
+                        if (liveBatterySocEl) liveBatterySocEl.textContent = "Unavailable";
+                        if (liveGridWattsEl) {
+                            liveGridWattsEl.textContent = "Offline";
+                            liveGridWattsEl.style.color = "var(--gray-400)";
+                        }
+                        if (liveGridSyncEl) liveGridSyncEl.textContent = "Offline · Standby";
+                        if (livePvStringsEl) livePvStringsEl.textContent = "PV: Not Connected";
+                        if (liveInverterTempEl) liveInverterTempEl.textContent = "Inverter: Offline";
+                        if (telemetryTimestampEl) telemetryTimestampEl.textContent = "Telemetry Offline";
+                        return;
+                    }
+
+                    const solarJitter = (Math.random() * 0.12 - 0.06);
+                    const homeJitter = (Math.random() * 0.08 - 0.04);
+                    const batteryJitter = (Math.random() * 0.04 - 0.02);
+
+                    const currentSolar = Math.max(1.2, +(baseSolar + solarJitter).toFixed(2));
+                    const currentHome = Math.max(0.6, +(baseHome + homeJitter).toFixed(2));
+                    const currentBattery = Math.max(0.2, +(baseBattery + batteryJitter).toFixed(2));
+                    const currentGrid = +(currentSolar - currentHome - currentBattery).toFixed(2);
+
+                    if (liveSolarWattsEl) liveSolarWattsEl.textContent = `${currentSolar.toFixed(2)} kW`;
+                    if (liveInverterWattsEl) liveInverterWattsEl.textContent = `${currentSolar.toFixed(2)} kW`;
+                    if (liveHomeWattsEl) liveHomeWattsEl.textContent = `${currentHome.toFixed(2)} kW`;
+                    if (liveBatteryWattsEl) liveBatteryWattsEl.textContent = `${currentBattery.toFixed(2)} kW`;
+                    if (liveBatterySocEl) liveBatterySocEl.textContent = `${currentBatterySoc}% (Charge)`;
+
+                    if (liveGridWattsEl) {
+                        if (currentGrid >= 0) {
+                            liveGridWattsEl.textContent = `+${currentGrid.toFixed(2)} kW`;
+                            liveGridWattsEl.style.color = "var(--navy)";
+                        } else {
+                            liveGridWattsEl.textContent = `${currentGrid.toFixed(2)} kW`;
+                            liveGridWattsEl.style.color = "#d97706";
+                        }
+                    }
+
+                    if (currentPackage.telemetry) {
+                        const baseV = currentPackage.telemetry.gridSync ? currentPackage.telemetry.gridSync.split("V")[0].trim() : "230.0";
+                        const jitterV = (+baseV + (Math.random() * 0.6 - 0.3)).toFixed(1);
+                        if (liveGridSyncEl) liveGridSyncEl.textContent = `${jitterV} V · 60.0 Hz`;
+                        if (livePvStringsEl) livePvStringsEl.textContent = currentPackage.telemetry.pvStrings || "PV: OK";
+                        if (liveInverterTempEl) liveInverterTempEl.textContent = currentPackage.telemetry.inverterTemp || "Normal";
+                    }
+
+                    secondsSinceSync = 1;
+                    if (telemetryTimestampEl) telemetryTimestampEl.textContent = "Sync: 1s ago";
+                }
+
+                // --------------------------------------------------------------------------
+                // 6. SYSTEMS OVERVIEW GRID RENDERING
+                // --------------------------------------------------------------------------
+                const systemsOverviewView = document.getElementById("systemsOverviewView");
+                const systemDetailView = document.getElementById("systemDetailView");
+                const systemsGrid = document.getElementById("systemsGrid");
+                const customerGreetingName = document.getElementById("customerGreetingName");
+                const backToSystemsBtn = document.getElementById("backToSystemsBtn");
+
+                function renderSystemsGrid() {
+                    if (!systemsGrid) return;
+                    systemsGrid.innerHTML = "";
+
+                    if (customerGreetingName) {
+                        customerGreetingName.textContent = activeCustomer.name || "Juan Dela Cruz";
+                    }
+
+                    const userPkgs = getUserPackages();
+
+                    userPkgs.forEach(pkg => {
+                        const activated = isSystemActivated(pkg);
+                        const card = document.createElement("article");
+                        card.className = `system-card ${activated ? "activated-card" : "deactivated-card"}`;
+                        card.setAttribute("role", "button");
+                        card.setAttribute("tabindex", "0");
+                        card.setAttribute("data-package-id", pkg.id);
+                        card.setAttribute("aria-label", `${pkg.name}, ${pkg.capacity}. Status: ${activated ? 'Active' : 'Deactivated, activation required'}`);
+
+                        card.innerHTML = `
+                            <div>
+                                <div class="system-card-header">
+                                    <div class="system-card-title-wrap">
+                                        <h2 class="system-card-model">${pkg.name}</h2>
+                                        <span class="system-card-capacity-pill">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/></svg>
+                                            ${pkg.capacity}
+                                        </span>
+                                    </div>
+                                    <span class="system-card-status-badge ${activated ? 'badge-active' : 'badge-deactivated'}">
+                                        <span class="badge-dot"></span>
+                                        ${activated ? 'Active' : 'Deactivated'}
+                                    </span>
+                                </div>
+
+                                <div class="system-card-body">
+                                    <div class="system-card-info-row">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                                        </svg>
+                                        <span>${pkg.location || 'Service Site'}</span>
+                                    </div>
+                                    <div class="system-card-info-row">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/>
+                                        </svg>
+                                        <span>Account ID: <strong>${pkg.accountNo || 'HS-Pending'}</strong></span>
+                                    </div>
+                                    ${!activated ? `
+                                    <div class="system-card-activation-note">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                                        </svg>
+                                        <span>Activation required</span>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+
+                            <div class="system-card-footer">
+                                <span class="system-card-action-text">
+                                    ${activated ? 'View Live Details' : 'Complete Activation'}
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="9 18 15 12 9 6"/>
+                                    </svg>
+                                </span>
+                            </div>
+                        `;
+
+                        function handleCardSelect() {
+                            lastTriggerElement = card;
+                            if (activated) {
+                                openSystemDetail(pkg);
+                            } else {
+                                openActivationModal(pkg);
+                            }
+                        }
+
+                        card.addEventListener("click", handleCardSelect);
+                        card.addEventListener("keydown", (e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                handleCardSelect();
+                            }
+                        });
+
+                        systemsGrid.appendChild(card);
+                    });
+
+                    // Add Account Card in the grid
+                    const addCard = document.createElement("div");
+                    addCard.className = "add-account-card";
+                    addCard.setAttribute("role", "button");
+                    addCard.setAttribute("tabindex", "0");
+                    addCard.setAttribute("aria-label", "Link another solar account");
+                    addCard.innerHTML = `
+                        <div class="add-account-card-icon" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                        </div>
+                        <div class="add-account-card-text">
+                            <div class="add-account-card-title">Add Account</div>
+                            <div class="add-account-card-desc">Connect another purchased Hello Solar system</div>
+                        </div>
+                    `;
+
+                    addCard.addEventListener("click", () => {
+                        lastTriggerElement = addCard;
+                        openAddAccountModalDialog();
+                    });
+                    addCard.addEventListener("keydown", (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            lastTriggerElement = addCard;
+                            openAddAccountModalDialog();
+                        }
+                    });
+
+                    systemsGrid.appendChild(addCard);
+                }
+
+                // --------------------------------------------------------------------------
+                // 7. SYSTEM DETAIL VIEW CONTROLLER
+                // --------------------------------------------------------------------------
+                const detailModelTitle = document.getElementById("detailModelTitle");
+                const detailCapacityPill = document.getElementById("detailCapacityPill");
+                const detailAccountMeta = document.getElementById("detailAccountMeta");
+                const paymentStatusDot = document.getElementById("paymentStatusDot");
+                const paymentStatusLabel = document.getElementById("paymentStatusLabel");
+                const savingsAmountDisplay = document.getElementById("savingsAmountDisplay");
+
+                function openSystemDetail(pkg) {
+                    if (!pkg) return;
+                    currentPackage = pkg;
+                    currentPackageGeneration++;
+
+                    previousScrollY = window.scrollY;
+
+                    // Switch view containers
+                    if (systemsOverviewView) systemsOverviewView.style.display = "none";
+                    if (systemDetailView) {
+                        const isMobile = window.innerWidth <= 768;
+                        systemDetailView.style.display = isMobile ? "flex" : "block";
+                        systemDetailView.classList.add("active");
+
+                        // Check mobile viewport for full-screen app experience
+                        if (isMobile) {
+                            systemDetailView.classList.add("mobile-fullscreen");
+                            document.body.classList.add("modal-open", "detail-view-open");
+                        } else {
+                            systemDetailView.classList.remove("mobile-fullscreen");
+                            document.body.classList.remove("modal-open", "detail-view-open");
+                        }
+
+                        const detailContent = systemDetailView.querySelector(".system-detail-content");
+                        if (detailContent) {
+                            detailContent.scrollTop = 0;
+                        }
+                    }
+
+                    // 1. Detail Header
+                    if (detailModelTitle) detailModelTitle.textContent = pkg.name;
+                    if (detailAccountMeta) {
+                        const loc = (pkg.location || "").trim();
+                        const acc = (pkg.accountNo || "").trim();
+                        if (loc && acc && !loc.includes(acc)) {
+                            detailAccountMeta.textContent = `${loc} · ${acc}`;
+                        } else {
+                            detailAccountMeta.textContent = loc || acc || "";
+                        }
+                    }
+                    if (detailCapacityPill) detailCapacityPill.textContent = pkg.capacity || "—";
+
+                    // 2. Payment Status Card (Only heading + gently pulsing dot and label)
+                    // Green: Paid | Orange: Due | Red: Unpaid
+                    if (paymentStatusDot && paymentStatusLabel) {
+                        const payData = pkg.payments || {};
+                        const status = (payData.status || "").toLowerCase();
+                        const standing = (payData.standing || "").toLowerCase();
+
+                        paymentStatusDot.className = "payment-status-indicator";
+
+                        if (standing === "good" || status === "paid") {
+                            paymentStatusDot.classList.add("status-paid");
+                            paymentStatusLabel.textContent = "Paid";
+                        } else if (standing === "due soon" || status === "due soon" || status === "due" || status === "upcoming") {
+                            paymentStatusDot.classList.add("status-due");
+                            paymentStatusLabel.textContent = "Due";
+                        } else if (status === "overdue" || status === "unpaid") {
+                            paymentStatusDot.classList.add("status-unpaid");
+                            paymentStatusLabel.textContent = "Unpaid";
+                        } else {
+                            paymentStatusDot.classList.add("status-due");
+                            paymentStatusLabel.textContent = "Due";
+                        }
+                    }
+
+                    // 3. Estimated Savings Card (Only heading + savings amount in currency, or "—")
+                    if (savingsAmountDisplay) {
+                        const savedAmt = (pkg.energy && pkg.energy.billSaved)
+                            || (pkg.estimatedSavings && pkg.estimatedSavings.amount);
+                        savingsAmountDisplay.textContent = savedAmt || "—";
+                    }
+
+                    // 4. Update Telemetry Base Values & Display
+                    if (pkg.telemetry) {
+                        baseSolar = pkg.telemetry.baseSolar || 3.48;
+                        baseHome = pkg.telemetry.baseHome || 1.85;
+                        baseBattery = pkg.telemetry.baseBattery || 1.15;
+                        currentBatterySoc = pkg.telemetry.batterySoc || 92;
+                    }
+
+                    updateTelemetryDisplay();
+
+                    // Synchronize portal active package ID
+                    if (window.HelloSolar && window.HelloSolar.setActivePackageId) {
+                        window.HelloSolar.setActivePackageId(pkg.id);
+                    }
+
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+
+                    if (backToSystemsBtn) {
+                        setTimeout(() => backToSystemsBtn.focus(), 100);
+                    }
+                }
+
+                function closeSystemDetail() {
+                    if (systemDetailView) {
+                        systemDetailView.style.display = "none";
+                        systemDetailView.classList.remove("active", "mobile-fullscreen");
+                    }
+                    document.body.classList.remove("modal-open", "detail-view-open");
+
+                    if (systemsOverviewView) {
+                        systemsOverviewView.style.display = "block";
+                    }
+
+                    window.scrollTo({ top: previousScrollY, behavior: "auto" });
+
+                    if (lastTriggerElement && typeof lastTriggerElement.focus === "function") {
+                        lastTriggerElement.focus();
+                    }
+                }
+
+                if (backToSystemsBtn) {
+                    backToSystemsBtn.addEventListener("click", closeSystemDetail);
+                }
+
+                window.addEventListener("resize", () => {
+                    if (systemDetailView && systemDetailView.classList.contains("active")) {
+                        const isMobile = window.innerWidth <= 768;
+                        systemDetailView.style.display = isMobile ? "flex" : "block";
+                        if (isMobile) {
+                            systemDetailView.classList.add("mobile-fullscreen");
+                            document.body.classList.add("modal-open", "detail-view-open");
+                        } else {
+                            systemDetailView.classList.remove("mobile-fullscreen");
+                            document.body.classList.remove("modal-open", "detail-view-open");
+                        }
+                    }
+                });
+
+                // --------------------------------------------------------------------------
+                // 8. PER-SYSTEM INSTALLATION & ACTIVATION MODAL
+                // --------------------------------------------------------------------------
+                const activationModalBackdrop = document.getElementById("activationModalBackdrop");
+                const closeActivationModalBtn = document.getElementById("closeActivationModalBtn");
+                const closeActivationFooterBtn = document.getElementById("closeActivationFooterBtn");
+                const advanceMilestoneBtn = document.getElementById("advanceMilestoneBtn");
+                const activateSystemBtn = document.getElementById("activateSystemBtn");
+                const activationModalModelName = document.getElementById("activationModalModelName");
+                const activationModalAccountNo = document.getElementById("activationModalAccountNo");
+                const activationRequirementsNotice = document.getElementById("activationRequirementsNotice");
+                const activationStepsList = document.getElementById("activationStepsList");
+
+                let targetActivationPackage = null;
+                let activeMilestones = [];
+
+                function openActivationModal(pkg) {
+                    if (!pkg) return;
+                    targetActivationPackage = pkg;
+                    activeMilestones = getSystemMilestones(pkg);
+
+                    if (activationModalModelName) activationModalModelName.textContent = pkg.name;
+                    if (activationModalAccountNo) activationModalAccountNo.textContent = pkg.accountNo || pkg.location || "HS-Pending";
+
+                    renderActivationMilestones();
+
+                    if (activationModalBackdrop) {
+                        activationModalBackdrop.classList.add("open");
+                        activationModalBackdrop.setAttribute("aria-hidden", "false");
+                        document.body.classList.add("modal-open");
+                        if (closeActivationModalBtn) setTimeout(() => closeActivationModalBtn.focus(), 80);
+                    }
+                }
+
+                function closeActivationModal() {
+                    if (activationModalBackdrop) {
+                        activationModalBackdrop.classList.remove("open");
+                        activationModalBackdrop.setAttribute("aria-hidden", "true");
+                    }
+                    document.body.classList.remove("modal-open");
+                    if (lastTriggerElement && typeof lastTriggerElement.focus === "function") {
+                        lastTriggerElement.focus();
+                    }
+                }
+
+                function renderActivationMilestones() {
+                    if (!activationStepsList) return;
+                    activationStepsList.innerHTML = "";
+
+                    let allCompleted = true;
+                    let firstIncompleteIdx = -1;
+
+                    activeMilestones.forEach((m, idx) => {
+                        const isDone = m.status === "Completed";
+                        if (!isDone && allCompleted) {
+                            allCompleted = false;
+                            firstIncompleteIdx = idx;
+                        }
+
+                        const item = document.createElement("div");
+                        item.className = `activation-step-item ${isDone ? 'completed' : (idx === firstIncompleteIdx ? 'active' : '')}`;
+
+                        item.innerHTML = `
+                            <div class="activation-step-indicator" aria-hidden="true">
+                                ${isDone ? '✓' : m.num}
+                            </div>
+                            <div class="activation-step-content">
+                                <div class="activation-step-title">${m.title}</div>
+                                <div class="activation-step-desc">${m.desc}</div>
+                                <div style="font-size: 11.5px; color: ${isDone ? '#059669' : 'var(--gray-400)'}; margin-top: 4px; font-weight: 600;">
+                                    ${m.date || (isDone ? 'Completed' : 'Pending')}
+                                </div>
+                            </div>
+                        `;
+
+                        activationStepsList.appendChild(item);
+                    });
+
+                    // Update Notice and Activate button state
+                    if (allCompleted) {
+                        if (activateSystemBtn) activateSystemBtn.disabled = false;
+                        if (advanceMilestoneBtn) advanceMilestoneBtn.style.display = "none";
+                        if (activationRequirementsNotice) {
+                            activationRequirementsNotice.innerHTML = `<strong>Requirements Met:</strong> All 5 installation milestones are completed. You may now commission and activate this solar system.`;
+                            activationRequirementsNotice.style.background = "#ecfdf5";
+                            activationRequirementsNotice.style.borderColor = "#a7f3d0";
+                            activationRequirementsNotice.style.color = "#065f46";
+                        }
+                    } else {
+                        if (activateSystemBtn) activateSystemBtn.disabled = true;
+                        if (advanceMilestoneBtn) {
+                            advanceMilestoneBtn.style.display = "inline-flex";
+                            const btnSpan = advanceMilestoneBtn.querySelector("span");
+                            if (btnSpan) btnSpan.textContent = `Complete Stage ${firstIncompleteIdx + 1} of 5`;
+                        }
+                        if (activationRequirementsNotice) {
+                            activationRequirementsNotice.innerHTML = `<strong>Activation Notice:</strong> System activation requires completion of all 5 installation milestones and engineering sign-off. Clicking a card does not activate automatically.`;
+                            activationRequirementsNotice.style.background = "#fffbeb";
+                            activationRequirementsNotice.style.borderColor = "#fed7aa";
+                            activationRequirementsNotice.style.color = "#9a3412";
+                        }
+                    }
+                }
+
+                // Advance incomplete milestone
+                if (advanceMilestoneBtn) {
+                    advanceMilestoneBtn.addEventListener("click", () => {
+                        if (!targetActivationPackage) return;
+                        const idx = activeMilestones.findIndex(m => m.status !== "Completed");
+                        if (idx !== -1) {
+                            const todayStr = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                            activeMilestones[idx].status = "Completed";
+                            activeMilestones[idx].date = `Completed ${todayStr}`;
+                            saveSystemMilestones(targetActivationPackage.id, activeMilestones);
+                            renderActivationMilestones();
+
+                            if (window.HelloSolar && window.HelloSolar.toast) {
+                                window.HelloSolar.toast(
+                                    "Stage Progressed",
+                                    `Milestone ${idx + 1} marked completed for ${targetActivationPackage.name}.`
+                                );
+                            }
+                        }
+                    });
+                }
+
+                // Activate System Button
+                if (activateSystemBtn) {
+                    activateSystemBtn.addEventListener("click", () => {
+                        if (!targetActivationPackage) return;
+
+                        // Save activated state in localStorage
+                        setSystemActivated(targetActivationPackage.id, true);
+                        targetActivationPackage.status = "Online · Normal";
+
+                        // Provide default telemetry if previously null
+                        if (!targetActivationPackage.telemetry) {
+                            targetActivationPackage.telemetry = {
+                                baseSolar: 4.50,
+                                baseHome: 2.20,
+                                baseBattery: 0,
+                                pvStrings: "PV1: 340V · PV2: 338V",
+                                gridSync: "230.5 V · 60.0 Hz",
+                                inverterTemp: "39.2°C (Optimal)"
+                            };
+                        }
+
+                        if (window.HelloSolar && window.HelloSolar.toast) {
+                            window.HelloSolar.toast(
+                                "System Activated!",
+                                `${targetActivationPackage.name} is now energized and generating solar power.`
+                            );
+                        }
+
+                        closeActivationModal();
+                        renderSystemsGrid();
+                        openSystemDetail(targetActivationPackage);
+                    });
+                }
+
+                if (closeActivationModalBtn) closeActivationModalBtn.addEventListener("click", closeActivationModal);
+                if (closeActivationFooterBtn) closeActivationFooterBtn.addEventListener("click", closeActivationModal);
+
+                if (activationModalBackdrop) {
+                    activationModalBackdrop.addEventListener("click", (e) => {
+                        if (e.target === activationModalBackdrop) closeActivationModal();
+                    });
+                }
+
+                // --------------------------------------------------------------------------
+                // 9. IN-PAGE SUPPORT MODAL (PRE-ASSOCIATED WITH SELECTED SYSTEM)
+                // --------------------------------------------------------------------------
+                const openSystemSupportBtn = document.getElementById("openSystemSupportBtn");
+                const systemSupportModalBackdrop = document.getElementById("systemSupportModalBackdrop");
+                const closeSupportModalBtn = document.getElementById("closeSupportModalBtn");
+                const cancelSupportModalBtn = document.getElementById("cancelSupportModalBtn");
+                const systemSupportForm = document.getElementById("systemSupportForm");
+                const supportModalSystemName = document.getElementById("supportModalSystemName");
+                const supportModalAccountNo = document.getElementById("supportModalAccountNo");
+                const supportModalSubject = document.getElementById("supportModalSubject");
+
+                function openSystemSupportModal() {
+                    const pkg = currentPackage || getUserPackages()[0];
+                    if (!pkg) return;
+
+                    lastTriggerElement = openSystemSupportBtn;
+
+                    if (supportModalSystemName) supportModalSystemName.textContent = pkg.name;
+                    if (supportModalAccountNo) supportModalAccountNo.textContent = pkg.accountNo || pkg.location || "HS-Pending";
+
+                    if (systemSupportModalBackdrop) {
+                        systemSupportModalBackdrop.classList.add("open");
+                        systemSupportModalBackdrop.setAttribute("aria-hidden", "false");
+                        document.body.classList.add("modal-open");
+                        if (supportModalSubject) {
+                            setTimeout(() => supportModalSubject.focus(), 100);
+                        }
+                    }
+                }
+
+                function closeSystemSupportModal() {
+                    if (systemSupportModalBackdrop) {
+                        systemSupportModalBackdrop.classList.remove("open");
+                        systemSupportModalBackdrop.setAttribute("aria-hidden", "true");
+                    }
+                    document.body.classList.remove("modal-open");
+                    if (openSystemSupportBtn && typeof openSystemSupportBtn.focus === "function") {
+                        openSystemSupportBtn.focus();
+                    }
+                }
+
+                if (openSystemSupportBtn) {
+                    openSystemSupportBtn.addEventListener("click", openSystemSupportModal);
+                }
+
+                if (closeSupportModalBtn) closeSupportModalBtn.addEventListener("click", closeSystemSupportModal);
+                if (cancelSupportModalBtn) cancelSupportModalBtn.addEventListener("click", closeSystemSupportModal);
+
+                if (systemSupportModalBackdrop) {
+                    systemSupportModalBackdrop.addEventListener("click", (e) => {
+                        if (e.target === systemSupportModalBackdrop) closeSystemSupportModal();
+                    });
+                }
+
+                if (systemSupportForm) {
+                    systemSupportForm.addEventListener("submit", (e) => {
+                        e.preventDefault();
+                        const pkg = currentPackage || getUserPackages()[0];
+                        const subject = supportModalSubject ? supportModalSubject.value.trim() : "System Inquiry";
+
+                        closeSystemSupportModal();
+                        if (systemSupportForm) systemSupportForm.reset();
+
+                        if (window.HelloSolar && window.HelloSolar.toast) {
+                            window.HelloSolar.toast(
+                                "Support Request Sent",
+                                `Ticket logged for ${pkg.name} (${pkg.accountNo || 'HS-Account'}): "${subject}". Our team will respond shortly.`
+                            );
+                        }
+                    });
+                }
+
+                // --------------------------------------------------------------------------
+                // 10. ADD ACCOUNT MODAL CONTROLLER
+                // --------------------------------------------------------------------------
+                const openAddAccountOverviewBtn = document.getElementById("openAddAccountOverviewBtn");
+                const addAccountModalBackdrop = document.getElementById("addAccountModalBackdrop");
+                const closeAddAccountModal = document.getElementById("closeAddAccountModal");
+                const cancelAddAccountBtn = document.getElementById("cancelAddAccountBtn");
+                const submitAddAccountBtn = document.getElementById("submitAddAccountBtn");
+                const serviceAccountIdInput = document.getElementById("serviceAccountIdInput");
+
+                function openAddAccountModalDialog() {
+                    if (addAccountModalBackdrop) {
+                        addAccountModalBackdrop.classList.add("open");
+                        addAccountModalBackdrop.setAttribute("aria-hidden", "false");
+                        document.body.classList.add("modal-open");
+                        if (serviceAccountIdInput) {
+                            setTimeout(() => serviceAccountIdInput.focus(), 100);
+                        }
+                    }
+                }
+
+                function closeAddAccountModalDialog() {
+                    if (addAccountModalBackdrop) {
+                        addAccountModalBackdrop.classList.remove("open");
+                        addAccountModalBackdrop.setAttribute("aria-hidden", "true");
+                    }
+                    document.body.classList.remove("modal-open");
+                    if (serviceAccountIdInput) serviceAccountIdInput.value = "";
+                    if (lastTriggerElement && typeof lastTriggerElement.focus === "function") {
+                        lastTriggerElement.focus();
+                    }
+                }
+
+                if (openAddAccountOverviewBtn) {
+                    openAddAccountOverviewBtn.addEventListener("click", (e) => {
+                        lastTriggerElement = openAddAccountOverviewBtn;
+                        openAddAccountModalDialog();
+                    });
+                }
+
+                if (closeAddAccountModal) closeAddAccountModal.addEventListener("click", closeAddAccountModalDialog);
+                if (cancelAddAccountBtn) cancelAddAccountBtn.addEventListener("click", closeAddAccountModalDialog);
+
+                if (addAccountModalBackdrop) {
+                    addAccountModalBackdrop.addEventListener("click", (e) => {
+                        if (e.target === addAccountModalBackdrop) closeAddAccountModalDialog();
+                    });
+                }
+
+                if (submitAddAccountBtn) {
+                    submitAddAccountBtn.addEventListener("click", () => {
+                        const val = serviceAccountIdInput ? serviceAccountIdInput.value.trim() : "";
+                        if (!val) {
+                            if (serviceAccountIdInput) serviceAccountIdInput.focus();
+                            return;
+                        }
+
+                        // Create linked account object
+                        const cleanId = `pkg-user-${Date.now().toString().slice(-4)}`;
+                        const newSystem = {
+                            id: cleanId,
+                            name: `Solar Unit (${val})`,
+                            shortLabel: `Solar Unit — 5.0 kW`,
+                            capacity: "5.0 kW",
+                            location: `Service Account · ${val}`,
+                            accountNo: val,
+                            status: "Deactivated",
+                            isCustomAdded: true,
+                            telemetry: null,
+                            payments: { status: "Due Soon", standing: "Due Soon" },
+                            energy: { billSaved: "—" },
+                            install: {
+                                completionPct: 20,
+                                milestones: JSON.parse(JSON.stringify(DEFAULT_5_MILESTONES))
+                            }
+                        };
+
+                        saveUserLinkedAccount(newSystem);
+                        closeAddAccountModalDialog();
+                        renderSystemsGrid();
+
+                        if (window.HelloSolar && window.HelloSolar.toast) {
+                            window.HelloSolar.toast(
+                                "Account Linked",
+                                `Account ${val} added to your solar systems. Complete installation activation to energize.`
+                            );
+                        }
+                    });
+                }
+
+                // Global Escape Key Listener
+                document.addEventListener("keydown", (e) => {
+                    if (e.key === "Escape") {
+                        if (systemSupportModalBackdrop && systemSupportModalBackdrop.classList.contains("open")) {
+                            closeSystemSupportModal();
+                        } else if (activationModalBackdrop && activationModalBackdrop.classList.contains("open")) {
+                            closeActivationModal();
+                        } else if (addAccountModalBackdrop && addAccountModalBackdrop.classList.contains("open")) {
+                            closeAddAccountModalDialog();
+                        } else if (systemDetailView && systemDetailView.classList.contains("mobile-fullscreen")) {
+                            closeSystemDetail();
+                        }
+                    }
+                });
+
+                // --------------------------------------------------------------------------
+                // 11. TIMING & INITIALIZATION
+                // --------------------------------------------------------------------------
+                // Initialize Overview Grid
+                renderSystemsGrid();
+
+                // Periodic telemetry jitter (every 4s)
+                if (telemetryIntervalId) clearInterval(telemetryIntervalId);
+                telemetryIntervalId = setInterval(updateTelemetryDisplay, 4000);
+
+                // Periodic seconds ticker
+                if (tickerIntervalId) clearInterval(tickerIntervalId);
+                tickerIntervalId = setInterval(() => {
+                    secondsSinceSync++;
+                    if (telemetryTimestampEl) {
+                        telemetryTimestampEl.textContent = `Sync: ${secondsSinceSync}s ago`;
+                    }
+                }, 1000);
+
+                // Manual Sync Button Handler
+                if (telemetrySyncBtn) {
+                    telemetrySyncBtn.addEventListener("click", () => {
+                        telemetrySyncBtn.classList.add("syncing");
+                        if (syncBtnLabel) syncBtnLabel.textContent = "Syncing...";
+
+                        setTimeout(() => {
+                            updateTelemetryDisplay();
+                            telemetrySyncBtn.classList.remove("syncing");
+                            if (syncBtnLabel) syncBtnLabel.textContent = "Synced";
+
+                            if (window.HelloSolar && window.HelloSolar.toast) {
+                                window.HelloSolar.toast(
+                                    "Live Telemetry Synchronized",
+                                    `Inverter telemetry verified for ${currentPackage ? currentPackage.name : "system"}.`
+                                );
+                            }
+
+                            setTimeout(() => {
+                                if (syncBtnLabel) syncBtnLabel.textContent = "Sync";
+                            }, 1800);
+                        }, 600);
+                    });
+                }
+
+                // Listen for async JSON dataset load
+                window.addEventListener("helloSolarDataLoaded", (e) => {
+                    if (e.detail && Array.isArray(e.detail.packages)) {
+                        packages = e.detail.packages;
+                        renderSystemsGrid();
+                    }
+                });
+
+                // Handle window resize for mobile-fullscreen class on detail view
+                window.addEventListener("resize", () => {
+                    if (systemDetailView && systemDetailView.classList.contains("active")) {
+                        if (window.innerWidth <= 768) {
+                            systemDetailView.classList.add("mobile-fullscreen");
+                            document.body.classList.add("modal-open", "detail-view-open");
+                        } else {
+                            systemDetailView.classList.remove("mobile-fullscreen");
+                            document.body.classList.remove("modal-open", "detail-view-open");
+                        }
+                    }
+                });
+            })();
+        </script>
+        <script src="assets/js/notifications.js"></script>
+</body>
+
+</html>

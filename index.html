@@ -5,18 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hello Solar Customer Portal</title>
-    <style>
-        * {
-            background-image: url('assets/images/landing_page_bg.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-    </style>
+    <!-- Favicon / Tab Icon -->
+    <link rel="icon" type="image/png" href="assets/images/logofortab.png">
     <script>
         // Automatic routing based on authentication state
         if (localStorage.getItem("hello_solar_logged_in") === "true") {
-            window.location.replace("dashboard.html");
+            window.location.replace("mysystem.html");
         } else {
             window.location.replace("login.html");
         }

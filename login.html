@@ -14,6 +14,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
+    <!-- Favicon / Tab Icon -->
+    <link rel="icon" type="image/png" href="assets/images/logofortab.png">
+
     <!-- Design System CSS -->
     <link rel="stylesheet" href="assets/css/portal.css">
 
@@ -54,8 +57,30 @@
             width: auto;
         }
 
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
         .auth-header {
-            margin-bottom: 26px;
+            margin-bottom: 24px;
+        }
+
+        .eyebrow,
+        .auth-header .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 11px;
+            font-style: normal;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--solar-orange-dark, #f47718);
+            background: rgba(255, 138, 0, 0.08);
+            padding: 4px 10px;
+            border-radius: 999px;
+            margin-bottom: 10px;
         }
 
         .auth-header h1 {
@@ -209,6 +234,24 @@
             color: var(--navy);
         }
 
+        .error-msg {
+            display: none;
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.4;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-msg.visible {
+            display: flex;
+        }
+
         @media (max-width: 480px) {
             .auth-card {
                 padding: 28px 20px;
@@ -244,12 +287,37 @@
             </a>
 
             <header class="auth-header">
-                <!-- <p class="eyebrow">Customer Portal</p> -->
+                <span class="eyebrow">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    Customer Portal
+                </span>
                 <h1 id="loginHeading">Welcome <span>back.</span></h1>
                 <p>Log in to access your system dashboard, live production, and billing details.</p>
             </header>
 
             <form class="auth-form" id="loginForm" novalidate>
+                <!-- Error Alert Box -->
+                <div class="error-msg" id="loginErrorMsg" role="alert">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span id="loginErrorText">Invalid email, account ID, or password. Please try again.</span>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label" for="username">Email or Account ID</label>
                     <div class="input-icon-wrap">
@@ -259,8 +327,8 @@
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
                         <input class="form-input" id="username" name="username" type="text"
-                            placeholder="e.g. juan@hellosolar.ph" autocomplete="username" value="customer@hellosolar.ph"
-                            required>
+                            placeholder="e.g. customer@hellosolar.ph" autocomplete="username"
+                            value="customer@hellosolar.ph" required>
                     </div>
                 </div>
 
@@ -278,7 +346,7 @@
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
                         <input class="form-input" id="password" name="password" type="password"
-                            placeholder="Enter password" autocomplete="current-password" value="••••••••" required>
+                            placeholder="Enter password" autocomplete="current-password" value="password123" required>
                         <button type="button" class="password-toggle-btn" id="passwordToggle"
                             aria-label="Toggle password visibility">
                             <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none"
@@ -306,7 +374,7 @@
 
             <div class="demo-credentials-box">
                 <div><strong>Demo Mode:</strong> Pre-filled with demo account.</div>
-                <div>Account: <code>customer@hellosolar.ph</code> · Any password</div>
+                <div>Account: <code>customer@hellosolar.ph</code> · Password: <code>password123</code></div>
             </div>
 
             <p class="auth-footer">
@@ -315,6 +383,9 @@
             </p>
         </section>
     </main>
+
+    <!-- Customer Authentication Logic & Registry -->
+    <script src="assets/js/auth.js"></script>
 
     <!-- Core Portal JavaScript -->
     <script src="assets/js/portal.js"></script>
@@ -328,6 +399,21 @@
         const passwordToggle = document.getElementById("passwordToggle");
         const usernameInput = document.getElementById("username");
         const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+        const loginErrorMsg = document.getElementById("loginErrorMsg");
+        const loginErrorText = document.getElementById("loginErrorText");
+
+        function showError(msg) {
+            if (loginErrorMsg && loginErrorText) {
+                loginErrorText.textContent = msg;
+                loginErrorMsg.classList.add("visible");
+            }
+        }
+
+        function hideError() {
+            if (loginErrorMsg) {
+                loginErrorMsg.classList.remove("visible");
+            }
+        }
 
         // Toggle password visibility
         passwordToggle.addEventListener("click", (e) => {
@@ -340,7 +426,6 @@
             const eyeIcon = document.getElementById("eyeIcon");
             if (eyeIcon) {
                 if (isPassword) {
-                    // Password revealed -> show eye-off (slashed eye)
                     eyeIcon.innerHTML = `
                         <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
                         <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
@@ -348,7 +433,6 @@
                         <line x1="2" y1="2" x2="22" y2="22"/>
                     `;
                 } else {
-                    // Password hidden -> show regular open eye
                     eyeIcon.innerHTML = `
                         <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
                         <circle cx="12" cy="12" r="3"/>
@@ -359,32 +443,53 @@
 
         forgotPasswordLink.addEventListener("click", (e) => {
             e.preventDefault();
-            window.HelloSolar.toast("Password Reset Demo", "A reset link simulation has been sent to your registered email address.");
+            if (window.HelloSolar && window.HelloSolar.toast) {
+                window.HelloSolar.toast("Password Reset Demo", "A reset simulation link has been sent to your registered email address.");
+            } else {
+                alert("Please contact Hello Solar Support at support@hellosolar.ph to reset your customer credentials.");
+            }
         });
 
-        function performLogin(customerName = null) {
+        function performLogin(identifier = null, password = null) {
+            hideError();
+
+            const id = (identifier || usernameInput.value).trim();
+            const pass = password !== null ? password : passwordInput.value;
+
+            if (!id) {
+                showError("Please enter your email or account ID.");
+                usernameInput.focus();
+                return;
+            }
+
+            if (!pass) {
+                showError("Please enter your password.");
+                passwordInput.focus();
+                return;
+            }
+
             loginBtn.disabled = true;
-            loginBtnText.textContent = "Authenticating...";
+            loginBtnText.textContent = "Verifying...";
 
             setTimeout(() => {
-                localStorage.setItem("hello_solar_logged_in", "true");
+                // Check credentials against HelloSolarAuth
+                const matchedUser = window.HelloSolarAuth ? window.HelloSolarAuth.authenticate(id, pass) : null;
 
-                if (customerName) {
-                    localStorage.setItem("hello_solar_user", customerName);
+                if (matchedUser) {
+                    window.HelloSolarAuth.setSession(matchedUser);
+                    loginBtnText.textContent = "Access Granted ✓";
+                    loginBtn.style.background = "#16a34a";
+
+                    setTimeout(() => {
+                        window.location.href = "mysystem.html";
+                    }, 350);
                 } else {
-                    const rawUser = usernameInput.value.trim();
-                    if (rawUser && !rawUser.includes("@")) {
-                        localStorage.setItem("hello_solar_user", rawUser);
-                    } else if (!localStorage.getItem("hello_solar_user")) {
-                        localStorage.setItem("hello_solar_user", "Juan Dela Cruz");
-                    }
+                    loginBtn.disabled = false;
+                    loginBtnText.textContent = "Log In";
+                    showError("Invalid email/account ID or password. Please try again.");
+                    passwordInput.focus();
                 }
-
-                loginBtnText.textContent = "Access Granted ✓";
-                setTimeout(() => {
-                    window.location.href = "dashboard.html";
-                }, 300);
-            }, 600);
+            }, 500);
         }
 
         loginForm.addEventListener("submit", (e) => {
@@ -393,8 +498,9 @@
         });
 
         quickDemoBtn.addEventListener("click", () => {
-            usernameInput.value = "Juan Dela Cruz";
-            performLogin("Juan Dela Cruz");
+            usernameInput.value = "customer@hellosolar.ph";
+            passwordInput.value = "password123";
+            performLogin("customer@hellosolar.ph", "password123");
         });
     </script>
 </body>

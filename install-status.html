@@ -7,10 +7,20 @@
     <meta name="description" content="Hello Solar — Track your rooftop solar installation progress, milestone stages, and inspection dates.">
     <title>Hello Solar — Install Status</title>
 
+    <!-- Immediate Authentication Guard -->
+    <script>
+        if (localStorage.getItem("hello_solar_logged_in") !== "true") {
+            window.location.replace("login.html");
+        }
+    </script>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Favicon / Tab Icon -->
+    <link rel="icon" type="image/png" href="assets/images/logofortab.png">
 
     <!-- Design System CSS -->
     <link rel="stylesheet" href="assets/css/portal.css">
@@ -164,28 +174,21 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="assets/css/notifications.css">
 </head>
 
 <body>
     <div class="app">
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
-            <a href="dashboard.html" class="logo">
+            <a href="mysystem.html" class="logo">
                 <img src="assets/images/hello_solar.png" alt="Hello Solar">
             </a>
 
             <div class="nav-label">Customer Portal</div>
 
             <nav class="nav" aria-label="Portal navigation">
-                <a href="dashboard.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
-                        <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-                    </svg>
-                    Dashboard
-                </a>
-
-                <a href="my-system.html" class="nav-link">
+                <a href="mysystem.html" class="nav-link">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="4" />
                         <path d="M12 2v2" /><path d="M12 20v2" />
@@ -261,7 +264,7 @@
                             <line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="18" x2="20" y2="18" />
                         </svg>
                     </button>
-                    <a href="dashboard.html" class="mobile-logo">
+                    <a href="mysystem.html" class="mobile-logo">
                         <img src="assets/images/hello_solar.png" alt="Hello Solar">
                     </a>
                 </div>
@@ -283,6 +286,7 @@
             </header>
 
             <!-- CONTENT -->
+            <!-- CONTENT -->
             <div class="content">
                 <section class="page-intro">
                     <div>
@@ -291,17 +295,18 @@
                         <p>Track the 5 major milestone stages of your rooftop solar installation.</p>
                     </div>
                     <div class="cta-group">
-                        <a href="support.html?type=installation" class="btn btn-primary">
+                        <div class="package-selector-slot" id="pagePackageSelector"></div>
+                        <a href="support.html?type=installation" class="btn btn-primary" id="contactLeadBtn">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                             </svg>
-                            Contact Project Lead
+                            <span id="contactLeadBtnText">Contact Project Lead</span>
                         </a>
-                        <a href="my-system.html" class="btn btn-secondary">
+                        <a href="mysystem.html#specsCard" class="btn btn-secondary" id="hardwareSpecsBtn">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/>
                             </svg>
-                            Hardware Specs
+                            <span>Hardware Specs</span>
                         </a>
                     </div>
                 </section>
@@ -317,8 +322,8 @@
                                 </svg>
                             </div>
                         </div>
-                        <div class="summary-value">In Progress</div>
-                        <div class="summary-meta"><span class="status-dot"></span>Active deployment</div>
+                        <div class="summary-value" id="installPhaseVal">In Progress</div>
+                        <div class="summary-meta" id="installPhaseMeta"><span class="status-dot"></span>Active deployment</div>
                     </article>
 
                     <article class="summary-card">
@@ -330,8 +335,8 @@
                                 </svg>
                             </div>
                         </div>
-                        <div class="summary-value">60%</div>
-                        <div class="summary-meta">3 of 5 milestones achieved</div>
+                        <div class="summary-value" id="installCompletionVal">60%</div>
+                        <div class="summary-meta" id="installCompletionMeta">3 of 5 milestones achieved</div>
                     </article>
 
                     <article class="summary-card">
@@ -343,8 +348,8 @@
                                 </svg>
                             </div>
                         </div>
-                        <div class="summary-value">Grid Sync</div>
-                        <div class="summary-meta">Net-metering connection</div>
+                        <div class="summary-value" id="installMilestoneVal">Grid Sync</div>
+                        <div class="summary-meta" id="installMilestoneMeta">Net-metering connection</div>
                     </article>
 
                     <article class="summary-card">
@@ -356,8 +361,8 @@
                                 </svg>
                             </div>
                         </div>
-                        <div class="summary-value">Aug 30</div>
-                        <div class="summary-meta">Final utility inspection</div>
+                        <div class="summary-value" id="installTargetVal">Aug 30</div>
+                        <div class="summary-meta" id="installTargetMeta">Final utility inspection</div>
                     </article>
                 </section>
 
@@ -368,85 +373,18 @@
                         <div class="panel-header" style="padding: 0 0 16px; border-bottom: none;">
                             <div>
                                 <h2 class="panel-title">Stage Progression</h2>
-                                <p class="panel-subtitle">From engineering site survey to utility grid energization</p>
+                                <p class="panel-subtitle" id="installProgressSubtitle">From engineering site survey to utility grid energization</p>
                             </div>
-                            <span class="badge badge-upcoming">60% Complete</span>
+                            <span class="badge badge-upcoming" id="installProgressBadge">60% Complete</span>
                         </div>
 
                         <div class="overall-progress-bar">
-                            <div class="overall-progress-fill"></div>
+                            <div class="overall-progress-fill" id="installProgressBarFill" style="width: 60%;"></div>
                         </div>
 
-                        <!-- 5 Milestone Stages -->
-                        <div class="milestone-steps-list">
-                            <!-- Stage 1 -->
-                            <div class="milestone-step-item completed">
-                                <div class="step-timeline-connector"></div>
-                                <div class="step-indicator">✓</div>
-                                <div class="step-content">
-                                    <div class="step-top">
-                                        <h3 class="step-title">1. Site Assessment & Engineering Survey</h3>
-                                        <span class="badge badge-paid">Completed</span>
-                                    </div>
-                                    <p class="step-desc">Roof structural audit, solar irradiation modeling, and electrical panel inspection completed.</p>
-                                    <div class="step-date">Completed March 1, 2025</div>
-                                </div>
-                            </div>
-
-                            <!-- Stage 2 -->
-                            <div class="milestone-step-item completed">
-                                <div class="step-timeline-connector"></div>
-                                <div class="step-indicator">✓</div>
-                                <div class="step-content">
-                                    <div class="step-top">
-                                        <h3 class="step-title">2. Solar PV Panels Installed</h3>
-                                        <span class="badge badge-paid">Completed</span>
-                                    </div>
-                                    <p class="step-desc">12x Trina Solar 420W Monocrystalline modules mounted, clamped, and DC wired.</p>
-                                    <div class="step-date">Completed March 10, 2025</div>
-                                </div>
-                            </div>
-
-                            <!-- Stage 3 -->
-                            <div class="milestone-step-item completed">
-                                <div class="step-timeline-connector"></div>
-                                <div class="step-indicator">✓</div>
-                                <div class="step-content">
-                                    <div class="step-top">
-                                        <h3 class="step-title">3. Inverter & Battery Storage Setup</h3>
-                                        <span class="badge badge-paid">Completed</span>
-                                    </div>
-                                    <p class="step-desc">Solis 5kW hybrid inverter, 10 kWh battery enclosure, and ATS backup switch mounted.</p>
-                                    <div class="step-date">Completed March 15, 2025</div>
-                                </div>
-                            </div>
-
-                            <!-- Stage 4 -->
-                            <div class="milestone-step-item active">
-                                <div class="step-timeline-connector"></div>
-                                <div class="step-indicator">4</div>
-                                <div class="step-content">
-                                    <div class="step-top">
-                                        <h3 class="step-title">4. Utility Grid Connection (Net Metering)</h3>
-                                        <span class="badge badge-upcoming">In Progress</span>
-                                    </div>
-                                    <p class="step-desc">Utility bi-directional meter testing and distribution utility coordination underway.</p>
-                                    <div class="step-date">Current Stage · Estimated 3-5 business days</div>
-                                </div>
-                            </div>
-
-                            <!-- Stage 5 -->
-                            <div class="milestone-step-item">
-                                <div class="step-indicator">5</div>
-                                <div class="step-content">
-                                    <div class="step-top">
-                                        <h3 class="step-title">5. Final Safety Inspection & Handover</h3>
-                                        <span class="badge badge-neutral">Scheduled</span>
-                                    </div>
-                                    <p class="step-desc">Final safety commissioning, net-metering sign-off, and customer portal walk-through.</p>
-                                    <div class="step-date">Scheduled for August 30, 2026</div>
-                                </div>
-                            </div>
+                        <!-- 5 Milestone Stages Container -->
+                        <div class="milestone-steps-list" id="milestoneStepsList">
+                            <!-- Populated dynamically via JS -->
                         </div>
                     </section>
 
@@ -455,26 +393,31 @@
                         <section class="installer-contact-card">
                             <span class="eyebrow">Your Assigned Team</span>
                             <div style="display: flex; align-items: center; gap: 14px;">
-                                <div class="team-avatar">CV</div>
+                                <div class="team-avatar" id="assignedTeamAvatar">CV</div>
                                 <div>
-                                    <h3 style="font-size: 16px; font-weight: 800; color: var(--navy);">Carlos Villanueva</h3>
-                                    <p style="font-size: 12.5px; color: var(--gray-500);">Certified Solar Master Installer</p>
-                                    <p style="font-size: 12px; color: var(--solar-orange-dark); font-weight: 700;">+63 917 555 0101</p>
+                                    <h3 style="font-size: 16px; font-weight: 800; color: var(--navy);" id="assignedTeamName">Carlos Villanueva</h3>
+                                    <p style="font-size: 12.5px; color: var(--gray-500);" id="assignedTeamRole">Certified Solar Master Installer</p>
+                                    <p style="font-size: 12px; color: var(--solar-orange-dark); font-weight: 700;" id="assignedTeamPhone">+63 917 555 0101</p>
                                 </div>
                             </div>
 
-                            <p style="font-size: 13px; color: var(--gray-600); line-height: 1.4;">
-                                Carlos is managing your rooftop installation and utility coordination. You can message him directly or request Hello Solar customer support.
+                            <p style="font-size: 13px; color: var(--gray-600); line-height: 1.4;" id="assignedTeamNote">
+                                Carlos managed your rooftop installation and utility coordination. You can message him directly or request Hello Solar customer support.
                             </p>
 
-                            <a href="support.html" class="btn btn-primary btn-sm" style="width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                            <div style="padding: 10px 14px; background: var(--gray-50); border-radius: var(--radius-sm); border: 1px solid var(--gray-200); font-size: 12px; color: var(--gray-600);">
+                                <strong style="color: var(--navy); display: block; margin-bottom: 2px;">System Hardware Scope:</strong>
+                                <span id="assignedTeamHardware">12x Trina Solar 450W Panels · Solis 5kW Hybrid Inverter · 10 kWh Battery</span>
+                            </div>
+
+                            <a href="support.html" class="btn btn-primary btn-sm" id="messageTeamBtn" style="width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M3 11a9 9 0 0 1 18 0" />
                                     <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
                                     <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
                                     <path d="M17 17c0 2-2 3-5 3" />
                                 </svg>
-                                Send Message to Carlos
+                                <span id="messageTeamBtnText">Send Message to Carlos</span>
                             </a>
                         </section>
 
@@ -483,8 +426,8 @@
                             <p style="font-size: 13px; color: var(--gray-500); line-height: 1.4; margin-bottom: 14px;">
                                 If you need to adjust your on-site inspection appointment, our logistics team is available Mon-Sat, 8 AM - 6 PM.
                             </p>
-                            <a href="tel:09175550101" class="btn btn-outline btn-sm" style="width: 100%;">
-                                Call Hello Solar Dispatch
+                            <a href="tel:09175550101" id="dispatchPhoneLink" class="btn btn-outline btn-sm" style="width: 100%;">
+                                <span id="dispatchPhoneText">Call Hello Solar Dispatch</span>
                             </a>
                         </section>
                     </div>
@@ -499,45 +442,233 @@
         </main>
     </div>
 
-    <!-- MOBILE BOTTOM NAVIGATION (ERGONOMIC 5-PILLAR APP NAV) -->
+    <!-- MOBILE BOTTOM NAVIGATION (5-PILLAR CUSTOMER APP NAV) -->
     <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
         <div class="mobile-bottom-nav-inner">
-            <a href="dashboard.html" class="mobile-nav-item">
+            <a href="mysystem.html" class="mobile-nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                    <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                    <circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" />
+                    <path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" />
+                    <path d="M2 12h2" /><path d="M20 12h2" />
                 </svg>
-                <span>Home</span>
+                <span>My System</span>
+            </a>
+            <a href="energy.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                </svg>
+                <span>Energy</span>
             </a>
             <a href="payments.html" class="mobile-nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/>
+                    <rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /><path d="M6 15h4" />
                 </svg>
-                <span>Bills</span>
-            </a>
-            <a href="my-system.html" class="mobile-nav-item mobile-nav-fab-wrap" aria-label="My System Live Telemetry">
-                <div class="mobile-nav-fab">
-                    <img src="assets/images/logofortab.png" alt="System" class="mobile-nav-fab-img">
-                </div>
-                <span>System</span>
+                <span>Payments</span>
             </a>
             <a href="install-status.html" class="mobile-nav-item active" aria-current="page">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 12 2.5 2.5L16 9"/>
+                    <rect x="3" y="3" width="18" height="18" rx="2" /><path d="m8 12 2.5 2.5L16 9" />
                 </svg>
-                <span>Status</span>
+                <span>Installation</span>
             </a>
-            <a href="#" id="bottomNavProfileBtn" class="mobile-nav-item" aria-label="Open Profile & Settings">
+            <a href="support.html" class="mobile-nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    <path d="M3 11a9 9 0 0 1 18 0" /><path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" /><path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" /><path d="M17 17c0 2-2 3-5 3" />
                 </svg>
-                <span>Profile</span>
+                <span>Support</span>
             </a>
         </div>
     </nav>
 
     <!-- Core Portal JavaScript -->
     <script src="assets/js/portal.js"></script>
+
+    <script>
+        (function () {
+            "use strict";
+
+            const installPhaseVal = document.getElementById("installPhaseVal");
+            const installPhaseMeta = document.getElementById("installPhaseMeta");
+            const installCompletionVal = document.getElementById("installCompletionVal");
+            const installCompletionMeta = document.getElementById("installCompletionMeta");
+            const installMilestoneVal = document.getElementById("installMilestoneVal");
+            const installMilestoneMeta = document.getElementById("installMilestoneMeta");
+            const installTargetVal = document.getElementById("installTargetVal");
+            const installTargetMeta = document.getElementById("installTargetMeta");
+
+            const installProgressSubtitle = document.getElementById("installProgressSubtitle");
+            const installProgressBadge = document.getElementById("installProgressBadge");
+            const installProgressBarFill = document.getElementById("installProgressBarFill");
+            const milestoneStepsList = document.getElementById("milestoneStepsList");
+
+            const assignedTeamAvatar = document.getElementById("assignedTeamAvatar");
+            const assignedTeamName = document.getElementById("assignedTeamName");
+            const assignedTeamRole = document.getElementById("assignedTeamRole");
+            const assignedTeamPhone = document.getElementById("assignedTeamPhone");
+            const assignedTeamNote = document.getElementById("assignedTeamNote");
+            const assignedTeamHardware = document.getElementById("assignedTeamHardware");
+            const messageTeamBtn = document.getElementById("messageTeamBtn");
+            const messageTeamBtnText = document.getElementById("messageTeamBtnText");
+            const contactLeadBtn = document.getElementById("contactLeadBtn");
+            const contactLeadBtnText = document.getElementById("contactLeadBtnText");
+            const dispatchPhoneLink = document.getElementById("dispatchPhoneLink");
+            const dispatchPhoneText = document.getElementById("dispatchPhoneText");
+
+            let currentPackage = null;
+            let renderToken = 0;
+
+            function renderInstallStatusPage(pkg) {
+                if (!pkg) return;
+                renderToken++;
+                const thisToken = renderToken;
+                currentPackage = pkg;
+
+                // Clear previous milestone list to prevent stale artifacts
+                if (milestoneStepsList) {
+                    milestoneStepsList.innerHTML = "";
+                }
+
+                const inst = pkg.install;
+                if (!inst) return;
+
+                // 1. Summary Cards
+                if (installPhaseVal) installPhaseVal.textContent = inst.phase || "—";
+                if (installPhaseMeta) {
+                    const dotClass = (inst.phase === "Completed") ? "status-dot" : ((inst.phase === "In Progress") ? "status-dot warning" : "status-dot");
+                    installPhaseMeta.innerHTML = `<span class="${dotClass}"></span>${inst.phaseMeta || inst.phaseStatusText || "System installation"}`;
+                }
+
+                if (installCompletionVal) installCompletionVal.textContent = `${inst.completionPct || 0}%`;
+                if (installCompletionMeta) installCompletionMeta.textContent = inst.milestonesAchieved || "—";
+
+                if (installMilestoneVal) installMilestoneVal.textContent = inst.nextMilestone || "—";
+                if (installMilestoneMeta) installMilestoneMeta.textContent = inst.nextMilestoneMeta || "—";
+
+                if (installTargetVal) installTargetVal.textContent = inst.targetCompletion || "—";
+                if (installTargetMeta) installTargetMeta.textContent = inst.targetCompletionMeta || "—";
+
+                // 2. Progression Header & Bar
+                if (installProgressSubtitle) {
+                    installProgressSubtitle.textContent = `Stage progression for ${pkg.name} (${pkg.capacity}) · Account #${pkg.accountNo}`;
+                }
+                if (installProgressBadge) {
+                    installProgressBadge.textContent = `${inst.completionPct}% Complete`;
+                    installProgressBadge.className = inst.completionPct === 100 ? "badge badge-paid" : "badge badge-upcoming";
+                }
+                if (installProgressBarFill) {
+                    installProgressBarFill.style.width = `${inst.completionPct}%`;
+                }
+
+                // 3. Render 5 Milestones
+                if (milestoneStepsList && Array.isArray(inst.milestones)) {
+                    inst.milestones.forEach((m, idx) => {
+                        const item = document.createElement("div");
+                        const isLast = idx === inst.milestones.length - 1;
+                        let stateClass = "";
+                        let indicatorContent = m.num;
+
+                        if (m.status === "Completed") {
+                            stateClass = "completed";
+                            indicatorContent = "✓";
+                        } else if (m.status === "In Progress") {
+                            stateClass = "active";
+                        }
+
+                        item.className = `milestone-step-item ${stateClass}`.trim();
+
+                        // Distinguish scheduled vs estimated dates
+                        let datePrefix = "";
+                        if (m.status === "Completed") {
+                            datePrefix = "Completed on ";
+                        } else if (m.status === "In Progress") {
+                            datePrefix = "Scheduled for ";
+                        } else {
+                            datePrefix = "Estimated: ";
+                        }
+
+                        item.innerHTML = `
+                            ${!isLast ? '<div class="step-timeline-connector"></div>' : ''}
+                            <div class="step-indicator">${indicatorContent}</div>
+                            <div class="step-content">
+                                <div class="step-top">
+                                    <h3 class="step-title">${m.title}</h3>
+                                    <span class="badge ${m.badgeClass || 'badge-neutral'}">${m.status}</span>
+                                </div>
+                                <p class="step-desc">${m.desc}</p>
+                                <div class="step-date">${datePrefix}${m.date}</div>
+                            </div>
+                        `;
+
+                        milestoneStepsList.appendChild(item);
+                    });
+                }
+
+                // 4. Assigned Team Card & CTAs
+                const isPendingTeam = !inst.assignedTeam || inst.assignedTeam.isAssigned === false || (inst.assignedTeam.name && inst.assignedTeam.name.toLowerCase().includes("pending"));
+                const team = (!isPendingTeam && inst.assignedTeam) ? inst.assignedTeam : {
+                    name: "Operations Dispatch",
+                    initials: "HS",
+                    role: "Engineering & Permitting Desk",
+                    phone: "+63 2 8888 0100",
+                    note: "Engineering site survey is pending municipal permits. An installation lead will be assigned upon document release."
+                };
+
+                if (assignedTeamAvatar) assignedTeamAvatar.textContent = team.initials || "HS";
+                if (assignedTeamName) assignedTeamName.textContent = team.name;
+                if (assignedTeamRole) assignedTeamRole.textContent = team.role;
+                if (assignedTeamPhone) assignedTeamPhone.textContent = team.phone;
+                if (assignedTeamNote) assignedTeamNote.textContent = team.note;
+                if (assignedTeamHardware) assignedTeamHardware.textContent = inst.hardwareSpecs || "Standard Hello Solar Commercial Kit";
+
+                if (isPendingTeam) {
+                    if (messageTeamBtnText) messageTeamBtnText.textContent = "Message Solar Operations";
+                    if (messageTeamBtn) messageTeamBtn.href = `support.html?recipient=Operations&package=${pkg.id}`;
+
+                    if (contactLeadBtnText) contactLeadBtnText.textContent = "Contact Operations";
+                    if (contactLeadBtn) contactLeadBtn.href = `support.html?type=installation&package=${pkg.id}`;
+
+                    if (dispatchPhoneLink) dispatchPhoneLink.href = `tel:+63288880100`;
+                    if (dispatchPhoneText) dispatchPhoneText.textContent = "Call Hello Solar Dispatch";
+                } else {
+                    const firstName = team.name.split(" ")[0];
+                    if (messageTeamBtnText) messageTeamBtnText.textContent = `Send Message to ${firstName}`;
+                    if (messageTeamBtn) messageTeamBtn.href = `support.html?recipient=${encodeURIComponent(team.name)}&package=${pkg.id}`;
+
+                    if (contactLeadBtnText) contactLeadBtnText.textContent = `Contact ${firstName}`;
+                    if (contactLeadBtn) contactLeadBtn.href = `support.html?type=installation&lead=${encodeURIComponent(team.name)}&package=${pkg.id}`;
+
+                    if (dispatchPhoneLink) {
+                        dispatchPhoneLink.href = `tel:${team.phone.replace(/[^0-9+]/g, '')}`;
+                    }
+                    if (dispatchPhoneText) {
+                        dispatchPhoneText.textContent = `Call ${team.name} (${team.phone})`;
+                    }
+                }
+            }
+
+            // Initial render
+            const initialPkg = (window.HelloSolar && window.HelloSolar.getActivePackage)
+                ? window.HelloSolar.getActivePackage()
+                : null;
+            if (initialPkg) renderInstallStatusPage(initialPkg);
+
+            // Listen for package changes from other tabs / sources
+            window.addEventListener("helloSolarPackageChanged", (e) => {
+                if (e.detail && e.detail.package) {
+                    renderInstallStatusPage(e.detail.package);
+                }
+            });
+
+            // Listen for dataset async load completion
+            window.addEventListener("helloSolarDataLoaded", () => {
+                const active = window.HelloSolar ? window.HelloSolar.getActivePackage() : null;
+                if (active) {
+                    renderInstallStatusPage(active);
+                }
+            });
+        })();
+    </script>
+    <script src="assets/js/notifications.js"></script>
 </body>
 
 </html>

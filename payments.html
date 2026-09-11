@@ -4,13 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Hello Solar — View payment schedule, account amortization status, bank channels, and upload proof of payment.">
+    <meta name="description"
+        content="Hello Solar — View payment schedule, account amortization status, bank channels, and upload proof of payment.">
     <title>Hello Solar — My Payments</title>
+
+    <!-- Immediate Authentication Guard -->
+    <script>
+        if (localStorage.getItem("hello_solar_logged_in") !== "true") {
+            window.location.replace("login.html");
+        }
+    </script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Favicon / Tab Icon -->
+    <link rel="icon" type="image/png" href="assets/images/logofortab.png">
 
     <!-- Design System CSS -->
     <link rel="stylesheet" href="assets/css/portal.css">
@@ -74,7 +86,8 @@
             gap: 10px;
         }
 
-        .upload-dropzone:hover, .upload-dropzone.dragover {
+        .upload-dropzone:hover,
+        .upload-dropzone.dragover {
             border-color: var(--solar-orange);
             background: #fff8eb;
         }
@@ -151,67 +164,148 @@
             .payment-methods-grid {
                 grid-template-columns: 1fr;
             }
+
             .due-callout {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 8px;
             }
         }
+
+        /* Payments Table Search & Filter Bar */
+        .payments-table-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .payments-search-wrap,
+        .payments-search-box {
+            position: relative;
+            flex: 1;
+            min-width: 220px;
+            max-width: 360px;
+        }
+
+        .payments-search-wrap svg,
+        .payments-search-box svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px !important;
+            height: 16px !important;
+            max-width: 16px !important;
+            max-height: 16px !important;
+            color: var(--gray-400);
+            pointer-events: none;
+            flex-shrink: 0;
+        }
+
+        .payments-search-input,
+        .payments-search-box input,
+        .payments-search-wrap input {
+            width: 100%;
+            padding: 9px 12px 9px 38px;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--navy);
+            outline: none;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+            box-sizing: border-box;
+        }
+
+        .payments-search-input:focus,
+        .payments-search-box input:focus,
+        .payments-search-wrap input:focus {
+            border-color: var(--solar-orange);
+            box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.12);
+        }
+
+        .payments-filter-chips {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-chip {
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: var(--gray-100);
+            border: 1px solid transparent;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .filter-chip:hover {
+            color: var(--navy);
+            background: var(--gray-200);
+        }
+
+        .filter-chip.active {
+            background: var(--navy);
+            color: var(--white);
+        }
     </style>
+    <link rel="stylesheet" href="assets/css/notifications.css">
 </head>
 
 <body>
     <div class="app">
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
-            <a href="dashboard.html" class="logo">
+            <a href="mysystem.html" class="logo">
                 <img src="assets/images/hello_solar.png" alt="Hello Solar">
             </a>
 
             <div class="nav-label">Customer Portal</div>
 
             <nav class="nav" aria-label="Portal navigation">
-                <a href="dashboard.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
-                        <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-                    </svg>
-                    Dashboard
-                </a>
-
-                <a href="my-system.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <a href="mysystem.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <circle cx="12" cy="12" r="4" />
-                        <path d="M12 2v2" /><path d="M12 20v2" />
-                        <path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" />
-                        <path d="M2 12h2" /><path d="M20 12h2" />
+                        <path d="M12 2v2" />
+                        <path d="M12 20v2" />
+                        <path d="m4.93 4.93 1.41 1.41" />
+                        <path d="m17.66 17.66 1.41 1.41" />
+                        <path d="M2 12h2" />
+                        <path d="M20 12h2" />
                     </svg>
                     My System
                 </a>
 
                 <a href="energy.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
                     </svg>
                     Energy
                 </a>
 
                 <a href="payments.html" class="nav-link active" aria-current="page">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /><path d="M6 15h4" />
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <path d="M2 10h20" />
+                        <path d="M6 15h4" />
                     </svg>
                     My Payments
                 </a>
 
-                <a href="install-status.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="18" height="18" rx="2" /><path d="m8 12 2.5 2.5L16 9" />
-                    </svg>
-                    Install Status
-                </a>
 
                 <a href="support.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <path d="M3 11a9 9 0 0 1 18 0" />
                         <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
                         <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
@@ -233,9 +327,11 @@
                 <div class="sidebar-divider"></div>
 
                 <button class="logout-button" id="logoutButton" type="button">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
                     </svg>
                     Logout
                 </button>
@@ -250,19 +346,20 @@
             <!-- TOPBAR -->
             <header class="topbar">
                 <div class="mobile-header">
-                    <button class="mobile-menu-button" id="mobileMenuButton" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
-                        <svg id="menuIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                            <line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="18" x2="20" y2="18" />
-                        </svg>
-                    </button>
-                    <a href="dashboard.html" class="mobile-logo">
+
+                    <a href="mysystem.html" class="mobile-logo">
                         <img src="assets/images/hello_solar.png" alt="Hello Solar">
                     </a>
                 </div>
 
                 <div class="topbar-right">
                     <a href="support.html" class="quick-support-link">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 11a9 9 0 0 1 18 0"/><path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2"/><path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2"/><path d="M17 17c0 2-2 3-5 3"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M3 11a9 9 0 0 1 18 0" />
+                            <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                            <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                            <path d="M17 17c0 2-2 3-5 3" />
+                        </svg>
                         Billing Help
                     </a>
 
@@ -285,21 +382,24 @@
                         <p>View your amortization schedule, verified receipts, payment channels, and submit proof.</p>
                     </div>
                     <div class="cta-group">
+                        <div class="package-selector-slot" id="pagePackageSelector"></div>
                         <a href="#submitProofSection" class="btn btn-primary" id="payPrimaryCta">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                 <polyline points="17 8 12 3 7 8"></polyline>
                                 <line x1="12" y1="3" x2="12" y2="15"></line>
                             </svg>
                             <span>Upload Proof of Payment</span>
                         </a>
-                        <button type="button" class="btn btn-outline" id="downloadReceiptBtn" onclick="if(window.HelloSolar&&window.HelloSolar.toast)window.HelloSolar.toast('Receipt Generated','Official statement downloaded.');">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <button type="button" class="btn btn-outline" id="downloadReceiptBtn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                 <polyline points="7 10 12 15 17 10"></polyline>
                                 <line x1="12" y1="15" x2="12" y2="3"></line>
                             </svg>
-                            <span>Download Statement</span>
+                            <span id="downloadStatementBtnText">Download Statement</span>
                         </button>
                     </div>
                 </section>
@@ -310,52 +410,60 @@
                         <div class="summary-top">
                             <span class="summary-label">Next Payment</span>
                             <div class="summary-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /><path d="M6 15h4" />
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                                    <path d="M2 10h20" />
+                                    <path d="M6 15h4" />
                                 </svg>
                             </div>
                         </div>
-                        <div class="summary-value">₱9,067</div>
-                        <div class="summary-meta">Due on September 1, 2026</div>
+                        <div class="summary-value" id="paymentNextAmount">₱9,067</div>
+                        <div class="summary-meta" id="paymentNextDueMeta">Due on October 15, 2026</div>
                     </article>
 
                     <article class="summary-card">
                         <div class="summary-top">
                             <span class="summary-label">Amortization Plan</span>
                             <div class="summary-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round">
                                     <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                                 </svg>
                             </div>
                         </div>
-                        <div class="summary-value">5 Years</div>
-                        <div class="summary-meta">Fixed monthly payment</div>
+                        <div class="summary-value" id="paymentPlanTerm">5 Years</div>
+                        <div class="summary-meta" id="paymentPlanMeta">Fixed monthly amortization</div>
                     </article>
 
                     <article class="summary-card">
                         <div class="summary-top">
                             <span class="summary-label">Paid Installments</span>
                             <div class="summary-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 14 14" />
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12 6 12 12 14 14" />
                                 </svg>
                             </div>
                         </div>
-                        <div class="summary-value">4 of 60</div>
-                        <div class="summary-meta">₱36,268 total paid</div>
+                        <div class="summary-value" id="paymentPaidCount">4 of 60</div>
+                        <div class="summary-meta" id="paymentTotalPaidMeta">₱36,268 total paid</div>
                     </article>
 
                     <article class="summary-card">
                         <div class="summary-top">
                             <span class="summary-label">Account Standing</span>
                             <div class="summary-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round">
                                     <polyline points="20 6 9 17 4 12" />
                                 </svg>
                             </div>
                         </div>
-                        <div class="summary-value">Good</div>
-                        <div class="summary-meta"><span class="status-dot"></span>Account up to date</div>
+                        <div class="summary-value" id="paymentStandingVal">Good</div>
+                        <div class="summary-meta" id="paymentStandingMeta"><span class="status-dot"></span>Account up to
+                            date</div>
                     </article>
                 </section>
 
@@ -366,80 +474,75 @@
                         <div class="panel-header">
                             <div>
                                 <h2 class="panel-title">Payment Schedule & History</h2>
-                                <p class="panel-subtitle">Monthly installment status for system #HS-88219</p>
+                                <p class="panel-subtitle" id="paymentScheduleSubtitle">Monthly installment status for
+                                    system #HS-88219</p>
                             </div>
-                            <span class="badge badge-neutral">5-Year Term</span>
+                            <span class="badge badge-neutral" id="paymentScheduleBadge">5-Year Term</span>
+                        </div>
+
+                        <!-- Table Search & Filter Controls -->
+                        <div class="payments-table-controls">
+                            <div class="payments-search-wrap">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                </svg>
+                                <input type="text" id="paymentsSearchInput" class="payments-search-input"
+                                    placeholder="Search billing period, receipt ID..."
+                                    aria-label="Search payment records">
+                            </div>
+                            <div class="payments-filter-chips" id="paymentsFilterChips">
+                                <button type="button" class="filter-chip active" data-filter="all">All</button>
+                                <button type="button" class="filter-chip" data-filter="paid">Paid</button>
+                                <button type="button" class="filter-chip" data-filter="due">Due / Upcoming</button>
+                            </div>
                         </div>
 
                         <div class="table-responsive">
-                            <table class="portal-table" aria-label="Payment history and schedule">
+                            <table class="portal-table" id="paymentScheduleTable"
+                                aria-label="Payment history and schedule">
                                 <thead>
                                     <tr>
                                         <th>Billing Period</th>
                                         <th>Due Date</th>
                                         <th>Status</th>
                                         <th>Amount</th>
+                                        <th>Receipt</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>May 2026</strong></td>
-                                        <td>May 1, 2026</td>
-                                        <td><span class="badge badge-paid">Paid</span></td>
-                                        <td><strong>₱9,067</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Jun 2026</strong></td>
-                                        <td>Jun 1, 2026</td>
-                                        <td><span class="badge badge-paid">Paid</span></td>
-                                        <td><strong>₱9,067</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Jul 2026</strong></td>
-                                        <td>Jul 1, 2026</td>
-                                        <td><span class="badge badge-paid">Paid</span></td>
-                                        <td><strong>₱9,067</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Aug 2026</strong></td>
-                                        <td>Aug 1, 2026</td>
-                                        <td><span class="badge badge-paid">Paid</span></td>
-                                        <td><strong>₱9,067</strong></td>
-                                    </tr>
-                                    <tr style="background: #fffbf2;">
-                                        <td><strong>Sep 2026 (Current)</strong></td>
-                                        <td>Sep 1, 2026</td>
-                                        <td><span class="badge badge-due">Due Soon</span></td>
-                                        <td style="color: var(--solar-orange-dark);"><strong>₱9,067</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Oct 2026</strong></td>
-                                        <td>Oct 1, 2026</td>
-                                        <td><span class="badge badge-upcoming">Upcoming</span></td>
-                                        <td><strong>₱9,067</strong></td>
-                                    </tr>
+                                <tbody id="paymentScheduleTableBody">
+                                    <!-- Populated dynamically via JS -->
                                 </tbody>
                             </table>
                         </div>
                     </section>
 
                     <!-- Make Payment / Upload Proof Column -->
-                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div style="display: flex; flex-direction: column; gap: 20px;" id="submitProofSection">
                         <section class="panel panel-body">
-                            <div class="due-callout">
+                            <div class="due-callout" id="dueCalloutBox">
                                 <div>
-                                    <div style="font-size: 12px; font-weight: 700; color: var(--solar-orange-dark); text-transform: uppercase;">Amount Due</div>
-                                    <div class="due-amount-large">₱9,067</div>
+                                    <div id="dueCalloutTitle"
+                                        style="font-size: 12px; font-weight: 700; color: var(--solar-orange-dark); text-transform: uppercase;">
+                                        Amount Due</div>
+                                    <div class="due-amount-large" id="dueCalloutAmount">₱9,067</div>
                                 </div>
-                                <div style="font-size: 13px; text-align: right; color: var(--navy);">
-                                    Period: <strong>Sep 1, 2026</strong><br>
-                                    <span style="font-size: 11.5px; color: var(--gray-500);">Ref: HS-88219-0926</span>
+                                <div id="dueCalloutMeta"
+                                    style="font-size: 13px; text-align: right; color: var(--navy);">
+                                    Period: <strong id="dueCalloutPeriod">Sep 2026 (Current)</strong><br>
+                                    <span style="font-size: 11.5px; color: var(--gray-500);" id="dueCalloutRef">Ref:
+                                        HS-88219-0926</span>
                                 </div>
                             </div>
 
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                                <h3 style="font-size: 15px; font-weight: 800; margin: 0; color: var(--navy);">Official Payment Channels</h3>
-                                <button type="button" onclick="window.HelloSolar && window.HelloSolar.openProfileSettings()" style="background: none; border: none; font-size: 12px; color: var(--solar-orange-dark); font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px;">
+                            <div
+                                style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <h3 style="font-size: 15px; font-weight: 800; margin: 0; color: var(--navy);">Official
+                                    Payment Channels</h3>
+                                <button type="button"
+                                    onclick="window.HelloSolar && window.HelloSolar.openProfileSettings()"
+                                    style="background: none; border: none; font-size: 12px; color: var(--solar-orange-dark); font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px;">
                                     Change Preferred ⚙
                                 </button>
                             </div>
@@ -457,23 +560,29 @@
                             </div>
 
                             <!-- Upload Proof -->
-                            <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 8px; color: var(--navy);">Submit Payment Receipt</h3>
+                            <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 8px; color: var(--navy);">
+                                Submit Payment Receipt</h3>
                             <p style="font-size: 12.5px; color: var(--gray-500); margin-bottom: 14px;">
                                 Upload your transaction screenshot or deposit slip for Hello Solar verification.
                             </p>
 
-                            <input type="file" id="proofFileInput" class="upload-file-input" accept="image/png,image/jpeg,application/pdf">
-                            <div class="upload-dropzone" id="uploadDropzone" role="button" tabindex="0" aria-label="Click or drag file to upload payment proof">
+                            <input type="file" id="proofFileInput" class="upload-file-input"
+                                accept="image/png,image/jpeg,application/pdf">
+                            <div class="upload-dropzone" id="uploadDropzone" role="button" tabindex="0"
+                                aria-label="Click or drag file to upload payment proof">
                                 <div class="upload-icon-circle">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                        stroke-linejoin="round">
                                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                                         <polyline points="17 8 12 3 7 8" />
                                         <line x1="12" y1="3" x2="12" y2="15" />
                                     </svg>
                                 </div>
                                 <div>
-                                    <strong style="font-size: 13.5px; color: var(--navy);">Click to upload receipt</strong>
-                                    <p style="font-size: 11.5px; color: var(--gray-400); margin-top: 2px;">PNG, JPG, or PDF up to 10MB</p>
+                                    <strong style="font-size: 13.5px; color: var(--navy);">Click to upload
+                                        receipt</strong>
+                                    <p style="font-size: 11.5px; color: var(--gray-400); margin-top: 2px;">PNG, JPG, or
+                                        PDF up to 10MB</p>
                                 </div>
                             </div>
 
@@ -482,7 +591,8 @@
                                 <span id="selectedFileName">receipt.png</span>
                             </div>
 
-                            <button type="button" class="btn btn-primary" id="uploadProofBtn" style="width: 100%; margin-top: 16px;" disabled>
+                            <button type="button" class="btn btn-primary" id="uploadProofBtn"
+                                style="width: 100%; margin-top: 16px;" disabled>
                                 Submit Proof of Payment
                             </button>
 
@@ -502,39 +612,47 @@
         </main>
     </div>
 
-    <!-- MOBILE BOTTOM NAVIGATION (ERGONOMIC 5-PILLAR APP NAV) -->
+    <!-- MOBILE BOTTOM NAVIGATION (5-PILLAR CUSTOMER APP NAV) -->
     <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
         <div class="mobile-bottom-nav-inner">
-            <a href="dashboard.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                    <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            <a href="mysystem.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2v2" />
+                    <path d="M12 20v2" />
+                    <path d="m4.93 4.93 1.41 1.41" />
+                    <path d="m17.66 17.66 1.41 1.41" />
+                    <path d="M2 12h2" />
+                    <path d="M20 12h2" />
                 </svg>
-                <span>Home</span>
+                <span>My System</span>
+            </a>
+            <a href="energy.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                </svg>
+                <span>Energy</span>
             </a>
             <a href="payments.html" class="mobile-nav-item active" aria-current="page">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                    <path d="M2 10h20" />
+                    <path d="M6 15h4" />
                 </svg>
-                <span>Bills</span>
+                <span>Payments</span>
             </a>
-            <a href="my-system.html" class="mobile-nav-item mobile-nav-fab-wrap" aria-label="My System Live Telemetry">
-                <div class="mobile-nav-fab">
-                    <img src="assets/images/logofortab.png" alt="System" class="mobile-nav-fab-img">
-                </div>
-                <span>System</span>
-            </a>
-            <a href="install-status.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 12 2.5 2.5L16 9"/>
+            <a href="support.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M3 11a9 9 0 0 1 18 0" />
+                    <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                    <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                    <path d="M17 17c0 2-2 3-5 3" />
                 </svg>
-                <span>Status</span>
-            </a>
-            <a href="#" id="bottomNavProfileBtn" class="mobile-nav-item" aria-label="Open Profile & Settings">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                </svg>
-                <span>Profile</span>
+                <span>Support</span>
             </a>
         </div>
     </nav>
@@ -543,67 +661,474 @@
     <script src="assets/js/portal.js"></script>
 
     <script>
-        const proofFileInput = document.getElementById("proofFileInput");
-        const uploadDropzone = document.getElementById("uploadDropzone");
-        const selectedFileBadge = document.getElementById("selectedFileBadge");
-        const selectedFileName = document.getElementById("selectedFileName");
-        const uploadProofBtn = document.getElementById("uploadProofBtn");
+        (function () {
+            "use strict";
 
-        uploadDropzone.addEventListener("click", () => proofFileInput.click());
-        uploadDropzone.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                proofFileInput.click();
+            const proofFileInput = document.getElementById("proofFileInput");
+            const uploadDropzone = document.getElementById("uploadDropzone");
+            const selectedFileBadge = document.getElementById("selectedFileBadge");
+            const selectedFileName = document.getElementById("selectedFileName");
+            const uploadProofBtn = document.getElementById("uploadProofBtn");
+            const downloadReceiptBtn = document.getElementById("downloadReceiptBtn");
+
+            // Summary card elements
+            const paymentNextAmount = document.getElementById("paymentNextAmount");
+            const paymentNextDueMeta = document.getElementById("paymentNextDueMeta");
+            const paymentPlanTerm = document.getElementById("paymentPlanTerm");
+            const paymentPlanMeta = document.getElementById("paymentPlanMeta");
+            const paymentPaidCount = document.getElementById("paymentPaidCount");
+            const paymentTotalPaidMeta = document.getElementById("paymentTotalPaidMeta");
+            const paymentStandingVal = document.getElementById("paymentStandingVal");
+            const paymentStandingMeta = document.getElementById("paymentStandingMeta");
+
+            // Schedule table elements
+            const paymentScheduleSubtitle = document.getElementById("paymentScheduleSubtitle");
+            const paymentScheduleBadge = document.getElementById("paymentScheduleBadge");
+            const paymentScheduleTableBody = document.getElementById("paymentScheduleTableBody");
+            const paymentsSearchInput = document.getElementById("paymentsSearchInput");
+            const paymentsFilterChips = document.getElementById("paymentsFilterChips");
+
+            // Due callout elements
+            const dueCalloutBox = document.getElementById("dueCalloutBox");
+            const dueCalloutTitle = document.getElementById("dueCalloutTitle");
+            const dueCalloutAmount = document.getElementById("dueCalloutAmount");
+            const dueCalloutPeriod = document.getElementById("dueCalloutPeriod");
+            const dueCalloutRef = document.getElementById("dueCalloutRef");
+
+            let currentPackage = null;
+            let renderToken = 0;
+            let selectedFile = null;
+            let activeFilter = "all";
+            let activeSearchQuery = "";
+            const packageFileDrafts = {};
+            const submittedProofs = {};
+
+            // ----------------------------------------------------------------------
+            // 1. UNFINISHED INPUT / DIRTY CHECK PROTECTION
+            // ----------------------------------------------------------------------
+            function setupDirtyCheck() {
+                if (window.HelloSolar && window.HelloSolar.registerDirtyCheck) {
+                    window.HelloSolar.registerDirtyCheck(() => {
+                        if (selectedFile) {
+                            return `payment proof file "${selectedFile.name}" is selected but not submitted`;
+                        }
+                        return null;
+                    });
+                }
             }
-        });
 
-        uploadDropzone.addEventListener("dragover", (e) => {
-            e.preventDefault();
-            uploadDropzone.classList.add("dragover");
-        });
-
-        uploadDropzone.addEventListener("dragleave", () => {
-            uploadDropzone.classList.remove("dragover");
-        });
-
-        uploadDropzone.addEventListener("drop", (e) => {
-            e.preventDefault();
-            uploadDropzone.classList.remove("dragover");
-            if (e.dataTransfer.files.length > 0) {
-                handleFileSelected(e.dataTransfer.files[0]);
-            }
-        });
-
-        proofFileInput.addEventListener("change", () => {
-            if (proofFileInput.files.length > 0) {
-                handleFileSelected(proofFileInput.files[0]);
-            }
-        });
-
-        function handleFileSelected(file) {
-            selectedFileName.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-            selectedFileBadge.classList.add("visible");
-            uploadProofBtn.disabled = false;
-        }
-
-        uploadProofBtn.addEventListener("click", () => {
-            uploadProofBtn.disabled = true;
-            uploadProofBtn.textContent = "Processing submission...";
-
-            setTimeout(() => {
-                uploadProofBtn.textContent = "Proof Submitted ✓";
-                window.HelloSolar.toast(
-                    "Receipt Submitted (Demo)",
-                    `Your transfer proof (${selectedFileName.textContent}) has been recorded. In production, finance confirms within 24 hours.`
-                );
-
-                setTimeout(() => {
-                    uploadProofBtn.disabled = false;
+            function clearSelectedFile(preserveInDraft = true) {
+                if (preserveInDraft && currentPackage && selectedFile) {
+                    packageFileDrafts[currentPackage.id] = selectedFile;
+                }
+                selectedFile = null;
+                if (proofFileInput) proofFileInput.value = "";
+                if (selectedFileName) selectedFileName.textContent = "";
+                if (selectedFileBadge) selectedFileBadge.classList.remove("visible");
+                if (uploadProofBtn) {
+                    uploadProofBtn.disabled = true;
                     uploadProofBtn.textContent = "Submit Proof of Payment";
-                }, 3000);
-            }, 800);
-        });
+                }
+            }
+
+            function restoreSelectedFile(file) {
+                if (!file) return;
+                selectedFile = file;
+                if (selectedFileName) {
+                    selectedFileName.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+                }
+                if (selectedFileBadge) selectedFileBadge.classList.add("visible");
+                if (uploadProofBtn) uploadProofBtn.disabled = false;
+            }
+
+            // File selection event handlers
+            if (uploadDropzone && proofFileInput) {
+                uploadDropzone.addEventListener("click", () => proofFileInput.click());
+                uploadDropzone.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        proofFileInput.click();
+                    }
+                });
+
+                uploadDropzone.addEventListener("dragover", (e) => {
+                    e.preventDefault();
+                    uploadDropzone.classList.add("dragover");
+                });
+
+                uploadDropzone.addEventListener("dragleave", () => {
+                    uploadDropzone.classList.remove("dragover");
+                });
+
+                uploadDropzone.addEventListener("drop", (e) => {
+                    e.preventDefault();
+                    uploadDropzone.classList.remove("dragover");
+                    if (e.dataTransfer.files.length > 0) {
+                        handleFileSelected(e.dataTransfer.files[0]);
+                    }
+                });
+
+                proofFileInput.addEventListener("change", () => {
+                    if (proofFileInput.files.length > 0) {
+                        handleFileSelected(proofFileInput.files[0]);
+                    }
+                });
+            }
+
+            function handleFileSelected(file) {
+                selectedFile = file;
+                if (currentPackage) {
+                    packageFileDrafts[currentPackage.id] = file;
+                }
+                restoreSelectedFile(file);
+            }
+
+            if (uploadProofBtn) {
+                uploadProofBtn.addEventListener("click", () => {
+                    if (!selectedFile || !currentPackage) return;
+                    uploadProofBtn.disabled = true;
+                    uploadProofBtn.textContent = "Processing submission...";
+
+                    setTimeout(() => {
+                        const pkgName = currentPackage.name;
+                        const pkgAcc = currentPackage.accountNo;
+                        const fileName = selectedFile.name;
+
+                        // Save proof submission status for this package
+                        submittedProofs[currentPackage.id] = {
+                            fileName: fileName,
+                            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                            status: "Payment Submitted (Pending Verification)"
+                        };
+
+                        // Clear draft for this package
+                        delete packageFileDrafts[currentPackage.id];
+                        selectedFile = null;
+                        if (proofFileInput) proofFileInput.value = "";
+                        if (selectedFileBadge) selectedFileBadge.classList.remove("visible");
+
+                        uploadProofBtn.textContent = "Proof Submitted (Pending Review) ✓";
+
+                        if (window.HelloSolar && window.HelloSolar.toast) {
+                            window.HelloSolar.toast(
+                                "Payment Submitted (Pending Verification)",
+                                `Receipt (${fileName}) for ${pkgName} (#${pkgAcc}) uploaded. Hello Solar finance team verifies within 24 hours.`
+                            );
+                        }
+
+                        // Re-render table and cards with updated submission status
+                        renderPaymentsPage(currentPackage);
+
+                        setTimeout(() => {
+                            uploadProofBtn.disabled = true;
+                            uploadProofBtn.textContent = "Submit Proof of Payment";
+                        }, 3000);
+                    }, 800);
+                });
+            }
+
+            // ----------------------------------------------------------------------
+            // 2. RENDER PAYMENTS FOR ACTIVE PACKAGE
+            // ----------------------------------------------------------------------
+            function renderTableRows(schedule, pkg) {
+                if (!paymentScheduleTableBody) return;
+                paymentScheduleTableBody.innerHTML = "";
+
+                if (!Array.isArray(schedule) || schedule.length === 0) {
+                    paymentScheduleTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 24px; color: var(--gray-500);">
+                                No payment records found.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                // Check if user submitted proof for this package
+                const pendingProof = submittedProofs[pkg.id];
+
+                // Filter rows
+                const filtered = schedule.filter(row => {
+                    // Status filter
+                    const rowStatusLower = (row.status || "").toLowerCase();
+                    if (activeFilter === "paid" && !rowStatusLower.includes("paid")) return false;
+                    if (activeFilter === "due" && !rowStatusLower.includes("due") && !rowStatusLower.includes("upcoming") && !rowStatusLower.includes("pending")) return false;
+
+                    // Search filter
+                    if (activeSearchQuery) {
+                        const q = activeSearchQuery.toLowerCase();
+                        const periodMatch = (row.period || "").toLowerCase().includes(q);
+                        const dueMatch = (row.due || "").toLowerCase().includes(q);
+                        const statusMatch = (row.status || "").toLowerCase().includes(q);
+                        const receiptMatch = (row.receiptId || "").toLowerCase().includes(q);
+                        const amountMatch = (row.amount || "").toLowerCase().includes(q);
+                        if (!periodMatch && !dueMatch && !statusMatch && !receiptMatch && !amountMatch) return false;
+                    }
+
+                    return true;
+                });
+
+                if (filtered.length === 0) {
+                    paymentScheduleTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 32px 16px; color: var(--gray-500);">
+                                <strong>No records match your filter</strong>
+                                <p style="font-size: 12px; margin-top: 4px;">Try searching for another period or resetting the filter chips.</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                filtered.forEach(row => {
+                    const tr = document.createElement("tr");
+                    let displayStatus = row.status;
+                    let displayBadge = row.badgeClass || 'badge-neutral';
+                    let isHighlighted = false;
+
+                    if (pendingProof && (row.status === "Due Soon" || row.status === "Due")) {
+                        displayStatus = "Payment Submitted (Pending Verification)";
+                        displayBadge = "badge-warning";
+                        isHighlighted = true;
+                        tr.style.background = "#fffdf5";
+                    } else if (row.status === "Due Soon") {
+                        tr.style.background = "#fffbf2";
+                    }
+
+                    const receiptCell = row.receiptId ? `
+                        <button type="button" class="btn btn-outline btn-xs download-row-receipt" data-receipt="${row.receiptId}" data-period="${row.period}" title="Download receipt for ${row.period}">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            <span>${row.receiptId}</span>
+                        </button>
+                    ` : (pendingProof && (row.status === "Due Soon" || row.status === "Due")
+                        ? `<span style="color: var(--solar-orange-dark); font-size: 11.5px; font-weight: 700;">Uploaded (${pendingProof.fileName})</span>`
+                        : `<span style="color: var(--gray-400); font-size: 12px;">—</span>`);
+
+                    tr.innerHTML = `
+                        <td><strong>${row.period}</strong></td>
+                        <td>${row.due}</td>
+                        <td><span class="badge ${displayBadge}">${displayStatus}</span></td>
+                        <td ${isHighlighted || row.status === 'Due Soon' ? 'style="color: var(--solar-orange-dark); font-weight: 800;"' : ''}>${row.amount}</td>
+                        <td>${receiptCell}</td>
+                    `;
+
+                    paymentScheduleTableBody.appendChild(tr);
+                });
+
+                // Wire row download handlers
+                paymentScheduleTableBody.querySelectorAll(".download-row-receipt").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        const rec = btn.dataset.receipt;
+                        const per = btn.dataset.period;
+                        if (window.HelloSolar && window.HelloSolar.toast) {
+                            window.HelloSolar.toast(
+                                "Receipt Downloaded",
+                                `Receipt #${rec} for ${pkg.name} (${per}) downloaded.`
+                            );
+                        }
+                    });
+                });
+            }
+
+            function renderPaymentsPage(pkg) {
+                if (!pkg) return;
+                renderToken++;
+                const thisToken = renderToken;
+
+                currentPackage = pkg;
+
+                // Restore or clear draft input for this system
+                if (packageFileDrafts[pkg.id]) {
+                    restoreSelectedFile(packageFileDrafts[pkg.id]);
+                } else {
+                    clearSelectedFile(false);
+                }
+
+                const p = pkg.payments;
+
+                if (p && p.hasBills) {
+                    const pendingProof = submittedProofs[pkg.id];
+
+                    // 1. Summary Cards
+                    if (paymentNextAmount) {
+                        paymentNextAmount.textContent = pendingProof ? "Under Verification" : (p.nextPaymentAmount || "—");
+                    }
+                    if (paymentNextDueMeta) {
+                        paymentNextDueMeta.textContent = pendingProof
+                            ? `Receipt uploaded at ${pendingProof.timestamp}`
+                            : (p.nextDueDate ? `Due on ${p.nextDueDate}` : "No payment due");
+                    }
+                    if (paymentPlanTerm) paymentPlanTerm.textContent = p.term || "5 Years";
+                    if (paymentPlanMeta) paymentPlanMeta.textContent = "Fixed monthly amortization";
+                    if (paymentPaidCount) paymentPaidCount.textContent = p.paidInstallments || "—";
+                    if (paymentTotalPaidMeta) paymentTotalPaidMeta.textContent = `${p.totalPaid || "₱0"} total paid`;
+                    if (paymentStandingVal) {
+                        paymentStandingVal.textContent = pendingProof ? "Verification Pending" : (p.standing || "Good");
+                    }
+                    if (paymentStandingMeta) {
+                        if (pendingProof) {
+                            paymentStandingMeta.innerHTML = `<span class="status-dot warning"></span>Proof under review`;
+                        } else {
+                            const dotClass = (p.standing === "Due Soon") ? "status-dot warning" : "status-dot";
+                            paymentStandingMeta.innerHTML = `<span class="${dotClass}"></span>${p.standingMeta || "Account up to date"}`;
+                        }
+                    }
+
+                    // 2. Schedule Panel
+                    if (paymentScheduleSubtitle) {
+                        paymentScheduleSubtitle.textContent = `Monthly installment status for ${pkg.name} (#${pkg.accountNo})`;
+                    }
+                    if (paymentScheduleBadge) {
+                        paymentScheduleBadge.textContent = p.termBadge || "Standard Term";
+                    }
+
+                    // 3. Populate Table Rows
+                    renderTableRows(p.schedule, pkg);
+
+                    // 4. Due Callout Box
+                    if (dueCalloutBox) {
+                        dueCalloutBox.style.background = "#fff5e5";
+                        dueCalloutBox.style.borderLeftColor = "var(--solar-orange)";
+                    }
+                    if (dueCalloutTitle) dueCalloutTitle.textContent = pendingProof ? "Verification Status" : "Amount Due";
+                    if (dueCalloutAmount) dueCalloutAmount.textContent = pendingProof ? "Pending Approval" : (p.nextPaymentAmount || "₱0");
+                    if (dueCalloutPeriod) dueCalloutPeriod.textContent = p.currentBillPeriod || p.nextDueDate || "Current";
+                    if (dueCalloutRef) dueCalloutRef.textContent = `Ref: ${p.currentBillRef || pkg.accountNo}`;
+
+                } else {
+                    // MISSING / PENDING BILLING STATE (e.g. pkg-biz-6k0)
+                    // Explicitly distinguish missing data from zero
+                    if (paymentNextAmount) paymentNextAmount.textContent = "Pending Setup";
+                    if (paymentNextDueMeta) paymentNextDueMeta.textContent = "No billing schedule generated yet";
+                    if (paymentPlanTerm) paymentPlanTerm.textContent = "Pending Assessment";
+                    if (paymentPlanMeta) paymentPlanMeta.textContent = "Awaiting electrical survey sign-off";
+                    if (paymentPaidCount) paymentPaidCount.textContent = "0 of 0";
+                    if (paymentTotalPaidMeta) paymentTotalPaidMeta.textContent = "₱0 total billed";
+                    if (paymentStandingVal) paymentStandingVal.textContent = "Pending Billing";
+                    if (paymentStandingMeta) {
+                        paymentStandingMeta.innerHTML = `<span class="status-dot" style="background:#94a3b8;"></span>No bills issued yet`;
+                    }
+
+                    if (paymentScheduleSubtitle) {
+                        paymentScheduleSubtitle.textContent = `No billing records found for ${pkg.name} (#${pkg.accountNo})`;
+                    }
+                    if (paymentScheduleBadge) {
+                        paymentScheduleBadge.textContent = "Pending Assessment";
+                    }
+
+                    if (paymentScheduleTableBody) {
+                        paymentScheduleTableBody.innerHTML = `
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 42px 20px; color: var(--gray-500);">
+                                    <div style="font-size: 32px; margin-bottom: 10px;">📋</div>
+                                    <strong style="font-size: 15px; color: var(--navy); display: block; margin-bottom: 6px;">No Billing Records Yet</strong>
+                                    <p style="font-size: 13px; max-width: 460px; margin: 0 auto; line-height: 1.5; color: var(--gray-500);">
+                                        This newly linked solar installation (#${pkg.accountNo}) has not reached billing generation yet. Once engineering site survey and net-metering stages are commissioned, your payment schedule will appear here.
+                                    </p>
+                                </td>
+                            </tr>
+                        `;
+                    }
+
+                    // Due Callout in pending mode
+                    if (dueCalloutBox) {
+                        dueCalloutBox.style.background = "var(--gray-50)";
+                        dueCalloutBox.style.borderLeftColor = "var(--gray-300)";
+                    }
+                    if (dueCalloutTitle) dueCalloutTitle.textContent = "Account Status";
+                    if (dueCalloutAmount) dueCalloutAmount.textContent = "No Bill Due";
+                    if (dueCalloutPeriod) dueCalloutPeriod.textContent = "Pending Commissioning";
+                    if (dueCalloutRef) dueCalloutRef.textContent = `Account: ${pkg.accountNo}`;
+                }
+            }
+
+            // Filter chips & search input event listeners
+            if (paymentsFilterChips) {
+                paymentsFilterChips.querySelectorAll(".filter-chip").forEach(chip => {
+                    chip.addEventListener("click", () => {
+                        paymentsFilterChips.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+                        chip.classList.add("active");
+                        activeFilter = chip.dataset.filter || "all";
+                        if (currentPackage && currentPackage.payments && currentPackage.payments.schedule) {
+                            renderTableRows(currentPackage.payments.schedule, currentPackage);
+                        }
+                    });
+                });
+            }
+
+            if (paymentsSearchInput) {
+                paymentsSearchInput.addEventListener("input", (e) => {
+                    activeSearchQuery = (e.target.value || "").trim();
+                    if (currentPackage && currentPackage.payments && currentPackage.payments.schedule) {
+                        renderTableRows(currentPackage.payments.schedule, currentPackage);
+                    }
+                });
+            }
+
+            // ----------------------------------------------------------------------
+            // 3. CTA HANDLERS TIED TO ACTIVE PACKAGE
+            // ----------------------------------------------------------------------
+            if (downloadReceiptBtn) {
+                downloadReceiptBtn.addEventListener("click", () => {
+                    const pkg = currentPackage || (window.HelloSolar && window.HelloSolar.getActivePackage());
+                    if (!pkg) return;
+
+                    if (pkg.payments && pkg.payments.hasBills) {
+                        if (window.HelloSolar && window.HelloSolar.toast) {
+                            window.HelloSolar.toast(
+                                "Statement Downloaded",
+                                `Official billing statement generated for ${pkg.name} (#${pkg.accountNo}).`
+                            );
+                        } else {
+                            alert(`Downloading official statement for ${pkg.name} (${pkg.accountNo})...`);
+                        }
+                    } else {
+                        if (window.HelloSolar && window.HelloSolar.toast) {
+                            window.HelloSolar.toast(
+                                "No Statement Available",
+                                `No issued billing statement exists yet for ${pkg.name} (#${pkg.accountNo}).`
+                            );
+                        } else {
+                            alert(`No statement available yet for ${pkg.name}.`);
+                        }
+                    }
+                });
+            }
+
+            // ----------------------------------------------------------------------
+            // 4. INITIALIZE PAGE & LISTENERS
+            // ----------------------------------------------------------------------
+            setupDirtyCheck();
+
+            // Initial render
+            const initialPkg = (window.HelloSolar && window.HelloSolar.getActivePackage)
+                ? window.HelloSolar.getActivePackage()
+                : null;
+            if (initialPkg) renderPaymentsPage(initialPkg);
+
+            // Listen for package changes triggered from elsewhere
+            window.addEventListener("helloSolarPackageChanged", (e) => {
+                if (e.detail && e.detail.package) {
+                    renderPaymentsPage(e.detail.package);
+                }
+            });
+
+            // Listen for dataset async load completion
+            window.addEventListener("helloSolarDataLoaded", () => {
+                const active = window.HelloSolar ? window.HelloSolar.getActivePackage() : null;
+                if (active) {
+                    renderPaymentsPage(active);
+                }
+            });
+        })();
     </script>
+    <script src="assets/js/notifications.js"></script>
 </body>
 
 </html>

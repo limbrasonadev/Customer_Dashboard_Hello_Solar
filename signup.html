@@ -14,6 +14,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
+    <!-- Favicon / Tab Icon -->
+    <link rel="icon" type="image/png" href="assets/images/logofortab.png">
+
     <!-- Design System CSS -->
     <link rel="stylesheet" href="assets/css/portal.css">
 
@@ -55,19 +58,26 @@
             width: auto;
         }
 
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
         .auth-header {
             margin-bottom: 24px;
         }
 
+        .eyebrow,
         .auth-header .eyebrow {
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             font-size: 11px;
+            font-style: normal;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: var(--solar-orange-dark);
+            color: var(--solar-orange-dark, #f47718);
             background: rgba(255, 138, 0, 0.08);
             padding: 4px 10px;
             border-radius: 999px;
@@ -457,7 +467,7 @@
             <header class="auth-header">
                 <span class="eyebrow">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2.5">
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="5"></circle>
                         <line x1="12" y1="1" x2="12" y2="3"></line>
                         <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -650,6 +660,9 @@
             </p>
         </section>
     </main>
+
+    <!-- Customer Authentication Logic & Registry -->
+    <script src="assets/js/auth.js"></script>
 
     <!-- Core Portal JavaScript -->
     <script src="assets/js/portal.js"></script>
@@ -885,6 +898,28 @@
                 return;
             }
 
+            // Check if account already exists with this email
+            if (window.HelloSolarAuth) {
+                const accounts = window.HelloSolarAuth.getAccounts();
+                const exists = accounts.some(acc => (acc.email || "").toLowerCase() === emailVal.toLowerCase());
+                if (exists) {
+                    emailGroup.classList.add("invalid");
+                    const emailError = emailGroup.querySelector(".error-message");
+                    if (emailError) {
+                        emailError.innerHTML = `
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            An account with this email already exists. Please log in instead.
+                        `;
+                    }
+                    emailInput.focus();
+                    return;
+                }
+            }
+
             // Loading state
             signupButton.disabled = true;
             signupBtnText.innerHTML = `
@@ -900,10 +935,12 @@
             const newAccountNo = `HS-${randomAccountNum}`;
 
             const newCustomerProfile = {
-                name: nameVal,
-                email: emailVal,
-                phone: phoneVal,
                 accountNo: newAccountNo,
+                email: emailVal,
+                username: emailVal.split("@")[0],
+                password: passVal,
+                name: nameVal,
+                phone: phoneVal,
                 status: "Online",
                 systemSize: "4.82 kW",
                 installationDate: new Date().toLocaleDateString("en-PH", { month: "long", day: "numeric", year: "numeric" }),
@@ -924,9 +961,14 @@
             };
 
             setTimeout(() => {
-                // Save customer data in store
-                localStorage.setItem("hello_solar_user", JSON.stringify(newCustomerProfile));
-                localStorage.setItem("hello_solar_logged_in", "true");
+                // Save customer data in accounts registry & store session
+                if (window.HelloSolarAuth) {
+                    window.HelloSolarAuth.saveAccount(newCustomerProfile);
+                    window.HelloSolarAuth.setSession(newCustomerProfile);
+                } else {
+                    localStorage.setItem("hello_solar_user", JSON.stringify(newCustomerProfile));
+                    localStorage.setItem("hello_solar_logged_in", "true");
+                }
 
                 // Success visual state
                 signupBtnText.textContent = "Account Created!";
@@ -942,7 +984,7 @@
                 }
 
                 setTimeout(() => {
-                    window.location.href = "dashboard.html";
+                    window.location.href = "mysystem.html";
                 }, 700);
             }, 800);
         });
