@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Hello Solar — Energy performance, generation trends, bill savings, and battery backup status.">
-    <title>Hello Solar — Energy</title>
+    <meta name="description" content="See what’s installed in your home and what your warranty covers.">
+    <title>Hello Solar — Equipment &amp; Warranty</title>
 
     <!-- Immediate Authentication Guard -->
     <script>
@@ -25,205 +24,723 @@
     <link rel="icon" type="image/png" href="assets/images/logofortab.png">
 
     <!-- Design System CSS -->
-    <link rel="stylesheet" href="assets/css/portal.css">
+    <link rel="stylesheet" href="assets/css/dashboard-theme.css">
 
     <style>
-        .energy-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-        }
+        /* Page layout stays below the shared dashboard theme in the cascade. */
+        @layer dashboard-legacy {
 
-        .chart-tabs {
-            display: flex;
-            background: var(--gray-100);
-            padding: 4px;
-            border-radius: var(--radius-sm);
-            gap: 4px;
-        }
-
-        .chart-tab {
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--gray-500);
-            transition: all var(--transition-fast);
-        }
-
-        .chart-tab:hover {
-            color: var(--navy);
-        }
-
-        .chart-tab.active {
-            background: var(--white);
-            color: var(--navy);
-            box-shadow: var(--shadow-xs);
-        }
-
-        .chart-area {
-            height: 250px;
-            padding: 10px 16px;
-            position: relative;
-        }
-
-        .chart-svg {
-            width: 100%;
-            height: 100%;
-            overflow: visible;
-        }
-
-        .chart-grid-line {
-            stroke: var(--gray-200);
-            stroke-dasharray: 4;
-            stroke-width: 1;
-        }
-
-        .chart-label {
-            font-size: 11px;
-            fill: var(--gray-400);
-            font-weight: 600;
-            user-select: none;
-        }
-
-        .chart-line {
-            fill: none;
-            stroke: var(--solar-orange);
-            stroke-width: 3;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .chart-area-fill {
-            fill: url(#energyGradient);
-            opacity: 0.25;
-        }
-
-        .chart-point {
-            fill: var(--white);
-            stroke: var(--solar-orange);
-            stroke-width: 2.5;
-            transition: r var(--transition-fast);
-        }
-
-        .chart-point:hover {
-            r: 6;
-            cursor: pointer;
-        }
-
-        .chart-legend {
-            padding: 12px 24px 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12.5px;
-            font-weight: 600;
-            color: var(--gray-500);
-        }
-
-        .legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: var(--radius-full);
-            background: var(--solar-orange);
-        }
-
-        /* Performance breakdown */
-        .performance-list {
-            padding: 20px 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .performance-item {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .performance-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 13px;
-        }
-
-        .performance-label {
-            color: var(--gray-500);
-            font-weight: 600;
-        }
-
-        .performance-value {
-            font-weight: 800;
-            color: var(--navy);
-        }
-
-        .performance-bar {
-            height: 7px;
-            background: var(--gray-100);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .performance-fill {
-            height: 100%;
-            border-radius: 4px;
-            background: var(--solar-gradient);
-        }
-
-        .performance-fill.green {
-            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-        }
-
-        .performance-fill.blue {
-            background: linear-gradient(90deg, #38bdf8 0%, #0284c7 100%);
-        }
-
-        /* Eco Impact Card */
-        .eco-card {
-            background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
-            color: var(--white);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .eco-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 6px;
-        }
-
-        .eco-stat-box {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: var(--radius-sm);
-            padding: 12px;
-        }
-
-        .eco-stat-val {
-            font-size: 20px;
-            font-weight: 800;
-            color: #a7f3d0;
-        }
-
-        .eco-stat-desc {
-            font-size: 11.5px;
-            color: #e2e8f0;
-            margin-top: 2px;
-        }
-
-        @media (max-width: 1024px) {
-            .energy-grid {
-                grid-template-columns: 1fr;
+            /* Main Layout & Warm Ivory Foundations */
+            body {
+                background-color: #fdfbf7;
             }
+
+            .app {
+                background-color: #fdfbf7;
+            }
+
+            .main {
+                min-height: auto;
+                background-color: #fdfbf7;
+            }
+
+            .content {
+                flex: 0 0 auto;
+                padding: 32px 36px 32px;
+                max-width: 1360px;
+                width: 100%;
+                margin: 0 auto;
+                box-sizing: border-box;
+            }
+
+            /* Section heading block */
+            .section-heading-block {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin-top: 24px;
+                margin-bottom: 16px;
+            }
+
+            .section-heading-block h2 {
+                font-size: 18px;
+                font-weight: 800;
+                color: var(--navy);
+                margin: 0;
+                letter-spacing: -0.01em;
+            }
+
+            .section-heading-block p {
+                font-size: 13.5px;
+                color: #596579;
+                margin-top: 3px;
+                margin-bottom: 0;
+            }
+
+            /* Warranty Help Action Button - Solar Orange with White Text & Icons */
+            #warrantySupportBtn {
+                white-space: nowrap;
+                height: 38px;
+                padding: 0 16px;
+                font-size: 13px;
+                font-weight: 700;
+                border-radius: 8px;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: var(--solar-gradient);
+                color: var(--white);
+                border: 1.5px solid transparent;
+                border-radius: var(--radius-sm);
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+                transition: background var(--transition-fast),
+                    box-shadow var(--transition-fast),
+                    transform var(--transition-fast),
+                    border-color var(--transition-fast);
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+            #warrantySupportBtn svg {
+                color: var(--white);
+                stroke: currentColor;
+                flex-shrink: 0;
+            }
+
+            #warrantySupportBtn:hover {
+                background: linear-gradient(135deg, #ff9400 0%, #e66800 100%);
+                box-shadow: 0 6px 20px rgba(255, 138, 0, 0.42);
+                transform: translate(-1px);
+                color: var(--white);
+            }
+
+            #warrantySupportBtn:active {
+                transform: translateY(0);
+                box-shadow: 0 2px 8px rgba(255, 138, 0, 0.25);
+            }
+
+            #warrantySupportBtn:focus-visible {
+                outline: 2px solid var(--solar-orange);
+                outline-offset: 3px;
+            }
+
+            /* --------------------------------------------------------------------------
+           EQUIPMENT & WARRANTY 2x2 GRID
+           -------------------------------------------------------------------------- */
+            .equipment-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                grid-auto-rows: 1fr;
+                gap: 20px;
+                margin-bottom: 28px;
+            }
+
+            /* Equal cards with clean white background and light orange hover */
+            .equipment-card {
+                background-color: #ffffff;
+                border: 1px solid #e8e5de;
+                border-radius: 16px;
+                padding: 22px;
+                box-shadow: 0 2px 8px rgba(16, 26, 46, 0.03);
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                height: 100%;
+                box-sizing: border-box;
+                /* CRITICAL: Transition background color and border color. Do not move, lift, or scale cards */
+                transition: background-color 0.2s ease, border-color 0.2s ease;
+            }
+
+            .equipment-card:hover {
+                border-color: #fed7aa;
+            }
+
+            .equipment-card-top {
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+            }
+
+            .equipment-card-header {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 12px;
+            }
+
+            .equipment-icon {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                color: #ff8a00;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                transition: background-color 0.2s ease;
+            }
+
+            .equipment-icon svg {
+                width: 26px;
+                height: 26px;
+            }
+
+            .equipment-card-badges {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+
+            .equipment-model-pill {
+                font-size: 11.5px;
+                font-weight: 700;
+                color: #ff8a00;
+                background: #fffbeb;
+                border: 1px solid #fde68a;
+                padding: 3px 10px;
+                border-radius: 999px;
+                line-height: 1.35;
+                max-width: 230px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .equipment-metric-pill {
+                font-size: 11.5px;
+                font-weight: 600;
+                color: #334155;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                padding: 3px 9px;
+                border-radius: 999px;
+                display: inline-flex;
+                align-items: center;
+                line-height: 1.35;
+            }
+
+            .equipment-metric-pill.neutral {
+                color: #64748b;
+                background: #f8fafc;
+                border-color: #e2e8f0;
+            }
+
+            .equipment-card-body {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .equipment-title {
+                font-size: 17.5px;
+                font-weight: 800;
+                color: var(--navy);
+                margin: 0;
+                letter-spacing: -0.015em;
+                line-height: 1.25;
+            }
+
+            .equipment-purpose {
+                font-size: 13.5px;
+                font-weight: 500;
+                color: #596579;
+                margin: 0;
+                line-height: 1.45;
+            }
+
+            .equipment-warranty-preview {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                margin-top: 4px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #475569;
+                background: rgba(255, 255, 255, 0.8);
+                border: 1px solid #e8e5de;
+                border-radius: 8px;
+                padding: 5px 9px;
+                width: fit-content;
+            }
+
+            .equipment-warranty-preview svg {
+                width: 14px;
+                height: 14px;
+                color: #ea580c;
+                flex-shrink: 0;
+            }
+
+            .equipment-card-footer {
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                margin-top: 18px;
+                padding-top: 14px;
+                border-top: 1px solid #f1efe9;
+            }
+
+            /* View Details Button - Solar Orange with White Text & Icons */
+            .btn-view-details {
+                background: var(--solar-gradient);
+                color: var(--white);
+                font-size: 13px;
+                font-weight: 700;
+                height: 34px;
+                padding: 0 14px;
+                border-radius: 8px;
+                border: 1.5px solid transparent;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                cursor: pointer;
+                box-shadow: 0 4px 14px rgba(255, 138, 0, 0.32);
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+                transition: background var(--transition-fast),
+                    box-shadow var(--transition-fast),
+                    transform var(--transition-fast),
+                    border-color var(--transition-fast);
+                box-sizing: border-box;
+            }
+
+            .btn-view-details svg {
+                width: 13px;
+                height: 13px;
+                stroke-width: 2.4;
+                color: #ffffff;
+                stroke: #ffffff;
+                transition: transform 0.15s ease;
+            }
+
+            .btn-view-details:hover {
+                background: linear-gradient(135deg, #ff9400 0%, #e66800 100%);
+                box-shadow: 0 6px 20px rgba(255, 138, 0, 0.42);
+                transform: translate(-1px);
+                color: var(--white);
+            }
+
+            .btn-view-details:active {
+                background: #c2410c;
+            }
+
+            .btn-view-details:hover svg {
+                transform: translateX(2px);
+            }
+
+            .btn-view-details:active {
+                background: #f59e0b;
+            }
+
+            .btn-view-details:focus-visible {
+                outline: 2px solid #ffb300;
+                outline-offset: 2px;
+            }
+
+            /* --------------------------------------------------------------------------
+           MODAL: SPECIFICATIONS & WARRANTY TERMS
+           -------------------------------------------------------------------------- */
+            .equipment-modal-backdrop {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(16, 26, 46, 0.55);
+                backdrop-filter: blur(4px);
+                z-index: 1050;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+
+            .equipment-modal-backdrop.is-open {
+                display: flex;
+                animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            @keyframes modalFadeIn {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+
+            .equipment-modal-panel {
+                background: #ffffff;
+                border-radius: 18px;
+                border: 1px solid #e8e5de;
+                box-shadow: 0 20px 45px rgba(16, 26, 46, 0.15);
+                width: 100%;
+                max-width: 620px;
+                max-height: 88vh;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                position: relative;
+                animation: modalSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            @keyframes modalSlideUp {
+                from {
+                    transform: translateY(12px) scale(0.98);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+            }
+
+            .equipment-modal-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 14px;
+                padding: 18px 24px;
+                border-bottom: 1px solid #e8e5de;
+                background: #ffffff;
+                flex-shrink: 0;
+            }
+
+            .equipment-modal-header-info {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                min-width: 0;
+            }
+
+            .equipment-modal-icon {
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                color: #ff8a00;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+
+            .equipment-modal-icon svg {
+                width: 24px;
+                height: 24px;
+            }
+
+            .equipment-modal-title-group {
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+            }
+
+            .equipment-modal-title {
+                font-size: 18px;
+                font-weight: 800;
+                color: var(--navy);
+                margin: 0;
+                letter-spacing: -0.015em;
+                line-height: 1.25;
+            }
+
+            .equipment-modal-model {
+                font-size: 12.5px;
+                font-weight: 600;
+                color: #596579;
+                margin: 2px 0 0 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .equipment-modal-close-btn {
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                background: #f1f5f9;
+                border: 1px solid #e2e8f0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #64748b;
+                cursor: pointer;
+                transition: all var(--transition-fast);
+                flex-shrink: 0;
+            }
+
+            .equipment-modal-close-btn:hover {
+                background: #e2e8f0;
+                color: var(--navy);
+            }
+
+            .equipment-modal-close-btn:focus-visible {
+                outline: 2px solid #ffb300;
+                outline-offset: 2px;
+            }
+
+            .equipment-modal-body {
+                padding: 20px 24px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                flex: 1;
+            }
+
+            .modal-section-title {
+                font-size: 11px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: #596579;
+                margin: 0 0 10px 0;
+                display: flex;
+                align-items: center;
+                gap: 7px;
+            }
+
+            .modal-section-title::before {
+                content: "";
+                display: inline-block;
+                width: 3.5px;
+                height: 12px;
+                background: #ff8a00;
+                border-radius: 2px;
+            }
+
+            .modal-spec-grid {
+                background: #fcfbf7;
+                border: 1px solid #e8e5de;
+                border-radius: 12px;
+                padding: 6px 14px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .modal-spec-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 8px 0;
+                border-bottom: 1px solid #f1efe9;
+                font-size: 13px;
+                gap: 12px;
+            }
+
+            .modal-spec-row:last-child {
+                border-bottom: none;
+            }
+
+            .modal-spec-label {
+                color: #596579;
+                font-weight: 500;
+                flex-shrink: 0;
+            }
+
+            .modal-spec-value {
+                color: var(--navy);
+                font-weight: 600;
+                text-align: right;
+                word-break: break-word;
+            }
+
+            /* Structured Warranty Terms: Duration & Coverage */
+            .warranty-breakdown-card {
+                background: #fcfbf7;
+                border: 1px solid #e8e5de;
+                border-radius: 12px;
+                padding: 14px 16px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .warranty-sub-item {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+            }
+
+            .warranty-sub-label {
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: #ff8a00;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .warranty-sub-value {
+                font-size: 13px;
+                color: var(--navy);
+                line-height: 1.45;
+            }
+
+            .equipment-modal-footer {
+                padding: 14px 24px;
+                border-top: 1px solid #e8e5de;
+                background: #ffffff;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                flex-shrink: 0;
+            }
+
+            .modal-secondary-btn {
+                height: 36px;
+                padding: 0 16px;
+                border-radius: 8px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                font-size: 13px;
+                font-weight: 600;
+                color: #475569;
+                cursor: pointer;
+                transition: all var(--transition-fast);
+            }
+
+            .modal-secondary-btn:hover {
+                background: #f1f5f9;
+                color: var(--navy);
+                border-color: #cbd5e1;
+            }
+
+            .modal-secondary-btn:focus-visible {
+                outline: 2px solid #ffb300;
+                outline-offset: 2px;
+            }
+
+            .modal-primary-btn {
+                height: 36px;
+                padding: 0 16px;
+                border-radius: 8px;
+                background: var(--solar-gradient);
+                color: var(--white);
+                font-size: 13px;
+                font-weight: 700;
+                border: 1.5px solid transparent;
+                display: inline-flex;
+                align-items: center;
+                gap: 7px;
+                text-decoration: none;
+                cursor: pointer;
+                box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+                transition: background var(--transition-fast),
+                    box-shadow var(--transition-fast),
+                    transform var(--transition-fast),
+                    border-color var(--transition-fast);
+                box-sizing: border-box;
+            }
+
+            .modal-primary-btn svg {
+                color: var(--white);
+                stroke: currentColor;
+                flex-shrink: 0;
+            }
+
+            .modal-primary-btn:hover {
+                background: linear-gradient(135deg, #ff9400 0%, #e66800 100%);
+                box-shadow: 0 6px 20px rgba(255, 138, 0, 0.42);
+                transform: translate(-1px);
+                color: var(--white);
+            }
+
+            .modal-primary-btn:active {
+                transform: translateY(0);
+                box-shadow: 0 2px 8px rgba(255, 138, 0, 0.25);
+            }
+
+            .modal-primary-btn:focus-visible {
+                outline: 2px solid var(--solar-orange);
+                outline-offset: 3px;
+            }
+
+            /* Footer Spacing */
+            .portal-footer {
+                margin-top: 0;
+                padding: 20px 36px;
+                background-color: #fdfbf7;
+            }
+
+            /* Responsive Breakpoints */
+            @media (max-width: 768px) {
+                .content {
+                    min-height: auto !important;
+                    flex: initial !important;
+                    padding: 16px 14px calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 14px) !important;
+                }
+
+                .section-heading-block {
+                    margin-top: 16px;
+                    margin-bottom: 12px;
+                }
+
+                .equipment-grid {
+                    grid-template-columns: 1fr;
+                    grid-auto-rows: auto;
+                    gap: 14px;
+                    margin-bottom: 20px;
+                }
+
+                .equipment-card {
+                    padding: 16px;
+                    border-radius: 14px;
+                }
+
+                .equipment-icon {
+                    width: 42px;
+                    height: 42px;
+                    border-radius: 10px;
+                }
+
+                .equipment-icon svg {
+                    width: 22px;
+                    height: 22px;
+                }
+
+                .equipment-modal-panel {
+                    max-height: 92vh;
+                    border-radius: 16px;
+                }
+
+                .equipment-modal-header,
+                .equipment-modal-body,
+                .equipment-modal-footer {
+                    padding-left: 16px;
+                    padding-right: 16px;
+                }
+
+                .modal-spec-row {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 2px;
+                }
+
+                .modal-spec-value {
+                    text-align: left;
+                }
+
+                .portal-footer {
+                    display: none !important;
+                }
+            }
+
         }
     </style>
-    <link rel="stylesheet" href="assets/css/notifications.css">
 </head>
 
 <body>
@@ -256,7 +773,7 @@
                         stroke-linejoin="round">
                         <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
                     </svg>
-                    Energy
+                    Equipment Details
                 </a>
 
                 <a href="payments.html" class="nav-link">
@@ -330,10 +847,7 @@
                     </a>
 
                     <div class="profile">
-                        <div class="profile-text">
-                            <span class="profile-name" id="profileName">Juan Dela Cruz</span>
-                            <span class="profile-role">Customer Account</span>
-                        </div>
+
                         <div class="profile-avatar" id="profileAvatar">JD</div>
                     </div>
                 </div>
@@ -343,257 +857,198 @@
             <div class="content">
                 <section class="page-intro">
                     <div>
-                        <p class="eyebrow">Generation & Savings</p>
-                        <h1>Energy <span>Performance</span></h1>
-                        <p>Detailed solar production records, utility bill savings, and battery reserve telemetry.</p>
+                        <h1>Equipment &amp; <span>Warranty</span></h1>
+
                     </div>
                     <div class="cta-group">
-                        <div class="package-selector-slot" id="pagePackageSelector"></div>
-                        <button type="button" class="btn btn-primary" id="exportEnergyBtn">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+
+                        <a href="support.html?type=warranty" class="btn btn-primary btn-sm" id="warrantySupportBtn">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                <polyline points="7 10 12 15 17 10" />
-                                <line x1="12" y1="15" x2="12" y2="3" />
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                             </svg>
-                            Export Energy Data
-                        </button>
-                        <a href="payments.html" class="btn btn-secondary">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2" y="5" width="20" height="14" rx="2" />
-                                <line x1="2" y1="10" x2="22" y2="10" />
-                            </svg>
-                            View Savings
+                            Get warranty help
                         </a>
                     </div>
                 </section>
 
-                <!-- 4 SUMMARY CARDS -->
-                <section class="summary-grid" aria-label="Energy overview stats">
-                    <article class="summary-card">
-                        <div class="summary-top">
-                            <span class="summary-label">Energy Generated</span>
-                            <div class="summary-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="summary-value" id="energyGeneratedVal">7.1 kWh</div>
-                        <div class="summary-meta" id="energyGeneratedMeta">Generated today so far</div>
-                    </article>
-
-                    <article class="summary-card">
-                        <div class="summary-top">
-                            <span class="summary-label">Bill Saved</span>
-                            <div class="summary-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <rect x="2" y="5" width="20" height="14" rx="2" />
-                                    <path d="M2 10h20" />
-                                    <path d="M12 13v4" />
-                                    <path d="M10 15h4" />
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="summary-value" id="billSavedVal">₱3,650</div>
-                        <div class="summary-meta" id="billSavedMeta">Estimated monthly reduction</div>
-                    </article>
-
-                    <article class="summary-card">
-                        <div class="summary-top">
-                            <span class="summary-label">Battery Reserve</span>
-                            <div class="summary-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <rect x="3" y="7" width="17" height="10" rx="2" />
-                                    <path d="M20 10h2v4h-2" />
-                                    <path d="M7 10v4" />
-                                    <path d="M10 10v4" />
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="summary-value" id="batteryReserveVal">10 kWh</div>
-                        <div class="summary-meta" id="batteryReserveMeta">92% State of Charge (Ready)</div>
-                    </article>
-
-                    <article class="summary-card">
-                        <div class="summary-top">
-                            <span class="summary-label">Brownout Backup</span>
-                            <div class="summary-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10" />
-                                    <polyline points="12 6 12 12 16 14" />
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="summary-value" id="brownoutBackupVal">18 hrs</div>
-                        <div class="summary-meta" id="brownoutBackupMeta">Estimated critical circuits</div>
-                    </article>
-                </section>
-
-                <!-- GRID: CHART & METRICS -->
-                <div class="energy-grid">
-                    <!-- Energy Production Chart -->
-                    <section class="panel">
-                        <div class="panel-header">
-                            <div>
-                                <h2 class="panel-title">Production History</h2>
-                                <p class="panel-subtitle" id="chartSubtitle">Interactive generation curve (kWh output)
-                                </p>
-                            </div>
-
-                            <div class="chart-tabs" id="chartTabsList" role="tablist">
-                                <button class="chart-tab" type="button" data-period="today">Today</button>
-                                <button class="chart-tab active" type="button" data-period="week">Last 7 Days</button>
-                                <button class="chart-tab" type="button" data-period="month">Monthly</button>
-                            </div>
-                        </div>
-
-                        <div class="chart-area" id="chartAreaContainer">
-                            <svg class="chart-svg" id="energyChart" viewBox="0 0 700 250" preserveAspectRatio="none"
-                                aria-label="Energy production history chart">
-                                <defs>
-                                    <linearGradient id="energyGradient" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stop-color="#ff8a00" stop-opacity="0.75" />
-                                        <stop offset="100%" stop-color="#ffb300" stop-opacity="0.05" />
-                                    </linearGradient>
-                                </defs>
-
-                                <line class="chart-grid-line" x1="45" y1="30" x2="680" y2="30" />
-                                <line class="chart-grid-line" x1="45" y1="80" x2="680" y2="80" />
-                                <line class="chart-grid-line" x1="45" y1="130" x2="680" y2="130" />
-                                <line class="chart-grid-line" x1="45" y1="180" x2="680" y2="180" />
-                                <line class="chart-grid-line" x1="45" y1="220" x2="680" y2="220" />
-
-                                <text class="chart-label" id="chartYMax" x="7" y="34">8 kWh</text>
-                                <text class="chart-label" id="chartY75" x="7" y="84">6 kWh</text>
-                                <text class="chart-label" id="chartY50" x="7" y="134">4 kWh</text>
-                                <text class="chart-label" id="chartY25" x="7" y="184">2 kWh</text>
-                                <text class="chart-label" x="10" y="224">0</text>
-
-                                <path id="chartFill" class="chart-area-fill"></path>
-                                <path id="chartLine" class="chart-line"></path>
-                                <g id="chartPoints"></g>
-                                <g id="chartLabels"></g>
-                            </svg>
-
-                            <!-- Clean Empty State when Package has no readings -->
-                            <div id="chartEmptyState" class="portal-empty-state"
-                                style="display: none; min-height: 200px;">
-                                <div class="portal-empty-icon">
+                <div class="equipment-grid">
+                    <!-- Card 1: Solar Panels -->
+                    <div class="equipment-card" id="equipmentPanelsCard">
+                        <div class="equipment-card-top">
+                            <div class="equipment-card-header">
+                                <div class="equipment-icon">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                                        <rect x="3" y="4" width="18" height="13" rx="2" />
+                                        <path d="M3 10h18M9 4v13M15 4v13M8 21h8M12 17v4" />
                                     </svg>
                                 </div>
-                                <h3 class="portal-empty-title">No Readings Recorded Yet</h3>
-                                <p class="portal-empty-desc">
-                                    Solar telemetry will begin populating once this installation is fully energized and
-                                    grid synchronization is confirmed.
+                                <div class="equipment-card-badges">
+                                    <span class="equipment-model-pill" id="specPanelsModel">Trina Solar Vertex S+
+                                        450W</span>
+                                    <span class="equipment-metric-pill" id="panelCountPill">12 Panels</span>
+                                </div>
+                            </div>
+                            <div class="equipment-card-body">
+                                <h3 class="equipment-title">Solar Panels</h3>
+                                <p class="equipment-purpose">Make electricity from sunlight.</p>
+                                <div class="equipment-warranty-preview">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                    </svg>
+                                    <span id="warrantyPanelsTerm">25-Year Performance · 12-Year Product</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="equipment-card-footer">
+                            <button type="button" class="btn-view-details" data-equipment="panels" id="viewPanelsBtn"
+                                aria-haspopup="dialog" aria-controls="equipmentModalBackdrop">
+                                View Details
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M5 12h14" />
+                                    <path d="m12 5 7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Inverter -->
+                    <div class="equipment-card" id="equipmentInverterCard">
+                        <div class="equipment-card-top">
+                            <div class="equipment-card-header">
+                                <div class="equipment-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="5" y="3" width="14" height="18" rx="3" />
+                                        <path d="m13 7-4 6h6l-4 5" />
+                                    </svg>
+                                </div>
+                                <div class="equipment-card-badges">
+                                    <span class="equipment-model-pill" id="specInverterModel">Solis 5kW Hybrid
+                                        Inverter</span>
+                                    <span class="equipment-metric-pill" id="inverterTypePill">System Inverter</span>
+                                </div>
+                            </div>
+                            <div class="equipment-card-body">
+                                <h3 class="equipment-title">Inverter</h3>
+                                <p class="equipment-purpose">Turns electricity from your panels into power your home can
+                                    use.</p>
+                                <div class="equipment-warranty-preview">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                    </svg>
+                                    <span id="warrantyInverterTerm">5-Year Warranty</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="equipment-card-footer">
+                            <button type="button" class="btn-view-details" data-equipment="inverter"
+                                id="viewInverterBtn" aria-haspopup="dialog" aria-controls="equipmentModalBackdrop">
+                                View Details
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M5 12h14" />
+                                    <path d="m12 5 7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Battery Storage -->
+                    <div class="equipment-card" id="equipmentBatteryCard">
+                        <div class="equipment-card-top">
+                            <div class="equipment-card-header">
+                                <div class="equipment-icon" id="specBatteryIconWrap">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="6" width="17" height="12" rx="3" />
+                                        <path d="M23 10v4M7 12h3M14 10v4M12 12h4" />
+                                    </svg>
+                                </div>
+                                <div class="equipment-card-badges">
+                                    <span class="equipment-model-pill" id="specBatteryModel">10 kWh Lithium-ion
+                                        Reserve</span>
+                                    <span class="equipment-metric-pill" id="batteryCapacityPill">10 kWh Storage</span>
+                                </div>
+                            </div>
+                            <div class="equipment-card-body">
+                                <h3 class="equipment-title">Battery Storage</h3>
+                                <p class="equipment-purpose" id="batteryPurposeText">Stores electricity for later use.
                                 </p>
+                                <div class="equipment-warranty-preview">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                    </svg>
+                                    <span id="warrantyBatteryTerm">10-Year / 6,000 Cycles</span>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="chart-legend" id="chartLegend">
-                            <span class="legend-dot"></span>
-                            Clean solar generation (kWh)
+                        <div class="equipment-card-footer">
+                            <button type="button" class="btn-view-details" data-equipment="battery" id="viewBatteryBtn"
+                                aria-haspopup="dialog" aria-controls="equipmentModalBackdrop">
+                                View Details
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M5 12h14" />
+                                    <path d="m12 5 7 7-7 7" />
+                                </svg>
+                            </button>
                         </div>
+                    </div>
 
-                        <!-- Accessible Readable Metrics Row (Mobile & Summary) -->
-                        <div class="chart-readable-metrics" id="chartReadableMetrics">
-                            <div class="chart-metric-pill">
-                                <span>Period:</span>
-                                <strong id="chartMetricPeriod">Last 7 Days</strong>
+                    <!-- Card 4: Workmanship & Installation -->
+                    <div class="equipment-card" id="equipmentInstallationCard">
+                        <div class="equipment-card-top">
+                            <div class="equipment-card-header">
+                                <div class="equipment-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Z" />
+                                        <path d="m8 12 3 3 5-6" />
+                                    </svg>
+                                </div>
+                                <div class="equipment-card-badges">
+                                    <span class="equipment-model-pill" id="warrantyInstallerName">Carlos
+                                        Villanueva</span>
+                                    <span class="equipment-metric-pill">Certified Workmanship</span>
+                                </div>
                             </div>
-                            <div class="chart-metric-pill">
-                                <span>Total:</span>
-                                <strong id="chartMetricTotal">44.6 kWh</strong>
-                            </div>
-                            <div class="chart-metric-pill">
-                                <span>Peak:</span>
-                                <strong id="chartMetricPeak">7.6 kWh (Sat)</strong>
-                            </div>
-                            <div class="chart-metric-pill">
-                                <span>Daily Avg:</span>
-                                <strong id="chartMetricAvg">6.37 kWh/d</strong>
+                            <div class="equipment-card-body">
+                                <h3 class="equipment-title">Workmanship &amp; Installation</h3>
+                                <p class="equipment-purpose">Covers roof weather-sealing, mounting structural integrity,
+                                    and electrical wiring.</p>
+                                <div class="equipment-warranty-preview">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                    </svg>
+                                    <span id="warrantyWorkmanshipTerm">5-Year Coverage</span>
+                                </div>
                             </div>
                         </div>
-                    </section>
-
-                    <!-- Right Column: Breakdown & Environmental Impact -->
-                    <div style="display: flex; flex-direction: column; gap: 20px;">
-                        <section class="panel">
-                            <div class="panel-header">
-                                <h2 class="panel-title" style="font-size: 16px;">Power Distribution</h2>
-                                <span class="badge badge-online" id="breakdownBadge">Live</span>
-                            </div>
-
-                            <div class="performance-list">
-                                <div class="performance-item">
-                                    <div class="performance-row">
-                                        <span class="performance-label">Home Direct Consumption</span>
-                                        <span class="performance-value" id="breakdownSolarVal">64%</span>
-                                    </div>
-                                    <div class="performance-bar">
-                                        <div class="performance-fill" id="breakdownSolarFill" style="width: 64%;"></div>
-                                    </div>
-                                </div>
-
-                                <div class="performance-item">
-                                    <div class="performance-row">
-                                        <span class="performance-label">Battery Storage Charged</span>
-                                        <span class="performance-value" id="breakdownBatteryVal">26%</span>
-                                    </div>
-                                    <div class="performance-bar">
-                                        <div class="performance-fill green" id="breakdownBatteryFill"
-                                            style="width: 26%;"></div>
-                                    </div>
-                                </div>
-
-                                <div class="performance-item">
-                                    <div class="performance-row">
-                                        <span class="performance-label">Exported to Grid (Net Metering)</span>
-                                        <span class="performance-value" id="breakdownGridVal">10%</span>
-                                    </div>
-                                    <div class="performance-bar">
-                                        <div class="performance-fill blue" id="breakdownGridFill" style="width: 10%;">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-
-                        <!-- Eco Impact -->
-                        <section class="eco-card">
-                            <div>
-                                <span class="eyebrow" style="color: #6ee7b7;">Environmental Impact</span>
-                                <h3 style="font-size: 17px; font-weight: 800; margin-top: 4px;">Clean Green Energy</h3>
-                                <p style="font-size: 12.5px; opacity: 0.9; margin-top: 2px;">Your rooftop system
-                                    directly eliminates fossil fuel greenhouse emissions.</p>
-                            </div>
-
-                            <div class="eco-stats">
-                                <div class="eco-stat-box">
-                                    <div class="eco-stat-val" id="ecoCo2Val">312 kg</div>
-                                    <div class="eco-stat-desc">CO₂ Emissions Avoided</div>
-                                </div>
-                                <div class="eco-stat-box">
-                                    <div class="eco-stat-val" id="ecoTreesVal">14 Trees</div>
-                                    <div class="eco-stat-desc">Planting Equivalent</div>
-                                </div>
-                            </div>
-                        </section>
+                        <div class="equipment-card-footer">
+                            <button type="button" class="btn-view-details" data-equipment="workmanship"
+                                id="viewWorkmanshipBtn" aria-haspopup="dialog" aria-controls="equipmentModalBackdrop">
+                                View Details
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M5 12h14" />
+                                    <path d="m12 5 7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- FOOTER -->
             <footer class="portal-footer">
-                <span>© 2026 Hello Solar Inc. Clean energy. Lower bills. Brighter future.</span>
+                <span>© 2026 Hello Solar Inc.</span>
                 <span>hellosolarph.com · support@hellosolarph.com</span>
             </footer>
         </main>
@@ -620,7 +1075,7 @@
                     stroke-linejoin="round">
                     <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
                 </svg>
-                <span>Energy</span>
+                <span>Equipment Details</span>
             </a>
             <a href="payments.html" class="mobile-nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
@@ -644,312 +1099,416 @@
         </div>
     </nav>
 
+    <!-- EQUIPMENT SPECIFICATIONS & WARRANTY TERMS MODAL -->
+    <div class="equipment-modal-backdrop" id="equipmentModalBackdrop" role="dialog" aria-modal="true"
+        aria-labelledby="modalEquipmentTitle" aria-hidden="true">
+        <div class="equipment-modal-panel" id="equipmentModalPanel">
+            <div class="equipment-modal-header">
+                <div class="equipment-modal-header-info">
+                    <div class="equipment-modal-icon" id="modalEquipmentIcon">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="equipment-modal-title-group">
+                        <h3 class="equipment-modal-title" id="modalEquipmentTitle">Equipment Details</h3>
+                        <p class="equipment-modal-model" id="modalEquipmentModel">Hardware Model &amp; Specifications
+                        </p>
+                    </div>
+                </div>
+                <button type="button" class="equipment-modal-close-btn" id="modalCloseBtn"
+                    aria-label="Close details dialog">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="equipment-modal-body" id="modalEquipmentBody">
+                <!-- 1. Specifications Section -->
+                <div class="modal-section">
+                    <h4 class="modal-section-title">Equipment Specifications</h4>
+                    <div class="modal-spec-grid" id="modalSpecGrid">
+                        <!-- Populated dynamically by JS -->
+                    </div>
+                </div>
+
+                <!-- 2. Warranty Terms Section -->
+                <div class="modal-section">
+                    <h4 class="modal-section-title">Warranty Terms &amp; Protection</h4>
+                    <div class="warranty-breakdown-card" id="modalWarrantyCard">
+                        <!-- Populated dynamically by JS: Duration, Coverage -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="equipment-modal-footer">
+                <button type="button" class="modal-secondary-btn" id="modalSecondaryCloseBtn">Close</button>
+                <a href="support.html?type=warranty" class="modal-primary-btn" id="modalWarrantyHelpBtn">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    Get Warranty Help
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared Data Loader -->
+    <script src="assets/js/data-loader.js"></script>
+
     <!-- Core Portal JavaScript -->
     <script src="assets/js/portal.js"></script>
 
-    <!-- Chart & Energy Performance Controller -->
+    <!-- System Details & Warranty Page Controller -->
     <script>
         (function () {
             "use strict";
 
-            const chartLine = document.getElementById("chartLine");
-            const chartFill = document.getElementById("chartFill");
-            const chartPoints = document.getElementById("chartPoints");
-            const chartLabels = document.getElementById("chartLabels");
-            const chartSvg = document.getElementById("energyChart");
-            const chartEmptyState = document.getElementById("chartEmptyState");
-            const chartLegend = document.getElementById("chartLegend");
-            const chartSubtitle = document.getElementById("chartSubtitle");
-
-            const chartYMax = document.getElementById("chartYMax");
-            const chartY75 = document.getElementById("chartY75");
-            const chartY50 = document.getElementById("chartY50");
-            const chartY25 = document.getElementById("chartY25");
-
-            const energyGeneratedVal = document.getElementById("energyGeneratedVal");
-            const energyGeneratedMeta = document.getElementById("energyGeneratedMeta");
-            const billSavedVal = document.getElementById("billSavedVal");
-            const billSavedMeta = document.getElementById("billSavedMeta");
-            const batteryReserveVal = document.getElementById("batteryReserveVal");
-            const batteryReserveMeta = document.getElementById("batteryReserveMeta");
-            const brownoutBackupVal = document.getElementById("brownoutBackupVal");
-            const brownoutBackupMeta = document.getElementById("brownoutBackupMeta");
-
-            const breakdownSolarVal = document.getElementById("breakdownSolarVal");
-            const breakdownSolarFill = document.getElementById("breakdownSolarFill");
-            const breakdownBatteryVal = document.getElementById("breakdownBatteryVal");
-            const breakdownBatteryFill = document.getElementById("breakdownBatteryFill");
-            const breakdownGridVal = document.getElementById("breakdownGridVal");
-            const breakdownGridFill = document.getElementById("breakdownGridFill");
-            const breakdownBadge = document.getElementById("breakdownBadge");
-
-            const ecoCo2Val = document.getElementById("ecoCo2Val");
-            const ecoTreesVal = document.getElementById("ecoTreesVal");
-            const exportEnergyBtn = document.getElementById("exportEnergyBtn");
-
-            const chartMetricPeriod = document.getElementById("chartMetricPeriod");
-            const chartMetricTotal = document.getElementById("chartMetricTotal");
-            const chartMetricPeak = document.getElementById("chartMetricPeak");
-            const chartMetricAvg = document.getElementById("chartMetricAvg");
-
             let currentPackage = null;
-            let currentPeriod = "week";
-            let renderGenerationToken = 0;
+            let activeModalEquipmentKey = null;
+            let lastActiveTrigger = null;
 
-            function updateReadableMetrics(period, data) {
-                if (!chartMetricPeriod || !chartMetricTotal || !chartMetricPeak || !chartMetricAvg) return;
+            // Modal elements
+            const modalBackdrop = document.getElementById("equipmentModalBackdrop");
+            const modalPanel = document.getElementById("equipmentModalPanel");
+            const modalCloseBtn = document.getElementById("modalCloseBtn");
+            const modalSecondaryCloseBtn = document.getElementById("modalSecondaryCloseBtn");
+            const modalEquipmentIcon = document.getElementById("modalEquipmentIcon");
+            const modalEquipmentTitle = document.getElementById("modalEquipmentTitle");
+            const modalEquipmentModel = document.getElementById("modalEquipmentModel");
+            const modalSpecGrid = document.getElementById("modalSpecGrid");
+            const modalWarrantyCard = document.getElementById("modalWarrantyCard");
 
-                if (!data || !data.values || data.values.length === 0) {
-                    chartMetricPeriod.textContent = period === "today" ? "Today" : (period === "month" ? "Last 30 Days" : "Last 7 Days");
-                    chartMetricTotal.textContent = "No data";
-                    chartMetricPeak.textContent = "N/A";
-                    chartMetricAvg.textContent = "N/A";
-                    return;
+            const EQUIPMENT_ICONS = {
+                panels: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M3 10h18M9 4v13M15 4v13M8 21h8M12 17v4"/></svg>`,
+                inverter: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="m13 7-4 6h6l-4 5"/></svg>`,
+                battery: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="17" height="12" rx="3"/><path d="M23 10v4M7 12h3M14 10v4M12 12h4"/></svg>`,
+                workmanship: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Z"/><path d="m8 12 3 3 5-6"/></svg>`
+            };
+
+            function getEquipmentModalData(key, pkg) {
+                if (!pkg) return null;
+
+                if (key === "panels") {
+                    const cellTech = (pkg.panelsModel && pkg.panelsModel.includes("Bifacial"))
+                        ? "Bifacial Monocrystalline PERC"
+                        : "Monocrystalline N-Type TOPCon";
+                    const termText = (pkg.warranties && pkg.warranties.panels && pkg.warranties.panels.termText)
+                        || "25-Year Performance · 12-Year Product Warranty";
+
+                    return {
+                        title: "Solar Panels",
+                        model: pkg.panelsModel || "Trina Solar Vertex S+ 450W",
+                        icon: EQUIPMENT_ICONS.panels,
+                        specs: [
+                            { label: "Installed Model", value: pkg.panelsModel || "Trina Solar Vertex S+ 450W" },
+                            { label: "Total DC Capacity", value: `${pkg.capacity || "5.4 kW"} DC (${pkg.panelsCount || 12} Panels)` },
+                            { label: "Cell Technology", value: cellTech }
+                        ],
+                        warranty: {
+                            duration: termText,
+                            coverage: "Guarantees power output efficiency and protects against manufacturing defects."
+                        }
+                    };
                 }
 
-                const periodLabel = period === "today" ? "Today (Hourly)" : (period === "month" ? "Last 30 Days" : "Last 7 Days");
-                const total = data.values.reduce((sum, v) => sum + (Number(v) || 0), 0);
-                let peakVal = -1;
-                let peakLabel = "";
+                if (key === "inverter") {
+                    const termText = (pkg.warranties && pkg.warranties.inverter && pkg.warranties.inverter.termText)
+                        || "5-Year Warranty";
+                    const serial = pkg.inverterSerial || "SOLIS-5K-202503-8891";
 
-                data.values.forEach((v, idx) => {
-                    if (v > peakVal) {
-                        peakVal = v;
-                        peakLabel = data.labels[idx] || "";
+                    return {
+                        title: "Inverter",
+                        model: pkg.inverterModel || "Solis 5kW Hybrid Inverter",
+                        icon: EQUIPMENT_ICONS.inverter,
+                        specs: [
+                            { label: "Installed Model", value: pkg.inverterModel || "Solis 5kW Hybrid Inverter" },
+                            { label: "Serial Number", value: serial, isMonospace: true },
+                            { label: "System Type", value: pkg.systemType || "Residential Hybrid Inverter" }
+                        ],
+                        warranty: {
+                            duration: termText,
+                            coverage: "Full coverage for repairs, internal electronics, and datalogger components."
+                        }
+                    };
+                }
+
+                if (key === "battery") {
+                    if (pkg.hasBattery === false) {
+                        return {
+                            title: "Battery Storage",
+                            model: "Grid-Tied Architecture (No Battery Unit)",
+                            icon: EQUIPMENT_ICONS.battery,
+                            specs: [
+                                { label: "System Architecture", value: "Direct Grid-Tied Solar System" },
+                                { label: "Battery Unit", value: "None (Direct Solar Daytime Export)" }
+                            ],
+                            warranty: {
+                                duration: "Grid-Tied Configuration",
+                                coverage: "Not applicable — this system operates without a battery storage unit."
+                            }
+                        };
                     }
-                });
 
-                const unit = period === "today" ? "kW" : "kWh";
-                const avg = data.values.length > 0 ? (total / data.values.length) : 0;
+                    const termText = (pkg.warranties && pkg.warranties.battery && pkg.warranties.battery.termText)
+                        || "10-Year / 6,000 Cycles";
+                    const usableCap = (pkg.energy && pkg.energy.batteryReserve)
+                        ? `${pkg.energy.batteryReserve} Usable Reserve`
+                        : (pkg.batteryCapacity || "10 kWh Reserve");
 
-                chartMetricPeriod.textContent = periodLabel;
-                chartMetricTotal.textContent = `${total.toFixed(1)} kWh`;
-                chartMetricPeak.textContent = peakVal >= 0 ? `${peakVal} ${unit}${peakLabel ? ` (${peakLabel})` : ""}` : "N/A";
-                chartMetricAvg.textContent = period === "today" ? `${avg.toFixed(2)} kW avg` : `${avg.toFixed(2)} kWh/d`;
+                    return {
+                        title: "Battery Storage",
+                        model: pkg.batteryCapacity || "10 kWh Lithium-ion Reserve",
+                        icon: EQUIPMENT_ICONS.battery,
+                        specs: [
+                            { label: "Battery Model", value: pkg.batteryCapacity || "10 kWh Lithium-ion Reserve" },
+                            { label: "Cell Chemistry", value: "LiFePO4 (Lithium Iron Phosphate)" },
+                            { label: "Usable Capacity", value: usableCap }
+                        ],
+                        warranty: {
+                            duration: termText,
+                            coverage: "Guarantees capacity retention above 70% and battery management system protection."
+                        }
+                    };
+                }
+
+                if (key === "workmanship") {
+                    const installer = (pkg.assignedInstaller && pkg.assignedInstaller.name)
+                        || (pkg.install && pkg.install.assignedTeam && pkg.install.assignedTeam.name)
+                        || "Carlos Villanueva";
+                    const phone = (pkg.assignedInstaller && pkg.assignedInstaller.phone)
+                        || "+63 917 555 0101";
+                    const termText = (pkg.warranties && pkg.warranties.workmanship && pkg.warranties.workmanship.termText)
+                        || "5-Year Coverage";
+
+                    return {
+                        title: "Workmanship & Installation",
+                        model: `Certified by ${installer}`,
+                        icon: EQUIPMENT_ICONS.workmanship,
+                        specs: [
+                            { label: "Certified Lead Installer", value: installer },
+                            { label: "Direct Field Contact", value: phone },
+                            { label: "Included Scope", value: "Roof penetrations, racking security & electrical connections" }
+                        ],
+                        warranty: {
+                            duration: termText,
+                            coverage: "100% labor, weather-tight roof penetrations, and electrical wiring."
+                        }
+                    };
+                }
+
+                return null;
             }
 
-            function drawChart(period) {
-                if (!currentPackage || !currentPackage.energy || !currentPackage.energy.hasReadings || !currentPackage.energy.chart) {
-                    if (chartSvg) chartSvg.style.display = "none";
-                    if (chartLegend) chartLegend.style.display = "none";
-                    if (chartEmptyState) chartEmptyState.style.display = "flex";
-                    updateReadableMetrics(period, null);
-                    return;
+            function populateModal(key, pkg) {
+                const data = getEquipmentModalData(key, pkg);
+                if (!data) return;
+
+                if (modalEquipmentIcon) modalEquipmentIcon.innerHTML = data.icon;
+                if (modalEquipmentTitle) modalEquipmentTitle.textContent = data.title;
+                if (modalEquipmentModel) modalEquipmentModel.textContent = data.model;
+
+                if (modalSpecGrid) {
+                    modalSpecGrid.innerHTML = data.specs.map(s => `
+                        <div class="modal-spec-row">
+                            <span class="modal-spec-label">${s.label}</span>
+                            <span class="modal-spec-value"${s.isMonospace ? ' style="font-family: monospace; font-size: 12px;"' : ""}>${s.value}</span>
+                        </div>
+                    `).join("");
                 }
 
-                const data = currentPackage.energy.chart[period];
-                if (!data) {
-                    updateReadableMetrics(period, null);
-                    return;
+                if (modalWarrantyCard) {
+                    modalWarrantyCard.innerHTML = `
+                        <div class="warranty-sub-item">
+                            <span class="warranty-sub-label">Duration</span>
+                            <span class="warranty-sub-value"><strong>${data.warranty.duration}</strong></span>
+                        </div>
+                        <div class="warranty-sub-item">
+                            <span class="warranty-sub-label">Coverage</span>
+                            <span class="warranty-sub-value">${data.warranty.coverage}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            function openEquipmentModal(key) {
+                if (!modalBackdrop) return;
+                activeModalEquipmentKey = key;
+                lastActiveTrigger = document.activeElement;
+
+                const pkg = currentPackage || ((window.HelloSolar && window.HelloSolar.getActivePackage)
+                    ? window.HelloSolar.getActivePackage()
+                    : null);
+                populateModal(key, pkg);
+
+                // Prevent page shift when modal opens by compensating for scrollbar width
+                const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+                if (scrollbarWidth > 0) {
+                    document.body.style.paddingRight = `${scrollbarWidth}px`;
+                }
+                document.body.style.overflow = "hidden";
+
+                modalBackdrop.classList.add("is-open");
+                modalBackdrop.setAttribute("aria-hidden", "false");
+
+                // Focus close button for accessibility
+                if (modalCloseBtn) {
+                    setTimeout(() => modalCloseBtn.focus(), 50);
+                }
+            }
+
+            function closeEquipmentModal() {
+                if (!modalBackdrop) return;
+                modalBackdrop.classList.remove("is-open");
+                modalBackdrop.setAttribute("aria-hidden", "true");
+                document.body.style.overflow = "";
+                document.body.style.paddingRight = "";
+                activeModalEquipmentKey = null;
+
+                if (lastActiveTrigger && typeof lastActiveTrigger.focus === "function") {
+                    lastActiveTrigger.focus();
+                }
+            }
+
+            function renderSystemDetailsAndWarranties(pkg) {
+                if (!pkg) return;
+
+                // Section Account Name
+                const specCurrentPkgName = document.getElementById("specCurrentPkgName");
+                if (specCurrentPkgName) specCurrentPkgName.textContent = pkg.name || "Home Primary";
+
+                // 1. Solar Panels Card
+                const panelCountPill = document.getElementById("panelCountPill");
+                const specPanelsModel = document.getElementById("specPanelsModel");
+                const warrantyPanelsTerm = document.getElementById("warrantyPanelsTerm");
+
+                if (panelCountPill) panelCountPill.textContent = `${pkg.panelsCount || 12} Panels`;
+                if (specPanelsModel) specPanelsModel.textContent = pkg.panelsModel || "Trina Solar Vertex S+ 450W";
+                if (warrantyPanelsTerm) {
+                    const term = (pkg.warranties && pkg.warranties.panels && pkg.warranties.panels.termText)
+                        || "25-Year Performance · 12-Year Product";
+                    warrantyPanelsTerm.textContent = term;
                 }
 
-                if (chartSvg) chartSvg.style.display = "block";
-                if (chartLegend) chartLegend.style.display = "flex";
-                if (chartEmptyState) chartEmptyState.style.display = "none";
+                // 2. Inverter Card
+                const inverterTypePill = document.getElementById("inverterTypePill");
+                const specInverterModel = document.getElementById("specInverterModel");
+                const warrantyInverterTerm = document.getElementById("warrantyInverterTerm");
 
-                updateReadableMetrics(period, data);
+                if (inverterTypePill) inverterTypePill.textContent = "System Inverter";
+                if (specInverterModel) specInverterModel.textContent = pkg.inverterModel || "Solis 5kW Hybrid Inverter";
+                if (warrantyInverterTerm) {
+                    const term = (pkg.warranties && pkg.warranties.inverter && pkg.warranties.inverter.termText)
+                        || "5-Year Warranty";
+                    warrantyInverterTerm.textContent = term;
+                }
 
-                const values = data.values;
-                const labels = data.labels;
-                const chartLeft = 45;
-                const chartRight = 680;
-                const chartTop = 30;
-                const chartBottom = 220;
-                const width = chartRight - chartLeft;
-                const height = chartBottom - chartTop;
-                const maxValue = Math.max(...values);
-                const safeMax = maxValue <= 0 ? 1 : maxValue * 1.15;
+                // 3. Battery Card
+                const batteryCapacityPill = document.getElementById("batteryCapacityPill");
+                const batteryPurposeText = document.getElementById("batteryPurposeText");
+                const specBatteryModel = document.getElementById("specBatteryModel");
+                const warrantyBatteryTerm = document.getElementById("warrantyBatteryTerm");
 
-                // Update Y Axis labels
-                if (chartYMax) chartYMax.textContent = `${Math.round(safeMax)} kWh`;
-                if (chartY75) chartY75.textContent = `${Math.round(safeMax * 0.75)} kWh`;
-                if (chartY50) chartY50.textContent = `${Math.round(safeMax * 0.5)} kWh`;
-                if (chartY25) chartY25.textContent = `${Math.round(safeMax * 0.25)} kWh`;
-
-                const points = values.map((value, index) => {
-                    const x = chartLeft + (index / Math.max(values.length - 1, 1)) * width;
-                    const y = chartBottom - (value / safeMax) * height;
-                    return { x, y, value };
-                });
-
-                const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
-                const fillPath = `${linePath} L ${points[points.length - 1].x} ${chartBottom} L ${points[0].x} ${chartBottom} Z`;
-
-                if (chartLine) chartLine.setAttribute("d", linePath);
-                if (chartFill) chartFill.setAttribute("d", fillPath);
-                if (chartPoints) chartPoints.innerHTML = "";
-                if (chartLabels) chartLabels.innerHTML = "";
-
-                points.forEach((point, index) => {
-                    if (chartPoints) {
-                        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                        circle.setAttribute("cx", point.x);
-                        circle.setAttribute("cy", point.y);
-                        circle.setAttribute("r", "4");
-                        circle.setAttribute("class", "chart-point");
-                        circle.setAttribute("tabindex", "0");
-                        circle.setAttribute("role", "graphics-symbol");
-                        circle.setAttribute("aria-label", `${labels[index]}: ${point.value} kWh`);
-                        chartPoints.appendChild(circle);
+                if (pkg.hasBattery === false) {
+                    if (batteryCapacityPill) {
+                        batteryCapacityPill.textContent = "No Battery Storage";
+                        batteryCapacityPill.className = "equipment-metric-pill neutral";
                     }
-
-                    if (chartLabels) {
-                        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                        text.setAttribute("x", point.x);
-                        text.setAttribute("y", "242");
-                        text.setAttribute("text-anchor", "middle");
-                        text.setAttribute("class", "chart-label");
-                        text.textContent = labels[index];
-                        chartLabels.appendChild(text);
+                    if (batteryPurposeText) {
+                        batteryPurposeText.textContent = "Direct daytime solar power (no battery unit installed).";
                     }
-                });
+                    if (specBatteryModel) specBatteryModel.textContent = "Grid-Tied (No Battery)";
+                    if (warrantyBatteryTerm) {
+                        warrantyBatteryTerm.textContent = "Grid-Tied (No Battery)";
+                    }
+                } else {
+                    if (batteryCapacityPill) {
+                        const rawCap = (pkg.energy && pkg.energy.batteryReserve)
+                            ? pkg.energy.batteryReserve
+                            : (pkg.batteryCapacity || "10 kWh");
+                        const cleanCap = rawCap.replace(/Lithium-ion /i, "").replace(/Reserve/i, "").trim();
+                        batteryCapacityPill.textContent = cleanCap.includes("Storage") ? cleanCap : `${cleanCap} Storage`;
+                        batteryCapacityPill.className = "equipment-metric-pill";
+                    }
+                    if (batteryPurposeText) {
+                        batteryPurposeText.textContent = "Stores electricity for later use.";
+                    }
+                    if (specBatteryModel) specBatteryModel.textContent = pkg.batteryCapacity || "10 kWh Lithium-ion Reserve";
+                    if (warrantyBatteryTerm) {
+                        const term = (pkg.warranties && pkg.warranties.battery && pkg.warranties.battery.termText)
+                            || "10-Year / 6,000 Cycles";
+                        warrantyBatteryTerm.textContent = term;
+                    }
+                }
+
+                // 4. Workmanship Card
+                const warrantyInstallerName = document.getElementById("warrantyInstallerName");
+                const warrantyWorkmanshipTerm = document.getElementById("warrantyWorkmanshipTerm");
+
+                if (warrantyInstallerName) {
+                    warrantyInstallerName.textContent = (pkg.assignedInstaller && pkg.assignedInstaller.name)
+                        || (pkg.install && pkg.install.assignedTeam && pkg.install.assignedTeam.name)
+                        || "Carlos Villanueva";
+                }
+                if (warrantyWorkmanshipTerm) {
+                    const term = (pkg.warranties && pkg.warranties.workmanship && pkg.warranties.workmanship.termText)
+                        || "5-Year Coverage";
+                    warrantyWorkmanshipTerm.textContent = term;
+                }
+
+                // Refresh modal content if currently open
+                if (activeModalEquipmentKey && modalBackdrop && modalBackdrop.classList.contains("is-open")) {
+                    populateModal(activeModalEquipmentKey, pkg);
+                }
             }
 
             function renderEnergyPage(pkg) {
                 if (!pkg) return;
-                renderGenerationToken++;
-                const thisToken = renderGenerationToken;
-
                 currentPackage = pkg;
-
-                // 1. Reset & Update 4 Summary Cards
-                if (pkg.energy && pkg.energy.hasReadings) {
-                    if (energyGeneratedVal) energyGeneratedVal.textContent = pkg.energy.todayGenerated || "0 kWh";
-                    if (energyGeneratedMeta) energyGeneratedMeta.textContent = "Generated today so far";
-
-                    if (billSavedVal) billSavedVal.textContent = pkg.energy.billSaved || "₱0";
-                    if (billSavedMeta) billSavedMeta.textContent = `Estimated ${pkg.energy.savingsPeriod ? pkg.energy.savingsPeriod.toLowerCase() : "monthly"} reduction`;
-
-                    if (pkg.hasBattery === false) {
-                        if (batteryReserveVal) batteryReserveVal.textContent = "Battery not included";
-                        if (batteryReserveMeta) batteryReserveMeta.textContent = "Grid-tied direct solar system";
-
-                        if (brownoutBackupVal) brownoutBackupVal.textContent = "Not supported";
-                        if (brownoutBackupMeta) brownoutBackupMeta.textContent = "Requires battery storage unit";
-                    } else {
-                        if (batteryReserveVal) batteryReserveVal.textContent = pkg.energy.batteryReserve || "0 kWh";
-                        if (batteryReserveMeta) batteryReserveMeta.textContent = `${pkg.energy.batterySoc || 0}% State of Charge (Ready)`;
-
-                        if (brownoutBackupVal) brownoutBackupVal.textContent = pkg.energy.backupHours || "0 hrs";
-                        if (brownoutBackupMeta) brownoutBackupMeta.textContent = "Estimated critical circuits";
-                    }
-                } else {
-                    // Distinguish missing data from zero
-                    if (energyGeneratedVal) energyGeneratedVal.textContent = "No readings";
-                    if (energyGeneratedMeta) energyGeneratedMeta.textContent = "Pending system telemetry";
-
-                    if (billSavedVal) billSavedVal.textContent = "No data yet";
-                    if (billSavedMeta) billSavedMeta.textContent = "Awaiting first generation cycle";
-
-                    if (pkg.hasBattery === false) {
-                        if (batteryReserveVal) batteryReserveVal.textContent = "Battery not included";
-                        if (batteryReserveMeta) batteryReserveMeta.textContent = "Grid-tied commercial system";
-
-                        if (brownoutBackupVal) brownoutBackupVal.textContent = "Not supported";
-                        if (brownoutBackupMeta) brownoutBackupMeta.textContent = "Direct grid-tied inverter";
-                    } else {
-                        if (batteryReserveVal) batteryReserveVal.textContent = "Unavailable";
-                        if (batteryReserveMeta) batteryReserveMeta.textContent = "Storage telemetry offline";
-
-                        if (brownoutBackupVal) brownoutBackupVal.textContent = "Unavailable";
-                        if (brownoutBackupMeta) brownoutBackupMeta.textContent = "Pending battery test";
-                    }
-                }
-
-                // 2. Update Subtitle
-                if (chartSubtitle) {
-                    chartSubtitle.textContent = (pkg.energy && pkg.energy.hasReadings)
-                        ? `Interactive generation curve for ${pkg.name} (${pkg.capacity})`
-                        : `No monitoring readings recorded yet for ${pkg.name}`;
-                }
-
-                // 3. Render Chart
-                if (thisToken === renderGenerationToken) {
-                    drawChart(currentPeriod);
-                }
-
-                // 4. Update Power Distribution
-                if (pkg.energy && pkg.energy.breakdown) {
-                    if (breakdownSolarVal) breakdownSolarVal.textContent = pkg.energy.breakdown.solarDirect;
-                    if (breakdownSolarFill) breakdownSolarFill.style.width = pkg.energy.breakdown.solarDirect;
-
-                    if (pkg.hasBattery === false) {
-                        if (breakdownBatteryVal) breakdownBatteryVal.textContent = "N/A (No battery)";
-                        if (breakdownBatteryFill) breakdownBatteryFill.style.width = "0%";
-                    } else {
-                        if (breakdownBatteryVal) breakdownBatteryVal.textContent = pkg.energy.breakdown.batteryStorage;
-                        if (breakdownBatteryFill) breakdownBatteryFill.style.width = pkg.energy.breakdown.batteryStorage;
-                    }
-
-                    if (breakdownGridVal) breakdownGridVal.textContent = pkg.energy.breakdown.gridExport;
-                    if (breakdownGridFill) breakdownGridFill.style.width = pkg.energy.breakdown.gridExport;
-
-                    if (breakdownBadge) {
-                        breakdownBadge.className = "badge badge-online";
-                        breakdownBadge.textContent = "Live";
-                    }
-                } else {
-                    if (breakdownSolarVal) breakdownSolarVal.textContent = "No data yet";
-                    if (breakdownSolarFill) breakdownSolarFill.style.width = "0%";
-
-                    if (breakdownBatteryVal) breakdownBatteryVal.textContent = pkg.hasBattery === false ? "N/A (No battery)" : "No data yet";
-                    if (breakdownBatteryFill) breakdownBatteryFill.style.width = "0%";
-
-                    if (breakdownGridVal) breakdownGridVal.textContent = "No data yet";
-                    if (breakdownGridFill) breakdownGridFill.style.width = "0%";
-
-                    if (breakdownBadge) {
-                        breakdownBadge.className = "badge badge-neutral";
-                        breakdownBadge.textContent = "Standby";
-                    }
-                }
-
-                // 5. Update Eco Impact
-                if (pkg.energy && pkg.energy.ecoImpact) {
-                    if (ecoCo2Val) ecoCo2Val.textContent = `${pkg.energy.ecoImpact.co2Kg} kg`;
-                    if (ecoTreesVal) ecoTreesVal.textContent = `${pkg.energy.ecoImpact.trees} Trees`;
-                } else {
-                    if (ecoCo2Val) ecoCo2Val.textContent = "Pending";
-                    if (ecoTreesVal) ecoTreesVal.textContent = "Pending";
-                }
+                renderSystemDetailsAndWarranties(pkg);
             }
 
-            // Export CTA Handler
-            if (exportEnergyBtn) {
-                exportEnergyBtn.addEventListener("click", () => {
-                    const pkg = currentPackage || (window.HelloSolar && window.HelloSolar.getActivePackage());
-                    if (!pkg) return;
+            // Keyboard and Modal event listeners
+            if (modalCloseBtn) modalCloseBtn.addEventListener("click", closeEquipmentModal);
+            if (modalSecondaryCloseBtn) modalSecondaryCloseBtn.addEventListener("click", closeEquipmentModal);
+            if (modalBackdrop) {
+                modalBackdrop.addEventListener("click", (e) => {
+                    if (e.target === modalBackdrop) closeEquipmentModal();
+                });
+            }
 
-                    if (pkg.energy && pkg.energy.hasReadings) {
-                        if (window.HelloSolar && window.HelloSolar.toast) {
-                            window.HelloSolar.toast(
-                                "Energy Report Exported",
-                                `CSV statement generated for ${pkg.name} (${pkg.accountNo || pkg.capacity}).`
-                            );
-                        } else {
-                            alert(`Exporting solar generation and consumption history for ${pkg.name} (${pkg.accountNo})...`);
-                        }
-                    } else {
-                        if (window.HelloSolar && window.HelloSolar.toast) {
-                            window.HelloSolar.toast(
-                                "No Records to Export",
-                                `No solar generation readings exist yet for ${pkg.name} (${pkg.accountNo || pkg.id}).`
-                            );
-                        } else {
-                            alert(`No energy readings recorded yet for ${pkg.name}.`);
+            window.addEventListener("keydown", (e) => {
+                if (e.key === "Escape" && modalBackdrop && modalBackdrop.classList.contains("is-open")) {
+                    closeEquipmentModal();
+                }
+            });
+
+            // Focus trap within modal
+            if (modalPanel) {
+                modalPanel.addEventListener("keydown", (e) => {
+                    if (e.key === "Tab") {
+                        const focusables = modalPanel.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                        if (!focusables || focusables.length === 0) return;
+                        const first = focusables[0];
+                        const last = focusables[focusables.length - 1];
+                        if (e.shiftKey && document.activeElement === first) {
+                            e.preventDefault();
+                            last.focus();
+                        } else if (!e.shiftKey && document.activeElement === last) {
+                            e.preventDefault();
+                            first.focus();
                         }
                     }
                 });
             }
 
-            // Chart Period Tab Buttons
-            const chartTabs = document.querySelectorAll(".chart-tab");
-            chartTabs.forEach(tab => {
-                tab.addEventListener("click", () => {
-                    chartTabs.forEach(t => t.classList.remove("active"));
-                    tab.classList.add("active");
-                    currentPeriod = tab.dataset.period || "week";
-                    drawChart(currentPeriod);
+            // Bind "View Details" buttons
+            document.querySelectorAll(".btn-view-details").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const eqKey = btn.dataset.equipment;
+                    if (eqKey) openEquipmentModal(eqKey);
                 });
             });
 

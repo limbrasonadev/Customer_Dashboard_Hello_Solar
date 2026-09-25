@@ -1,52 +1,33 @@
 [
   {
-    "accountNo": "HS-89421",
-    "email": "customer@hellosolar.ph",
-    "username": "customer",
-    "password": "password123",
+    "accountNo": "HS-88219",
     "name": "Juan Dela Cruz",
-    "phone": "+63 917 123 4567",
-    "status": "Online",
-    "systemSize": "5.4 kW",
-    "installationDate": "January 15, 2024",
-    "panelsCount": 14,
-    "panelsModel": "Canadian Solar 410W HiKu",
-    "inverterModel": "Growatt 5kW Hybrid Inverter",
-    "batteryCapacity": "10 kWh Lithium-ion Reserve",
-    "address": "142 Palm Avenue, Ayala Alabang, Muntinlupa City",
-    "inverterSerial": "GW-5K-2024-8841",
-    "plan": "5-Year Lease-to-Own",
-    "nextDue": "Oct 1, 2026",
-    "nextAmount": "₱9,067",
+    "email": "juan.delacruz@hellosolar.ph",
+    "phone": "+63 917 555 0199",
+    "address": "142 Solar Crest Way, Quezon City, Metro Manila",
     "role": "Solar Customer",
-    "installerName": "Carlos Villanueva",
-    "installerPhone": "+63 917 555 0101",
     "preferredPayment": "gcash",
-    "paymentAccount": "0917 123 4567"
+    "paymentAccount": "+63 917 555 0199",
+    "avatarUrl": null,
+    "linkedSystemIds": [
+      "pkg-home-5k4",
+      "pkg-villa-10k8",
+      "pkg-farm-3k6",
+      "pkg-biz-6k0"
+    ]
   },
   {
     "accountNo": "HS-72301",
-    "email": "maria.santos@gmail.com",
-    "username": "maria",
-    "password": "password123",
     "name": "Maria Santos",
+    "email": "maria.santos@gmail.com",
     "phone": "+63 918 765 4321",
-    "status": "Online",
-    "systemSize": "6.8 kW",
-    "installationDate": "March 10, 2024",
-    "panelsCount": 16,
-    "panelsModel": "Trina Solar Vertex S+ 420W",
-    "inverterModel": "Solis 6kW Hybrid Inverter",
-    "batteryCapacity": "12 kWh Lithium-ion Reserve",
     "address": "Quezon City, Metro Manila",
-    "inverterSerial": "SOLIS-6K-2024-7230",
-    "plan": "5-Year Amortization",
-    "nextDue": "Oct 5, 2026",
-    "nextAmount": "₱11,250",
     "role": "Solar Customer",
-    "installerName": "Carlos Villanueva",
-    "installerPhone": "+63 917 555 0101",
     "preferredPayment": "maya",
-    "paymentAccount": "0918 765 4321"
+    "paymentAccount": "+63 918 765 4321",
+    "avatarUrl": null,
+    "linkedSystemIds": [
+      "pkg-home-5k4"
+    ]
   }
 ]

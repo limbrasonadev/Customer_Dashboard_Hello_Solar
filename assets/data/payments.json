@@ -1,0 +1,211 @@
+[
+  {
+    "systemId": "pkg-home-5k4",
+    "accountNo": "HS-88219",
+    "hasBills": true,
+    "planTerm": "5-Year Lease-to-Own",
+    "termBadge": "5-Year Term",
+    "totalInstallments": 60,
+    "standing": "Good",
+    "standingMeta": "Account up to date",
+    "currentBillRef": "HS-88219-0926",
+    "currency": "PHP",
+    "monthlyInstallmentAmount": 9067,
+    "schedule": [
+      {
+        "id": "bill-88219-05",
+        "period": "May 2026",
+        "dueDate": "2026-05-01",
+        "amount": 9067,
+        "formattedAmount": "₱9,067",
+        "status": "Paid",
+        "badgeClass": "badge-paid",
+        "receiptId": "REC-88219-05"
+      },
+      {
+        "id": "bill-88219-06",
+        "period": "Jun 2026",
+        "dueDate": "2026-06-01",
+        "amount": 9067,
+        "formattedAmount": "₱9,067",
+        "status": "Paid",
+        "badgeClass": "badge-paid",
+        "receiptId": "REC-88219-06"
+      },
+      {
+        "id": "bill-88219-07",
+        "period": "Jul 2026",
+        "dueDate": "2026-07-01",
+        "amount": 9067,
+        "formattedAmount": "₱9,067",
+        "status": "Paid",
+        "badgeClass": "badge-paid",
+        "receiptId": "REC-88219-07"
+      },
+      {
+        "id": "bill-88219-08",
+        "period": "Aug 2026",
+        "dueDate": "2026-08-01",
+        "amount": 9067,
+        "formattedAmount": "₱9,067",
+        "status": "Paid",
+        "badgeClass": "badge-paid",
+        "receiptId": "REC-88219-08"
+      },
+      {
+        "id": "bill-88219-09",
+        "period": "Sep 2026",
+        "dueDate": "2026-09-01",
+        "amount": 9067,
+        "formattedAmount": "₱9,067",
+        "status": "Paid",
+        "badgeClass": "badge-paid",
+        "receiptId": "REC-88219-09"
+      },
+      {
+        "id": "bill-88219-10",
+        "period": "Oct 2026",
+        "dueDate": "2026-10-15",
+        "amount": 9067,
+        "formattedAmount": "₱9,067",
+        "status": "Upcoming",
+        "badgeClass": "badge-upcoming",
+        "receiptId": null
+      }
+    ]
+  },
+  {
+    "systemId": "pkg-villa-10k8",
+    "accountNo": "HS-99402",
+    "hasBills": true,
+    "planTerm": "7-Year Lease-to-Own",
+    "termBadge": "7-Year Term",
+    "totalInstallments": 84,
+    "standing": "Good",
+    "standingMeta": "Account up to date",
+    "currentBillRef": "HS-94021-0926",
+    "currency": "PHP",
+    "monthlyInstallmentAmount": 17450,
+    "schedule": [
+      {
+        "id": "bill-94021-06",
+        "period": "Jun 2026",
+        "dueDate": "2026-06-20",
+        "amount": 17450,
+        "formattedAmount": "₱17,450",
+        "status": "Paid",
+        "badgeClass": "badge-paid",
+        "receiptId": "REC-94021-06"
+      },
+      {
+        "id": "bill-94021-07",
+        "period": "Jul 2026",
+        "dueDate": "2026-07-20",
+        "amount": 17450,
+        "formattedAmount": "₱17,450",
+        "status": "Paid",
+        "badgeClass": "badge-paid",
+        "receiptId": "REC-94021-07"
+      },
+      {
+        "id": "bill-94021-08",
+        "period": "Aug 2026",
+        "dueDate": "2026-08-20",
+        "amount": 17450,
+        "formattedAmount": "₱17,450",
+        "status": "Paid",
+        "badgeClass": "badge-paid",
+        "receiptId": "REC-94021-08"
+      },
+      {
+        "id": "bill-94021-09",
+        "period": "Sep 2026",
+        "dueDate": "2026-09-20",
+        "amount": 17450,
+        "formattedAmount": "₱17,450",
+        "status": "Paid",
+        "badgeClass": "badge-paid",
+        "receiptId": "REC-94021-09"
+      },
+      {
+        "id": "bill-94021-10",
+        "period": "Oct 2026",
+        "dueDate": "2026-10-20",
+        "amount": 17450,
+        "formattedAmount": "₱17,450",
+        "status": "Upcoming",
+        "badgeClass": "badge-upcoming",
+        "receiptId": null
+      }
+    ]
+  },
+  {
+    "systemId": "pkg-farm-3k6",
+    "accountNo": "HS-77310",
+    "hasBills": true,
+    "planTerm": "3-Year Lease-to-Own",
+    "termBadge": "3-Year Term",
+    "totalInstallments": 36,
+    "standing": "Due Soon",
+    "standingMeta": "Bill due on September 30, 2026",
+    "currentBillRef": "HS-77310-0926",
+    "currency": "PHP",
+    "monthlyInstallmentAmount": 6200,
+    "schedule": [
+      {
+        "id": "bill-77310-07",
+        "period": "Jul 2026",
+        "dueDate": "2026-07-30",
+        "amount": 6200,
+        "formattedAmount": "₱6,200",
+        "status": "Paid",
+        "badgeClass": "badge-paid",
+        "receiptId": "REC-77310-07"
+      },
+      {
+        "id": "bill-77310-08",
+        "period": "Aug 2026",
+        "dueDate": "2026-08-30",
+        "amount": 6200,
+        "formattedAmount": "₱6,200",
+        "status": "Paid",
+        "badgeClass": "badge-paid",
+        "receiptId": "REC-77310-08"
+      },
+      {
+        "id": "bill-77310-09",
+        "period": "Sep 2026",
+        "dueDate": "2026-09-30",
+        "amount": 6200,
+        "formattedAmount": "₱6,200",
+        "status": "Due Soon",
+        "badgeClass": "badge-due",
+        "receiptId": null
+      },
+      {
+        "id": "bill-77310-10",
+        "period": "Oct 2026",
+        "dueDate": "2026-10-30",
+        "amount": 6200,
+        "formattedAmount": "₱6,200",
+        "status": "Upcoming",
+        "badgeClass": "badge-upcoming",
+        "receiptId": null
+      }
+    ]
+  },
+  {
+    "systemId": "pkg-biz-6k0",
+    "accountNo": "HS-10492",
+    "hasBills": false,
+    "planTerm": "Pending Setup",
+    "termBadge": "Pending Assessment",
+    "totalInstallments": 0,
+    "standing": "Pending Billing",
+    "standingMeta": "No billing records generated yet for this new installation",
+    "currentBillRef": "HS-10492",
+    "currency": "PHP",
+    "monthlyInstallmentAmount": 0,
+    "schedule": []
+  }
+]

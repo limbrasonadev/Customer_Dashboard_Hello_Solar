@@ -25,8 +25,268 @@
     <link rel="icon" type="image/png" href="assets/images/logofortab.png">
 
     <!-- Design System CSS -->
-    <link rel="stylesheet" href="assets/css/portal.css">
-    <link rel="stylesheet" href="assets/css/notifications.css">
+    <link rel="stylesheet" href="assets/css/dashboard-theme.css">
+
+    <style>
+        /* Page layout stays below the shared dashboard theme in the cascade. */
+        @layer dashboard-legacy {
+
+            /* Activation dialog: one scrolling body with stable header and actions. */
+            html:has(#activationModalBackdrop.open),
+            body:has(#activationModalBackdrop.open) {
+                overflow: hidden;
+                overscroll-behavior: none;
+            }
+
+            #activationModalBackdrop {
+                position: fixed;
+                inset: 0;
+                z-index: 10000;
+                box-sizing: border-box;
+                width: 100%;
+                height: 100%;
+                height: 100dvh;
+                padding: 24px;
+                overflow: hidden;
+            }
+
+            #activationModalBackdrop.open {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #activationModal {
+                position: relative;
+                inset: auto;
+                margin: 0;
+                transform: none;
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+                min-height: 0;
+                width: min(600px, 100%);
+                max-width: 100%;
+                height: auto;
+                max-height: 100%;
+                box-sizing: border-box;
+                overflow: hidden;
+                background: var(--white, #fff);
+                border: 1px solid var(--gray-200, #e5e7eb);
+                border-radius: 18px;
+            }
+
+            #activationModal .activation-modal-header {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                flex: 0 0 auto;
+                gap: 12px;
+                padding: 20px 22px;
+            }
+
+            #activationModal .activation-modal-header>div {
+                min-width: 0;
+            }
+
+            #activationModalTitle {
+                line-height: 1.45;
+            }
+
+            #activationModal #closeActivationModalBtn {
+                flex: 0 0 36px;
+                width: 36px;
+                height: 36px;
+                display: grid;
+                place-items: center;
+                padding: 0;
+            }
+
+            #activationModal .activation-modal-body {
+                flex: 1 1 auto;
+                min-height: 0;
+                max-height: none;
+                overflow-x: hidden;
+                overflow-y: auto;
+                padding: 20px 22px;
+                overscroll-behavior: contain;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            #activationModal #activationRequirementsNotice {
+                line-height: 1.55;
+            }
+
+            #activationModal .activation-step-content {
+                min-width: 0;
+                overflow-wrap: anywhere;
+            }
+
+            #activationModal .activation-step-title {
+                line-height: 1.45;
+            }
+
+            #activationModal .activation-step-desc {
+                line-height: 1.5;
+            }
+
+            #activationModal .activation-step-indicator {
+                flex-shrink: 0;
+            }
+
+            #activationModal .activation-modal-footer {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                flex: 0 0 auto;
+                gap: 12px;
+                margin: 0;
+                padding: 16px 22px;
+                border-top: 1px solid var(--gray-200, #e5e7eb);
+                background: var(--white, #fff);
+            }
+
+            #activationModal .activation-modal-footer .btn {
+                min-height: 44px;
+                justify-content: center;
+                white-space: normal;
+                text-align: center;
+                line-height: 1.35;
+            }
+
+            #activationModal #activateSystemBtn:not(:disabled) {
+                background: linear-gradient(110deg, #ff9500, #f06b00);
+                color: #fff;
+            }
+
+            #activationModal #activateSystemBtn:disabled {
+                background: #fff0d8;
+                color: #96764a;
+                border: 1px solid #eed9b7;
+                opacity: 1;
+                box-shadow: none;
+                cursor: not-allowed;
+            }
+
+            @media (max-width: 600px) {
+                #activationModalBackdrop {
+                    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+                }
+
+                #activationModal {
+                    border-radius: 16px;
+                }
+
+                #activationModal .activation-modal-header {
+                    padding: 16px;
+                    gap: 8px;
+                }
+
+                #activationModal .activation-modal-body {
+                    padding: 16px;
+                }
+
+                #activationModal #activationRequirementsNotice {
+                    padding: 12px !important;
+                    margin-bottom: 18px !important;
+                }
+
+                #activationModal .activation-modal-footer {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 10px;
+                    padding: 12px 16px;
+                }
+
+                #activationModal #advanceMilestoneBtn {
+                    width: 100%;
+                }
+
+                #activationModal .activation-modal-footer>div {
+                    display: grid !important;
+                    grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr);
+                    gap: 10px;
+                    width: 100%;
+                }
+
+                #activationModal .activation-modal-footer>div .btn {
+                    width: 100%;
+                    min-width: 0;
+                    padding: 10px 8px !important;
+                }
+            }
+
+        }
+    </style>
+    <style>
+        /* Selection-page model cards only. Match the existing one-pixel border
+           footprint so selecting or hovering never changes card dimensions. */
+        #systemsGrid .system-card {
+            background: #FFFFFF !important;
+            border-width: 1px;
+            border-color: var(--border) !important;
+            transform: none !important;
+        }
+
+        #systemsGrid .system-card.selected {
+            border-style: solid;
+            border-color: #FF8A00 !important;
+        }
+
+        #systemsGrid .system-card-capacity-pill {
+            background: none;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+            color: #FF8A00;
+            /* Replace the former 2px padding + 1px border with equal vertical
+               space, preserving card height while aligning text to the name. */
+            padding: 3px 0;
+            gap: 0;
+        }
+
+        #systemsGrid .activated-card .system-card-footer {
+            justify-content: flex-end;
+        }
+
+        #systemsGrid .system-card-statuses {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        #systemsGrid .badge-model-pending {
+            color: #FF8400;
+            background: #fff7ed;
+            border: 1px solid #fdba74;
+        }
+
+        #systemsGrid .system-card[aria-disabled="true"] {
+            cursor: not-allowed;
+        }
+
+        #systemsGrid .system-card[aria-disabled="true"] .system-card-action-text {
+            color: #FF8400;
+        }
+
+        #systemsGrid .system-card[aria-disabled="true"] .system-card-action-text svg {
+            display: none;
+        }
+
+        #systemsGrid .activated-card .system-card-action-text {
+            color: #FF8400;
+        }
+
+        #systemsGrid .activated-card .system-card-action-text svg {
+            color: inherit;
+            stroke: currentColor;
+            transform: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -59,7 +319,7 @@
                         stroke-linejoin="round">
                         <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
                     </svg>
-                    Energy
+                    Equipment Details
                 </a>
 
                 <a href="payments.html" class="nav-link">
@@ -133,10 +393,7 @@
                     </a>
 
                     <div class="profile" id="topbarProfileTrigger" style="cursor: pointer;">
-                        <div class="profile-text">
-                            <span class="profile-name" id="profileName">Juan Dela Cruz</span>
-                            <span class="profile-role">Customer Account</span>
-                        </div>
+
                         <div class="profile-avatar" id="profileAvatar">JD</div>
                     </div>
                 </div>
@@ -150,8 +407,7 @@
                         <div class="systems-overview-title-group">
                             <h1 class="welcome-heading">Good day, <span id="customerGreetingName">Juan Dela Cruz</span>.
                             </h1>
-                            <p class="welcome-subtitle">Select a solar model to view real-time telemetry, payment
-                                standing, and live energy flow.</p>
+
                         </div>
                     </div>
 
@@ -171,7 +427,7 @@
                                 stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M19 12H5M12 19l-7-7 7-7" />
                             </svg>
-                            <span class="btn-back-text">Back to My Systems</span>
+
                         </button>
 
                         <div class="system-detail-title-block">
@@ -179,47 +435,42 @@
                                 <h2 class="system-detail-title" id="detailModelTitle">Home Primary</h2>
                                 <span class="system-card-capacity-pill" id="detailCapacityPill">5.4 kW</span>
                             </div>
-                            <span id="detailAccountMeta" class="system-detail-account-meta">Quezon City · HS-88219</span>
+                            <span id="detailAccountMeta" class="system-detail-account-meta">Quezon City ·
+                                HS-88219</span>
                         </div>
                     </div>
 
                     <!-- Layout:
                          Desktop:
-                         First row: Payment Status left, Estimated Savings right
+                         First row: System Status left, Payment Status right
                          Second row: Live Telemetry spanning full width
                          Directly below telemetry: Need Help? Contact Support button
                     -->
                     <div class="system-detail-content">
-                        <!-- Row 1: Payment Status (Left) & Estimated Savings (Right) -->
+                        <!-- Row 1: System Status & Payment Status Quick Action Buttons -->
                         <div class="detail-summary-row">
-                            <!-- Payment Status Card -->
-                            <article class="payment-status-compact" aria-label="Billing payment status">
-                                <h3 class="compact-card-heading">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="2" y="5" width="20" height="14" rx="2" />
-                                        <path d="M2 10h20" />
-                                        <path d="M6 15h4" />
-                                    </svg>
-                                    Payment Status
-                                </h3>
-                                <div class="payment-status-display">
-                                    <span class="payment-status-indicator status-paid" id="paymentStatusDot"></span>
-                                    <span class="payment-status-label" id="paymentStatusLabel">Paid</span>
-                                </div>
-                            </article>
-
-                            <!-- Estimated Savings Card -->
-                            <article class="estimated-savings-compact" aria-label="Estimated monthly savings">
-                                <h3 class="compact-card-heading">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                                    </svg>
-                                    Estimated Savings
-                                </h3>
-                                <div class="savings-amount-display" id="savingsAmountDisplay">₱3,650</div>
-                            </article>
+                            <a href="energy.html" class="detail-summary-btn" id="detailSystemStatusCard">
+                                <span class="summary-btn-label">System Status</span>
+                                <span class="summary-status-value" id="systemStatusValue" data-status="pending">
+                                    <span class="summary-status-dot" aria-hidden="true"></span>
+                                    <span id="systemStatusLabel">Pending</span>
+                                </span>
+                                <svg class="summary-btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M5 12h14m-6-6 6 6-6 6" />
+                                </svg>
+                            </a>
+                            <a href="payments.html" class="detail-summary-btn" id="detailPaymentStatusCard">
+                                <span class="summary-btn-label">Payment Status</span>
+                                <span class="summary-status-value" id="paymentStatusValue" data-status="pending">
+                                    <span class="summary-status-dot" aria-hidden="true"></span>
+                                    <span id="paymentStatusLabel">Pending</span>
+                                </span>
+                                <svg class="summary-btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M5 12h14m-6-6 6 6-6 6" />
+                                </svg>
+                            </a>
                         </div>
 
                         <!-- Row 2: Live Telemetry (Spanning Full Available Width) -->
@@ -246,184 +497,153 @@
 
                                 <!-- Interactive Energy Flow Stage -->
                                 <div class="power-flow-stage">
-                                    <!-- Animated Flow Pipelines SVG -->
-                                    <svg class="flow-svg-overlay" viewBox="0 0 300 210" preserveAspectRatio="none"
-                                        aria-hidden="true">
-                                        <!-- Solar to Inverter (Vertical Top-Down) -->
-                                        <line class="flow-line flow-line-solar" x1="150" y1="35" x2="150" y2="105" />
-                                        <!-- Inverter to Battery (Horizontal Center to Left) -->
-                                        <line class="flow-line flow-line-battery" x1="150" y1="105" x2="50" y2="105" />
-                                        <!-- Inverter to Home (Horizontal Center to Right) -->
-                                        <line class="flow-line flow-line-home" x1="150" y1="105" x2="250" y2="105" />
-                                        <!-- Inverter to Grid (Vertical Center to Bottom) -->
-                                        <line class="flow-line flow-line-grid" x1="150" y1="105" x2="150" y2="175" />
+                                    <!-- Animated Flow Pipelines SVG Overlay -->
+                                    <svg class="flow-svg-overlay" id="flowSvgOverlay" aria-hidden="true">
+                                        <!-- 1. Solar to Inverter -->
+                                        <path class="flow-line-base flow-line-orange" id="flowLineSolar" />
+                                        <path class="flow-line-anim flow-anim-orange" id="flowLineSolarAnim" />
+                                        <path class="flow-arrow flow-arrow-orange" id="arrowSolar" />
+                                        <circle class="flow-dot flow-dot-orange" id="dotSolarInv" r="4.5" />
+
+                                        <!-- 2. Inverter to Home -->
+                                        <path class="flow-line-base flow-line-green" id="flowLineHome" />
+                                        <path class="flow-line-anim flow-anim-green" id="flowLineHomeAnim" />
+                                        <path class="flow-arrow flow-arrow-green" id="arrowHome" />
+                                        <circle class="flow-dot flow-dot-green" id="dotHomeInv" r="4.5" />
+                                        <circle class="flow-dot flow-dot-green" id="dotHomeEnd" r="4.5" />
+
+                                        <!-- 3. Inverter to Battery -->
+                                        <path class="flow-line-base flow-line-green" id="flowLineBattery" />
+                                        <path class="flow-line-anim flow-anim-green" id="flowLineBatteryAnim" />
+                                        <path class="flow-arrow flow-arrow-green" id="arrowBattery" />
+                                        <circle class="flow-dot flow-dot-green" id="dotBatteryInv" r="4.5" />
+                                        <circle class="flow-dot flow-dot-green" id="dotBatteryEnd" r="4.5" />
+
+                                        <!-- 4. Inverter to Grid -->
+                                        <path class="flow-line-base flow-line-orange" id="flowLineGrid" />
+                                        <path class="flow-line-anim flow-anim-orange" id="flowLineGridAnim" />
+                                        <path class="flow-arrow flow-arrow-orange" id="arrowGrid" />
+                                        <circle class="flow-dot flow-dot-orange" id="dotGridInv" r="4.5" />
+                                        <circle class="flow-dot flow-dot-orange" id="dotGridEnd" r="4.5" />
                                     </svg>
 
                                     <div class="power-flow-grid">
-                                        <!-- TOP: Rooftop Solar Array -->
-                                        <div class="node-top">
-                                            <div class="energy-node node-solar" id="nodeSolar" title="Solar Array">
-                                                <div class="node-icon-circle">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="2.2">
-                                                        <circle cx="12" cy="12" r="4" />
-                                                        <path d="M12 2v2" />
-                                                        <path d="M12 20v2" />
-                                                        <path d="m4.93 4.93 1.41 1.41" />
-                                                        <path d="m17.66 17.66 1.41 1.41" />
-                                                        <path d="M2 12h2" />
-                                                        <path d="M20 12h2" />
-                                                        <path d="m6.34 17.66-1.41 1.41" />
-                                                        <path d="m19.07 4.93-1.41 1.41" />
+                                        <!-- Row 1: Solar | Inverter | Home -->
+                                        <div class="power-flow-row power-flow-row-top">
+                                            <!-- Solar Panels Card -->
+                                            <div class="telemetry-node telemetry-card node-solar" id="nodeSolar"
+                                                title="Solar Array">
+                                                <div class="card-icon-col">
+                                                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" aria-hidden="true">
+                                                        <rect x="3" y="4" width="18" height="13" rx="2" />
+                                                        <path d="M3 10h18M9 4v13M15 4v13M8 21h8M12 17v4" />
                                                     </svg>
                                                 </div>
-                                                <span class="node-name">Solar Array</span>
-                                                <span class="node-wattage" id="liveSolarWatts">3.48 kW</span>
-                                                <span class="node-state">Producing</span>
+                                                <div class="card-content-col">
+                                                    <div class="card-title">Solar Panels</div>
+                                                    <div class="card-reading" id="liveSolarWatts">3.90 kW</div>
+                                                    <div class="card-secondary" id="livePvStrings">PV1 342 V · PV2 338 V
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <!-- LEFT: Battery Reserve Storage -->
-                                        <div class="node-left">
-                                            <div class="energy-node node-battery" id="nodeBattery"
-                                                title="Lithium-ion Reserve Battery">
-                                                <div class="node-icon-circle">
-                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="2">
-                                                        <rect x="2" y="7" width="16" height="12" rx="2" />
-                                                        <path d="M22 11v4" />
-                                                        <path d="M6 11v4" />
-                                                        <path d="M10 11v4" />
+                                            <!-- Hybrid Inverter (Circle Node) -->
+                                            <div class="telemetry-node telemetry-circle-node node-inverter"
+                                                id="nodeInverter" title="Hybrid Inverter System Hub">
+                                                <div class="circle-icon-wrap">
+                                                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" aria-hidden="true">
+                                                        <rect x="5" y="3" width="14" height="18" rx="3" />
+                                                        <path d="m13 7-4 6h6l-4 5" />
                                                     </svg>
                                                 </div>
-                                                <span class="node-name">Battery</span>
-                                                <span class="node-wattage" id="liveBatteryWatts">1.15 kW</span>
-                                                <span class="node-state" id="liveBatterySoc">92% (Charge)</span>
+                                                <div class="circle-title">Hybrid Inverter</div>
+                                                <div class="circle-reading" id="liveInverterWatts">3.90 kW</div>
+                                                <div class="circle-eff sec-green">98.4% efficiency</div>
+                                                <div class="circle-temp" id="liveInverterTemp">41.2°C · Optimal</div>
                                             </div>
-                                        </div>
 
-                                        <!-- CENTER: Hybrid Inverter -->
-                                        <div class="node-center">
-                                            <div class="energy-node node-inverter" id="nodeInverter"
-                                                title="Hybrid Inverter">
-                                                <div class="node-icon-circle">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="2.2">
-                                                        <rect x="4" y="4" width="16" height="16" rx="2" />
-                                                        <path d="M9 9h6v6H9z" />
-                                                        <path d="M9 1v3" />
-                                                        <path d="M15 1v3" />
-                                                        <path d="M9 20v3" />
-                                                        <path d="M15 20v3" />
-                                                    </svg>
-                                                </div>
-                                                <span class="node-name">Hybrid Inverter</span>
-                                                <span class="node-wattage" id="liveInverterWatts">3.48 kW</span>
-                                                <span class="node-state" style="color: var(--solar-orange-dark);">98.4%
-                                                    Eff</span>
-                                            </div>
-                                        </div>
-
-                                        <!-- RIGHT: Home Household Load -->
-                                        <div class="node-right">
-                                            <div class="energy-node node-home" id="nodeHome"
+                                            <!-- Home / Usage Card -->
+                                            <div class="telemetry-node telemetry-card node-home" id="nodeHome"
                                                 title="Home Appliances Consumption">
-                                                <div class="node-icon-circle">
-                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="2">
-                                                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                                                        <polyline points="9 22 9 12 15 12 15 22" />
+                                                <div class="card-icon-col">
+                                                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none"
+                                                        stroke="#f97316" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" aria-hidden="true">
+                                                        <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" />
+                                                        <path d="M9 21v-7h6v7" />
                                                     </svg>
                                                 </div>
-                                                <span class="node-name">Home Load</span>
-                                                <span class="node-wattage" id="liveHomeWatts">1.85 kW</span>
-                                                <span class="node-state">Consuming</span>
+                                                <div class="card-content-col">
+                                                    <div class="card-title">Home / Usage</div>
+                                                    <div class="card-reading" id="liveHomeWatts">1.93 kW</div>
+                                                    <div class="card-secondary sec-green" id="liveIndependence">100%
+                                                        solar powered</div>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <!-- BOTTOM: Grid Net-Metering -->
-                                        <div class="node-bottom">
-                                            <div class="energy-node node-grid" id="nodeGrid"
-                                                title="Net Metering: Grid Export">
-                                                <div class="node-icon-circle">
-                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="2">
-                                                        <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                                        <!-- Row 2: Battery | Grid -->
+                                        <div class="power-flow-row power-flow-row-bottom">
+                                            <!-- Battery Card -->
+                                            <div class="telemetry-node telemetry-card node-battery" id="nodeBattery"
+                                                title="Lithium-ion Battery Reserve">
+                                                <div class="card-icon-col">
+                                                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" aria-hidden="true">
+                                                        <rect x="3" y="6" width="17" height="12" rx="3" />
+                                                        <path d="M23 10v4M7 12h3M14 10v4M12 12h4" />
                                                     </svg>
                                                 </div>
-                                                <span class="node-name">Grid Export</span>
-                                                <span class="node-wattage" id="liveGridWatts">+0.48 kW</span>
-                                                <span class="node-state">Net Metering</span>
+                                                <div class="card-content-col">
+                                                    <div class="card-title">Battery</div>
+                                                    <div class="card-reading" id="liveBatterySoc">92%</div>
+                                                    <div class="card-secondary sec-green" id="liveBatteryWatts">Charging
+                                                        · 1.25 kW</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Grid Card -->
+                                            <div class="telemetry-node telemetry-card node-grid" id="nodeGrid"
+                                                title="Net Metering: Grid Connection">
+                                                <div class="card-icon-col">
+                                                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" aria-hidden="true">
+                                                        <path d="M9 3v5M15 3v5M7 8h10v4a5 5 0 0 1-10 0V8ZM12 17v4" />
+                                                    </svg>
+                                                </div>
+                                                <div class="card-content-col">
+                                                    <div class="card-title">Grid</div>
+                                                    <div class="card-reading" id="liveGridWatts">0.72 kW</div>
+                                                    <div class="card-secondary grid-secondary">
+                                                        <span class="sec-orange" id="liveGridState">Exporting</span>
+                                                        <span class="grid-sync-sub" id="liveGridSync">231.6 V · 60
+                                                            Hz</span>
+                                                        <span class="sec-meta">Grid locked · PF 0.99</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-
-                                <!-- Vital Real-time Telemetry Readouts -->
-                                <div class="telemetry-vitals">
-                                    <div class="vital-chip">
-                                        <span class="vital-label">
-                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="2.5">
-                                                <circle cx="12" cy="12" r="10" />
-                                                <path d="m10 15 5-3-5-3v6z" />
-                                            </svg>
-                                            Grid Sync
-                                        </span>
-                                        <span class="vital-val" id="liveGridSync">231.8 V · 60.0 Hz</span>
-                                        <span class="vital-meta">Luzon Grid Locked · PF 0.99</span>
-                                    </div>
-
-                                    <div class="vital-chip">
-                                        <span class="vital-label">
-                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="2.5">
-                                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                                            </svg>
-                                            Solar Independence
-                                        </span>
-                                        <span class="vital-val" style="color: #059669;" id="liveIndependence">100% Solar
-                                            Powered</span>
-                                        <span class="vital-meta">Zero grid import now</span>
-                                    </div>
-
-                                    <div class="vital-chip">
-                                        <span class="vital-label">
-                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="2.5">
-                                                <circle cx="12" cy="12" r="4" />
-                                                <path d="M12 2v2" />
-                                                <path d="M12 20v2" />
-                                            </svg>
-                                            PV Arrays
-                                        </span>
-                                        <span class="vital-val" id="livePvStrings">PV1: 342V · PV2: 338V</span>
-                                        <span class="vital-meta">Dual MPPT balanced</span>
-                                    </div>
-
-                                    <div class="vital-chip">
-                                        <span class="vital-label">
-                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="2.5">
-                                                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" />
-                                            </svg>
-                                            Inverter Temp
-                                        </span>
-                                        <span class="vital-val" id="liveInverterTemp">41.2°C (Optimal)</span>
-                                        <span class="vital-meta">Passive heatsink cool</span>
                                     </div>
                                 </div>
 
                                 <!-- Telemetry Footer Status -->
                                 <div class="telemetry-footer-bar">
                                     <span class="telemetry-status-msg">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a"
-                                            stroke-width="2.5">
-                                            <polyline points="20 6 9 17 4 12" />
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#16a34a" stroke="#ffffff"
+                                            stroke-width="2" aria-hidden="true">
+                                            <circle cx="12" cy="12" r="10" fill="#16a34a" />
+                                            <polyline points="16 9 10.5 15 8 12.5" stroke="#ffffff" stroke-width="2.5"
+                                                fill="none" />
                                         </svg>
-                                        All panels operating at normal yield
+                                        System operating normally
                                     </span>
-                                    <span class="telemetry-timestamp" id="telemetryTimestamp">Sync: 1s ago</span>
+                                    <span class="telemetry-timestamp" id="telemetryTimestamp">Updated 1s ago</span>
                                 </div>
                             </section>
                         </div>
@@ -448,7 +668,7 @@
 
             <!-- FOOTER -->
             <footer class="portal-footer">
-                <span>© 2026 Hello Solar Inc. Clean energy. Lower bills. Brighter future.</span>
+                <span>© 2026 Hello Solar Inc.</span>
                 <span>hellosolarph.com · support@hellosolarph.com</span>
             </footer>
         </main>
@@ -646,335 +866,789 @@
         </div>
     </div>
 
-        <!-- MOBILE BOTTOM NAVIGATION (5-PILLAR CUSTOMER APP NAV) -->
-        <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
-            <div class="mobile-bottom-nav-inner">
-                <a href="mysystem.html" class="mobile-nav-item active" aria-current="page">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="4" />
-                        <path d="M12 2v2" />
-                        <path d="M12 20v2" />
-                        <path d="m4.93 4.93 1.41 1.41" />
-                        <path d="m17.66 17.66 1.41 1.41" />
-                        <path d="M2 12h2" />
-                        <path d="M20 12h2" />
-                    </svg>
-                    <span>My System</span>
-                </a>
-                <a href="energy.html" class="mobile-nav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
-                    </svg>
-                    <span>Energy</span>
-                </a>
-                <a href="payments.html" class="mobile-nav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <rect x="2" y="5" width="20" height="14" rx="2" />
-                        <path d="M2 10h20" />
-                        <path d="M6 15h4" />
-                    </svg>
-                    <span>Payments</span>
-                </a>
-                <a href="support.html" class="mobile-nav-item">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M3 11a9 9 0 0 1 18 0" />
-                        <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
-                        <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
-                        <path d="M17 17c0 2-2 3-5 3" />
-                    </svg>
-                    <span>Support</span>
-                </a>
-            </div>
-        </nav>
+    <!-- MOBILE BOTTOM NAVIGATION (5-PILLAR CUSTOMER APP NAV) -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
+        <div class="mobile-bottom-nav-inner">
+            <a href="mysystem.html" class="mobile-nav-item active" aria-current="page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2v2" />
+                    <path d="M12 20v2" />
+                    <path d="m4.93 4.93 1.41 1.41" />
+                    <path d="m17.66 17.66 1.41 1.41" />
+                    <path d="M2 12h2" />
+                    <path d="M20 12h2" />
+                </svg>
+                <span>My System</span>
+            </a>
+            <a href="energy.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
+                </svg>
+                <span>Equipment Details</span>
+            </a>
+            <a href="payments.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                    <path d="M2 10h20" />
+                    <path d="M6 15h4" />
+                </svg>
+                <span>Payments</span>
+            </a>
+            <a href="support.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M3 11a9 9 0 0 1 18 0" />
+                    <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
+                    <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
+                    <path d="M17 17c0 2-2 3-5 3" />
+                </svg>
+                <span>Support</span>
+            </a>
+        </div>
+    </nav>
 
-        <!-- Customer Authentication Logic & Registry -->
-        <script src="assets/js/auth.js"></script>
+    <!-- Customer Authentication Logic & Registry -->
+    <script src="assets/js/auth.js"></script>
 
-        <!-- Core Portal JavaScript -->
-        <script src="assets/js/portal.js"></script>
+    <!-- Shared Data Loader -->
+    <script src="assets/js/data-loader.js"></script>
 
-        <!-- Consolidated Overview Controller & Decoupled Data Store -->
-        <script>
-            (function () {
-                "use strict";
+    <!-- Core Portal JavaScript -->
+    <script src="assets/js/portal.js"></script>
 
-                // --------------------------------------------------------------------------
-                // 1. LINKED PACKAGES REPOSITORY & CUSTOMER STATE
-                // --------------------------------------------------------------------------
-                const activeCustomer = (window.HelloSolar && window.HelloSolar.getCustomer)
-                    ? window.HelloSolar.getCustomer()
-                    : { name: "Juan Dela Cruz", accountNo: "HS-88219" };
+    <!-- Consolidated Overview Controller & Decoupled Data Store -->
+    <script>
+        (function () {
+            "use strict";
 
-                const userIdent = (window.HelloSolar && window.HelloSolar.getCustomerIdentifier)
-                    ? window.HelloSolar.getCustomerIdentifier()
-                    : (activeCustomer.accountNo || activeCustomer.email || "customer");
+            // --------------------------------------------------------------------------
+            // 1. LINKED PACKAGES REPOSITORY & CUSTOMER STATE
+            // --------------------------------------------------------------------------
+            const activeCustomer = (window.HelloSolar && window.HelloSolar.getCustomer)
+                ? window.HelloSolar.getCustomer()
+                : { name: "Juan Dela Cruz", accountNo: "HS-88219" };
 
-                let packages = (window.HelloSolar && window.HelloSolar.getLinkedPackages)
-                    ? window.HelloSolar.getLinkedPackages()
-                    : [];
+            const userIdent = (window.HelloSolar && window.HelloSolar.getCustomerIdentifier)
+                ? window.HelloSolar.getCustomerIdentifier()
+                : (activeCustomer.accountNo || activeCustomer.email || "customer");
 
-                // --------------------------------------------------------------------------
-                // 2. USER OWNED SYSTEMS FILTERING & DYNAMIC ACCOUNT LINKING
-                // --------------------------------------------------------------------------
-                function getUserLinkedAccounts() {
+            let packages = (window.HelloSolar && window.HelloSolar.getLinkedPackages)
+                ? window.HelloSolar.getLinkedPackages()
+                : [];
+
+            // --------------------------------------------------------------------------
+            // 2. USER OWNED SYSTEMS FILTERING & DYNAMIC ACCOUNT LINKING
+            // --------------------------------------------------------------------------
+            function getUserLinkedAccounts() {
+                try {
+                    const raw = localStorage.getItem(`hello_solar_user_linked_${userIdent}`);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (Array.isArray(parsed)) return parsed;
+                    }
+                } catch (e) {
+                    console.warn("Could not read user linked accounts:", e);
+                }
+                return [];
+            }
+
+            function saveUserLinkedAccount(newPkg) {
+                try {
+                    const list = getUserLinkedAccounts();
+                    list.push(newPkg);
+                    localStorage.setItem(`hello_solar_user_linked_${userIdent}`, JSON.stringify(list));
+                } catch (e) {
+                    console.error("Could not save linked account:", e);
+                }
+            }
+
+            function getUserPackages() {
+                const customLinked = getUserLinkedAccounts();
+                let baseList = [...packages];
+
+                // Account-specific scoping
+                if (activeCustomer.accountNo === "HS-72301") {
+                    baseList = baseList.filter(p => p.accountNo === "HS-72301" || p.id === "pkg-maria-6k8");
+                    if (baseList.length === 0) {
+                        baseList = [{
+                            id: "pkg-maria-6k8",
+                            installerAcceptanceStatus: "accepted",
+                            name: "Quezon Residence",
+                            shortLabel: "Residence — 6.8 kW",
+                            capacity: "6.8 kW",
+                            location: "Quezon City · HS-72301",
+                            accountNo: "HS-72301",
+                            status: "Online · Normal",
+                            telemetry: {
+                                baseSolar: 4.85,
+                                baseHome: 2.30,
+                                baseBattery: 1.40,
+                                batterySoc: 95,
+                                pvStrings: "PV1: 348V · PV2: 342V",
+                                gridSync: "231.2 V · 60.0 Hz",
+                                inverterTemp: "40.8°C (Optimal)"
+                            },
+                            energy: { billSaved: "₱4,580" },
+                            payments: { status: "Paid", standing: "Good" },
+                            install: { completionPct: 100 }
+                        }];
+                    }
+                }
+
+                // Merge user-linked accounts
+                customLinked.forEach(c => {
+                    if (!baseList.some(p => p.id === c.id)) {
+                        baseList.push(c);
+                    }
+                });
+
+                return baseList;
+            }
+
+            // --------------------------------------------------------------------------
+            // 3. PER-SYSTEM ACTIVATION STATE PERSISTENCE
+            // --------------------------------------------------------------------------
+            // Acceptance is supplied by the model record, independently of activation.
+            function isModelAccepted(pkg) {
+                return !!pkg && pkg.installerAcceptanceStatus === "accepted";
+            }
+
+            function isSystemActivated(pkg) {
+                if (!pkg) return false;
+                const key = `hello_solar_system_activation_${userIdent}_${pkg.id}`;
+                const stored = localStorage.getItem(key);
+                if (stored !== null) {
+                    return stored === "true";
+                }
+                // Default configuration:
+                // pkg-biz-6k0 defaults to Deactivated (awaiting activation)
+                if (pkg.id === "pkg-biz-6k0") {
+                    return false;
+                }
+                // Newly added accounts default to Deactivated
+                if (pkg.isCustomAdded) {
+                    return false;
+                }
+                // Existing live packages default to Activated
+                return true;
+            }
+
+            function setSystemActivated(pkgId, isActivated) {
+                const key = `hello_solar_system_activation_${userIdent}_${pkgId}`;
+                localStorage.setItem(key, isActivated ? "true" : "false");
+            }
+
+            // --------------------------------------------------------------------------
+            // 4. PER-SYSTEM INSTALLATION MILESTONES PERSISTENCE
+            // --------------------------------------------------------------------------
+            const DEFAULT_5_MILESTONES = [
+                { num: "1", title: "1. Site Assessment & Engineering Survey", status: "Scheduled", desc: "Structural audit and solar panel mounting geometry inspection.", date: "Scheduled" },
+                { num: "2", title: "2. Solar PV Panels Installed", status: "Pending", desc: "Monocrystalline solar PV modules mounted and wired.", date: "Pending Stage 1" },
+                { num: "3", title: "3. Inverter & Storage Setup", status: "Pending", desc: "Hybrid inverter, electrical safety disconnects, and conduit setup.", date: "Pending Stage 2" },
+                { num: "4", title: "4. Utility Grid Connection (Net Metering)", status: "Pending", desc: "Distribution utility bi-directional meter testing and grid connection.", date: "Pending Stage 3" },
+                { num: "5", title: "5. Final Safety Commissioning & Handover", status: "Pending", desc: "Electrical engineering sign-off, live energization, and customer handover.", date: "Pending Stage 4" }
+            ];
+
+            function getSystemMilestones(pkg) {
+                const key = `hello_solar_install_progress_${userIdent}_${pkg.id}`;
+                const stored = localStorage.getItem(key);
+                if (stored) {
                     try {
-                        const raw = localStorage.getItem(`hello_solar_user_linked_${userIdent}`);
-                        if (raw) {
-                            const parsed = JSON.parse(raw);
-                            if (Array.isArray(parsed)) return parsed;
-                        }
+                        const parsed = JSON.parse(stored);
+                        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
                     } catch (e) {
-                        console.warn("Could not read user linked accounts:", e);
-                    }
-                    return [];
-                }
-
-                function saveUserLinkedAccount(newPkg) {
-                    try {
-                        const list = getUserLinkedAccounts();
-                        list.push(newPkg);
-                        localStorage.setItem(`hello_solar_user_linked_${userIdent}`, JSON.stringify(list));
-                    } catch (e) {
-                        console.error("Could not save linked account:", e);
+                        console.warn("Could not parse milestones:", e);
                     }
                 }
 
-                function getUserPackages() {
-                    const customLinked = getUserLinkedAccounts();
-                    let baseList = [...packages];
-
-                    // Account-specific scoping
-                    if (activeCustomer.accountNo === "HS-72301") {
-                        baseList = baseList.filter(p => p.accountNo === "HS-72301" || p.id === "pkg-maria-6k8");
-                        if (baseList.length === 0) {
-                            baseList = [{
-                                id: "pkg-maria-6k8",
-                                name: "Quezon Residence",
-                                shortLabel: "Residence — 6.8 kW",
-                                capacity: "6.8 kW",
-                                location: "Quezon City · HS-72301",
-                                accountNo: "HS-72301",
-                                status: "Online · Normal",
-                                telemetry: {
-                                    baseSolar: 4.85,
-                                    baseHome: 2.30,
-                                    baseBattery: 1.40,
-                                    batterySoc: 95,
-                                    pvStrings: "PV1: 348V · PV2: 342V",
-                                    gridSync: "231.2 V · 60.0 Hz",
-                                    inverterTemp: "40.8°C (Optimal)"
-                                },
-                                energy: { billSaved: "₱4,580" },
-                                payments: { status: "Paid", standing: "Good" },
-                                install: { completionPct: 100 }
-                            }];
-                        }
-                    }
-
-                    // Merge user-linked accounts
-                    customLinked.forEach(c => {
-                        if (!baseList.some(p => p.id === c.id)) {
-                            baseList.push(c);
-                        }
-                    });
-
-                    return baseList;
+                if (pkg.install && Array.isArray(pkg.install.milestones) && pkg.install.milestones.length > 0) {
+                    return JSON.parse(JSON.stringify(pkg.install.milestones));
                 }
 
-                // --------------------------------------------------------------------------
-                // 3. PER-SYSTEM ACTIVATION STATE PERSISTENCE
-                // --------------------------------------------------------------------------
-                function isSystemActivated(pkg) {
-                    if (!pkg) return false;
-                    const key = `hello_solar_system_activation_${userIdent}_${pkg.id}`;
-                    const stored = localStorage.getItem(key);
-                    if (stored !== null) {
-                        return stored === "true";
-                    }
-                    // Default configuration:
-                    // pkg-biz-6k0 defaults to Deactivated (awaiting activation)
-                    if (pkg.id === "pkg-biz-6k0") {
-                        return false;
-                    }
-                    // Newly added accounts default to Deactivated
-                    if (pkg.isCustomAdded) {
-                        return false;
-                    }
-                    // Existing live packages default to Activated
-                    return true;
-                }
+                return JSON.parse(JSON.stringify(DEFAULT_5_MILESTONES));
+            }
 
-                function setSystemActivated(pkgId, isActivated) {
-                    const key = `hello_solar_system_activation_${userIdent}_${pkgId}`;
-                    localStorage.setItem(key, isActivated ? "true" : "false");
-                }
+            function saveSystemMilestones(pkgId, milestones) {
+                const key = `hello_solar_install_progress_${userIdent}_${pkgId}`;
+                localStorage.setItem(key, JSON.stringify(milestones));
+            }
 
-                // --------------------------------------------------------------------------
-                // 4. PER-SYSTEM INSTALLATION MILESTONES PERSISTENCE
-                // --------------------------------------------------------------------------
-                const DEFAULT_5_MILESTONES = [
-                    { num: "1", title: "1. Site Assessment & Engineering Survey", status: "Scheduled", desc: "Structural audit and solar panel mounting geometry inspection.", date: "Scheduled" },
-                    { num: "2", title: "2. Solar PV Panels Installed", status: "Pending", desc: "Monocrystalline solar PV modules mounted and wired.", date: "Pending Stage 1" },
-                    { num: "3", title: "3. Inverter & Storage Setup", status: "Pending", desc: "Hybrid inverter, electrical safety disconnects, and conduit setup.", date: "Pending Stage 2" },
-                    { num: "4", title: "4. Utility Grid Connection (Net Metering)", status: "Pending", desc: "Distribution utility bi-directional meter testing and grid connection.", date: "Pending Stage 3" },
-                    { num: "5", title: "5. Final Safety Commissioning & Handover", status: "Pending", desc: "Electrical engineering sign-off, live energization, and customer handover.", date: "Pending Stage 4" }
-                ];
+            // --------------------------------------------------------------------------
+            // 5. TELEMETRY DISPLAY & STREAM CONTROLLER
+            // --------------------------------------------------------------------------
+            const liveSolarWattsEl = document.getElementById("liveSolarWatts");
+            const liveBatteryWattsEl = document.getElementById("liveBatteryWatts");
+            const liveBatterySocEl = document.getElementById("liveBatterySoc");
+            const liveInverterWattsEl = document.getElementById("liveInverterWatts");
+            const liveHomeWattsEl = document.getElementById("liveHomeWatts");
+            const liveGridWattsEl = document.getElementById("liveGridWatts");
+            const liveGridSyncEl = document.getElementById("liveGridSync");
+            const livePvStringsEl = document.getElementById("livePvStrings");
+            const liveInverterTempEl = document.getElementById("liveInverterTemp");
+            const liveIndependenceEl = document.getElementById("liveIndependence");
+            const liveGridStateEl = document.getElementById("liveGridState");
+            const flowLineBattery = document.getElementById("flowLineBattery");
+            const flowLineGrid = document.getElementById("flowLineGrid");
+            const telemetryTimestampEl = document.getElementById("telemetryTimestamp");
+            const telemetrySyncBtn = document.getElementById("telemetrySyncBtn");
+            const syncBtnLabel = document.getElementById("syncBtnLabel");
 
-                function getSystemMilestones(pkg) {
-                    const key = `hello_solar_install_progress_${userIdent}_${pkg.id}`;
-                    const stored = localStorage.getItem(key);
-                    if (stored) {
-                        try {
-                            const parsed = JSON.parse(stored);
-                            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-                        } catch (e) {
-                            console.warn("Could not parse milestones:", e);
-                        }
-                    }
+            let currentPackage = null;
+            let currentPackageGeneration = 0;
+            let secondsSinceSync = 1;
+            let baseSolar = 3.85;
+            let baseHome = 1.95;
+            let baseBattery = 1.25;
+            let currentBatterySoc = 92;
+            let telemetryIntervalId = null;
+            let tickerIntervalId = null;
+            let previousScrollY = 0;
+            let lastTriggerElement = null;
 
-                    if (pkg.install && Array.isArray(pkg.install.milestones) && pkg.install.milestones.length > 0) {
-                        return JSON.parse(JSON.stringify(pkg.install.milestones));
-                    }
+            function updateTelemetryDisplay() {
+                if (!currentPackage) return;
 
-                    return JSON.parse(JSON.stringify(DEFAULT_5_MILESTONES));
-                }
-
-                function saveSystemMilestones(pkgId, milestones) {
-                    const key = `hello_solar_install_progress_${userIdent}_${pkgId}`;
-                    localStorage.setItem(key, JSON.stringify(milestones));
-                }
-
-                // --------------------------------------------------------------------------
-                // 5. TELEMETRY DISPLAY & STREAM CONTROLLER
-                // --------------------------------------------------------------------------
-                const liveSolarWattsEl = document.getElementById("liveSolarWatts");
-                const liveBatteryWattsEl = document.getElementById("liveBatteryWatts");
-                const liveBatterySocEl = document.getElementById("liveBatterySoc");
-                const liveInverterWattsEl = document.getElementById("liveInverterWatts");
-                const liveHomeWattsEl = document.getElementById("liveHomeWatts");
-                const liveGridWattsEl = document.getElementById("liveGridWatts");
-                const liveGridSyncEl = document.getElementById("liveGridSync");
-                const livePvStringsEl = document.getElementById("livePvStrings");
-                const liveInverterTempEl = document.getElementById("liveInverterTemp");
-                const telemetryTimestampEl = document.getElementById("telemetryTimestamp");
-                const telemetrySyncBtn = document.getElementById("telemetrySyncBtn");
-                const syncBtnLabel = document.getElementById("syncBtnLabel");
-
-                let currentPackage = null;
-                let currentPackageGeneration = 0;
-                let secondsSinceSync = 1;
-                let baseSolar = 3.85;
-                let baseHome = 1.95;
-                let baseBattery = 1.25;
-                let currentBatterySoc = 92;
-                let telemetryIntervalId = null;
-                let tickerIntervalId = null;
-                let previousScrollY = 0;
-                let lastTriggerElement = null;
-
-                function updateTelemetryDisplay() {
-                    if (!currentPackage) return;
-
-                    if (!currentPackage.telemetry) {
-                        if (liveSolarWattsEl) liveSolarWattsEl.textContent = "Unavailable";
-                        if (liveInverterWattsEl) liveInverterWattsEl.textContent = "Offline";
-                        if (liveHomeWattsEl) liveHomeWattsEl.textContent = "Unavailable";
-                        if (liveBatteryWattsEl) liveBatteryWattsEl.textContent = "Unavailable";
-                        if (liveBatterySocEl) liveBatterySocEl.textContent = "Unavailable";
-                        if (liveGridWattsEl) {
-                            liveGridWattsEl.textContent = "Offline";
-                            liveGridWattsEl.style.color = "var(--gray-400)";
-                        }
-                        if (liveGridSyncEl) liveGridSyncEl.textContent = "Offline · Standby";
-                        if (livePvStringsEl) livePvStringsEl.textContent = "PV: Not Connected";
-                        if (liveInverterTempEl) liveInverterTempEl.textContent = "Inverter: Offline";
-                        if (telemetryTimestampEl) telemetryTimestampEl.textContent = "Telemetry Offline";
-                        return;
-                    }
-
-                    const solarJitter = (Math.random() * 0.12 - 0.06);
-                    const homeJitter = (Math.random() * 0.08 - 0.04);
-                    const batteryJitter = (Math.random() * 0.04 - 0.02);
-
-                    const currentSolar = Math.max(1.2, +(baseSolar + solarJitter).toFixed(2));
-                    const currentHome = Math.max(0.6, +(baseHome + homeJitter).toFixed(2));
-                    const currentBattery = Math.max(0.2, +(baseBattery + batteryJitter).toFixed(2));
-                    const currentGrid = +(currentSolar - currentHome - currentBattery).toFixed(2);
-
-                    if (liveSolarWattsEl) liveSolarWattsEl.textContent = `${currentSolar.toFixed(2)} kW`;
-                    if (liveInverterWattsEl) liveInverterWattsEl.textContent = `${currentSolar.toFixed(2)} kW`;
-                    if (liveHomeWattsEl) liveHomeWattsEl.textContent = `${currentHome.toFixed(2)} kW`;
-                    if (liveBatteryWattsEl) liveBatteryWattsEl.textContent = `${currentBattery.toFixed(2)} kW`;
-                    if (liveBatterySocEl) liveBatterySocEl.textContent = `${currentBatterySoc}% (Charge)`;
-
+                if (!currentPackage.telemetry) {
+                    if (liveSolarWattsEl) liveSolarWattsEl.textContent = "Unavailable";
+                    if (liveInverterWattsEl) liveInverterWattsEl.textContent = "Offline";
+                    if (liveHomeWattsEl) liveHomeWattsEl.textContent = "Unavailable";
+                    if (liveBatterySocEl) liveBatterySocEl.textContent = "Unavailable";
+                    if (liveBatteryWattsEl) liveBatteryWattsEl.textContent = "Offline · Standby";
                     if (liveGridWattsEl) {
-                        if (currentGrid >= 0) {
-                            liveGridWattsEl.textContent = `+${currentGrid.toFixed(2)} kW`;
-                            liveGridWattsEl.style.color = "var(--navy)";
-                        } else {
-                            liveGridWattsEl.textContent = `${currentGrid.toFixed(2)} kW`;
-                            liveGridWattsEl.style.color = "#d97706";
-                        }
+                        liveGridWattsEl.textContent = "Offline";
+                        liveGridWattsEl.style.color = "var(--gray-400)";
                     }
-
-                    if (currentPackage.telemetry) {
-                        const baseV = currentPackage.telemetry.gridSync ? currentPackage.telemetry.gridSync.split("V")[0].trim() : "230.0";
-                        const jitterV = (+baseV + (Math.random() * 0.6 - 0.3)).toFixed(1);
-                        if (liveGridSyncEl) liveGridSyncEl.textContent = `${jitterV} V · 60.0 Hz`;
-                        if (livePvStringsEl) livePvStringsEl.textContent = currentPackage.telemetry.pvStrings || "PV: OK";
-                        if (liveInverterTempEl) liveInverterTempEl.textContent = currentPackage.telemetry.inverterTemp || "Normal";
-                    }
-
-                    secondsSinceSync = 1;
-                    if (telemetryTimestampEl) telemetryTimestampEl.textContent = "Sync: 1s ago";
+                    if (liveGridSyncEl) liveGridSyncEl.textContent = "Offline · Standby";
+                    if (livePvStringsEl) livePvStringsEl.textContent = "PV: Not Connected";
+                    if (liveInverterTempEl) liveInverterTempEl.textContent = "Inverter: Offline";
+                    if (liveIndependenceEl) liveIndependenceEl.textContent = "Offline";
+                    if (telemetryTimestampEl) telemetryTimestampEl.textContent = "Telemetry Offline";
+                    updateFlowConnectors();
+                    return;
                 }
 
-                // --------------------------------------------------------------------------
-                // 6. SYSTEMS OVERVIEW GRID RENDERING
-                // --------------------------------------------------------------------------
-                const systemsOverviewView = document.getElementById("systemsOverviewView");
-                const systemDetailView = document.getElementById("systemDetailView");
-                const systemsGrid = document.getElementById("systemsGrid");
-                const customerGreetingName = document.getElementById("customerGreetingName");
-                const backToSystemsBtn = document.getElementById("backToSystemsBtn");
+                const solarJitter = (Math.random() * 0.12 - 0.06);
+                const homeJitter = (Math.random() * 0.08 - 0.04);
+                const batteryJitter = (Math.random() * 0.04 - 0.02);
 
-                function renderSystemsGrid() {
-                    if (!systemsGrid) return;
-                    systemsGrid.innerHTML = "";
+                const currentSolar = Math.max(1.2, +(baseSolar + solarJitter).toFixed(2));
+                const currentHome = Math.max(0.6, +(baseHome + homeJitter).toFixed(2));
+                const currentBattery = Math.max(0.2, +(baseBattery + batteryJitter).toFixed(2));
+                const currentGrid = +(currentSolar - currentHome - currentBattery).toFixed(2);
 
-                    if (customerGreetingName) {
-                        customerGreetingName.textContent = activeCustomer.name || "Juan Dela Cruz";
+                if (liveSolarWattsEl) liveSolarWattsEl.textContent = `${currentSolar.toFixed(2)} kW`;
+                if (liveInverterWattsEl) liveInverterWattsEl.textContent = `${currentSolar.toFixed(2)} kW`;
+                if (liveHomeWattsEl) liveHomeWattsEl.textContent = `${currentHome.toFixed(2)} kW`;
+                if (liveBatterySocEl) liveBatterySocEl.textContent = `${currentBatterySoc}%`;
+                if (liveBatteryWattsEl) {
+                    const isCharging = currentBattery >= 0;
+                    const bState = isCharging ? "Charging" : "Discharging";
+                    liveBatteryWattsEl.textContent = `${bState} · ${Math.abs(currentBattery).toFixed(2)} kW`;
+                }
+
+                if (liveGridWattsEl) {
+                    if (currentGrid >= 0) {
+                        liveGridWattsEl.textContent = `+${currentGrid.toFixed(2)} kW`;
+                        liveGridWattsEl.style.color = "var(--navy)";
+                    } else {
+                        liveGridWattsEl.textContent = `${currentGrid.toFixed(2)} kW`;
+                        liveGridWattsEl.style.color = "#d97706";
+                    }
+                }
+
+                // Dynamic Solar Independence calculation
+                if (liveIndependenceEl) {
+                    if (currentGrid >= 0) {
+                        liveIndependenceEl.textContent = "100% Solar";
+                    } else {
+                        const pct = Math.min(99, Math.max(10, Math.round((currentSolar / currentHome) * 100)));
+                        liveIndependenceEl.textContent = `${pct}% Solar`;
+                    }
+                }
+
+                // Dynamic Battery Flow Direction
+                if (flowLineBattery) {
+                    if (currentBattery > 0) {
+                        flowLineBattery.classList.remove("flow-reverse");
+                        flowLineBattery.classList.add("flow-forward");
+                    } else {
+                        flowLineBattery.classList.remove("flow-forward");
+                        flowLineBattery.classList.add("flow-reverse");
+                    }
+                }
+                const flowLineBatteryAnim = document.getElementById("flowLineBatteryAnim");
+                if (flowLineBatteryAnim) {
+                    if (currentBattery > 0) {
+                        flowLineBatteryAnim.classList.remove("flow-reverse");
+                        flowLineBatteryAnim.classList.add("flow-forward");
+                    } else {
+                        flowLineBatteryAnim.classList.remove("flow-forward");
+                        flowLineBatteryAnim.classList.add("flow-reverse");
+                    }
+                }
+
+                // Dynamic Grid Flow Direction and State
+                if (flowLineGrid) {
+                    if (currentGrid >= 0) {
+                        flowLineGrid.classList.remove("flow-reverse");
+                        flowLineGrid.classList.add("flow-forward");
+                        if (liveGridStateEl) liveGridStateEl.textContent = "Exporting";
+                    } else {
+                        flowLineGrid.classList.remove("flow-forward");
+                        flowLineGrid.classList.add("flow-reverse");
+                        if (liveGridStateEl) liveGridStateEl.textContent = "Importing";
+                    }
+                }
+                const flowLineGridAnim = document.getElementById("flowLineGridAnim");
+                if (flowLineGridAnim) {
+                    if (currentGrid >= 0) {
+                        flowLineGridAnim.classList.remove("flow-reverse");
+                        flowLineGridAnim.classList.add("flow-forward");
+                    } else {
+                        flowLineGridAnim.classList.remove("flow-forward");
+                        flowLineGridAnim.classList.add("flow-reverse");
+                    }
+                }
+
+                if (currentPackage.telemetry) {
+                    const baseV = currentPackage.telemetry.gridSync ? currentPackage.telemetry.gridSync.split("V")[0].trim() : "230.0";
+                    const jitterV = (+baseV + (Math.random() * 0.6 - 0.3)).toFixed(1);
+                    if (liveGridSyncEl) liveGridSyncEl.textContent = `${jitterV} V · 60.0 Hz`;
+                    if (livePvStringsEl) livePvStringsEl.textContent = currentPackage.telemetry.pvStrings || "PV: OK";
+                    if (liveInverterTempEl) liveInverterTempEl.textContent = currentPackage.telemetry.inverterTemp || "Normal";
+                }
+
+                secondsSinceSync = 1;
+                if (telemetryTimestampEl) telemetryTimestampEl.textContent = "Sync: 1s ago";
+
+                updateFlowConnectors();
+            }
+
+            function updateFlowConnectors() {
+                requestAnimationFrame(() => {
+                    const stage = document.querySelector(".power-flow-stage");
+                    if (!stage || stage.offsetParent === null) return;
+                    const sRect = stage.getBoundingClientRect();
+                    if (sRect.width === 0 || sRect.height === 0) return;
+
+                    const nodeSolar = document.getElementById("nodeSolar");
+                    const nodeInverter = document.getElementById("nodeInverter");
+                    const nodeHome = document.getElementById("nodeHome");
+                    const nodeBattery = document.getElementById("nodeBattery");
+                    const nodeGrid = document.getElementById("nodeGrid");
+
+                    if (!nodeSolar || !nodeInverter || !nodeHome || !nodeBattery || !nodeGrid) return;
+
+                    const sL = sRect.left;
+                    const sT = sRect.top;
+
+                    const rSolar = nodeSolar.getBoundingClientRect();
+                    const rInverter = nodeInverter.getBoundingClientRect();
+                    const rHome = nodeHome.getBoundingClientRect();
+                    const rBattery = nodeBattery.getBoundingClientRect();
+                    const rGrid = nodeGrid.getBoundingClientRect();
+
+                    const isMobile = window.innerWidth <= 768;
+
+                    // Inverter center & radius
+                    const invCx = (rInverter.left + rInverter.right) / 2 - sL;
+                    const invCy = (rInverter.top + rInverter.bottom) / 2 - sT;
+                    const invR = rInverter.width / 2;
+
+                    // Battery & Grid state
+                    const isBatteryCharging = !flowLineBattery || !flowLineBattery.classList.contains("flow-reverse");
+                    const isGridExporting = !flowLineGrid || !flowLineGrid.classList.contains("flow-reverse");
+
+                    let pSolar = "";
+                    let dArrowSolar = "";
+                    let dotSolarInvPt = { x: 0, y: 0 };
+
+                    let pHome = "";
+                    let dArrowHome = "";
+                    let dotHomeInvPt = { x: 0, y: 0 };
+                    let dotHomeEndPt = { x: 0, y: 0 };
+
+                    let pBattery = "";
+                    let dArrowBattery = "";
+                    let dotBatteryInvPt = { x: 0, y: 0 };
+                    let dotBatteryEndPt = { x: 0, y: 0 };
+
+                    let pGrid = "";
+                    let dArrowGrid = "";
+                    let dotGridInvPt = { x: 0, y: 0 };
+                    let dotGridEndPt = { x: 0, y: 0 };
+
+                    if (!isMobile) {
+                        // -------------------------------------------------------------
+                        // DESKTOP LAYOUT (Centerline alignment & balanced pair below)
+                        // -------------------------------------------------------------
+
+                        // 1. Solar to Inverter (Exact horizontal centerline)
+                        const solX = rSolar.right - sL;
+                        const invSolX = invCx - invR;
+                        pSolar = `M ${solX} ${invCy} L ${invSolX} ${invCy}`;
+                        const midSolX = (solX + invSolX) / 2;
+                        dArrowSolar = `M ${midSolX - 5} ${invCy - 4.5} L ${midSolX + 4} ${invCy} L ${midSolX - 5} ${invCy + 4.5} Z`;
+                        dotSolarInvPt = { x: invSolX, y: invCy };
+
+                        // 2. Inverter to Home (Exact horizontal centerline)
+                        const invHomX = invCx + invR;
+                        const homX = rHome.left - sL;
+                        pHome = `M ${invHomX} ${invCy} L ${homX} ${invCy}`;
+                        const midHomX = (invHomX + homX) / 2;
+                        dArrowHome = `M ${midHomX - 5} ${invCy - 4.5} L ${midHomX + 4} ${invCy} L ${midHomX - 5} ${invCy + 4.5} Z`;
+                        dotHomeInvPt = { x: invHomX, y: invCy };
+                        dotHomeEndPt = { x: homX, y: invCy };
+
+                        // 3. Inverter to Battery (Bottom-left arc to Battery top edge)
+                        const dxBat = -invR * 0.44;
+                        const dyBat = Math.sqrt(Math.max(0, invR * invR - dxBat * dxBat));
+                        const invBatStartX = invCx + dxBat;
+                        const invBatStartY = invCy + dyBat;
+
+                        const batCenterX = (rBattery.left + rBattery.right) / 2 - sL;
+                        const batTopY = rBattery.top - sT;
+                        const batEndX = batCenterX + Math.min(24, rBattery.width * 0.12);
+
+                        const elbowBatY = (invBatStartY + batTopY) / 2;
+                        const crBat = Math.min(10, Math.max(3, (batTopY - invBatStartY) / 3), Math.abs(batEndX - invBatStartX) / 2);
+                        pBattery = `M ${invBatStartX} ${invBatStartY} L ${invBatStartX} ${elbowBatY - crBat} Q ${invBatStartX} ${elbowBatY} ${invBatStartX - crBat} ${elbowBatY} L ${batEndX + crBat} ${elbowBatY} Q ${batEndX} ${elbowBatY} ${batEndX} ${elbowBatY + crBat} L ${batEndX} ${batTopY}`;
+
+                        const arrBatX = batEndX;
+                        const arrBatY = (elbowBatY + crBat + batTopY) / 2;
+                        if (isBatteryCharging) {
+                            dArrowBattery = `M ${arrBatX - 4.5} ${arrBatY - 5} L ${arrBatX} ${arrBatY + 4} L ${arrBatX + 4.5} ${arrBatY - 5} Z`;
+                        } else {
+                            dArrowBattery = `M ${arrBatX - 4.5} ${arrBatY + 5} L ${arrBatX} ${arrBatY - 4} L ${arrBatX + 4.5} ${arrBatY + 5} Z`;
+                        }
+                        dotBatteryInvPt = { x: invBatStartX, y: invBatStartY };
+                        dotBatteryEndPt = { x: batEndX, y: batTopY };
+
+                        // 4. Inverter to Grid (Bottom-right arc to Grid top edge)
+                        const dxGrd = invR * 0.44;
+                        const dyGrd = Math.sqrt(Math.max(0, invR * invR - dxGrd * dxGrd));
+                        const invGrdStartX = invCx + dxGrd;
+                        const invGrdStartY = invCy + dyGrd;
+
+                        const grdCenterX = (rGrid.left + rGrid.right) / 2 - sL;
+                        const grdTopY = rGrid.top - sT;
+                        const grdEndX = grdCenterX - Math.min(24, rGrid.width * 0.12);
+
+                        const elbowGrdY = (invGrdStartY + grdTopY) / 2;
+                        const crGrd = Math.min(10, Math.max(3, (grdTopY - invGrdStartY) / 3), Math.abs(grdEndX - invGrdStartX) / 2);
+                        pGrid = `M ${invGrdStartX} ${invGrdStartY} L ${invGrdStartX} ${elbowGrdY - crGrd} Q ${invGrdStartX} ${elbowGrdY} ${invGrdStartX + crGrd} ${elbowGrdY} L ${grdEndX - crGrd} ${elbowGrdY} Q ${grdEndX} ${elbowGrdY} ${grdEndX} ${elbowGrdY + crGrd} L ${grdEndX} ${grdTopY}`;
+
+                        const arrGrdX = grdEndX;
+                        const arrGrdY = (elbowGrdY + crGrd + grdTopY) / 2;
+                        if (isGridExporting) {
+                            dArrowGrid = `M ${arrGrdX - 4.5} ${arrGrdY - 5} L ${arrGrdX} ${arrGrdY + 4} L ${arrGrdX + 4.5} ${arrGrdY - 5} Z`;
+                        } else {
+                            dArrowGrid = `M ${arrGrdX - 4.5} ${arrGrdY + 5} L ${arrGrdX} ${arrGrdY - 4} L ${arrGrdX + 4.5} ${arrGrdY + 5} Z`;
+                        }
+                        dotGridInvPt = { x: invGrdStartX, y: invGrdStartY };
+                        dotGridEndPt = { x: grdEndX, y: grdTopY };
+
+                    } else {
+                        // -------------------------------------------------------------
+                        // MOBILE 4-CORNER HUB ARRANGEMENT:
+                        // Top-Left: Solar Panels | Top-Right: Grid
+                        // Center: Circular Hybrid Inverter
+                        // Bottom-Left: Battery   | Bottom-Right: Home / Usage
+                        // -------------------------------------------------------------
+
+                        function getCardBorderPoint(rCard, targetX, targetY) {
+                            const left = rCard.left - sL;
+                            const right = rCard.right - sL;
+                            const top = rCard.top - sT;
+                            const bottom = rCard.bottom - sT;
+                            const cx = (left + right) / 2;
+                            const cy = (top + bottom) / 2;
+
+                            const dx = targetX - cx;
+                            const dy = targetY - cy;
+
+                            if (Math.abs(dx) < 0.001 && Math.abs(dy) < 0.001) {
+                                return { x: cx, y: cy };
+                            }
+
+                            const hw = (right - left) / 2;
+                            const hh = (bottom - top) / 2;
+
+                            const scaleX = hw / Math.abs(dx);
+                            const scaleY = hh / Math.abs(dy);
+
+                            if (scaleX < scaleY) {
+                                const edgeX = dx > 0 ? right : left;
+                                const edgeY = cy + (dx > 0 ? hw : -hw) * (dy / dx);
+                                return { x: edgeX, y: edgeY };
+                            } else {
+                                const edgeY = dy > 0 ? bottom : top;
+                                const edgeX = cx + (dy > 0 ? hh : -hh) * (dx / dy);
+                                return { x: edgeX, y: edgeY };
+                            }
+                        }
+
+                        function getCircleBorderPoint(targetX, targetY) {
+                            const angle = Math.atan2(targetY - invCy, targetX - invCx);
+                            return {
+                                x: invCx + invR * Math.cos(angle),
+                                y: invCy + invR * Math.sin(angle)
+                            };
+                        }
+
+                        function makeArrow(mx, my, angle, len = 7.5, halfWidth = 3.8) {
+                            const cos = Math.cos(angle);
+                            const sin = Math.sin(angle);
+                            const tipX = mx + (len / 2) * cos;
+                            const tipY = my + (len / 2) * sin;
+                            const backX = mx - (len / 2) * cos;
+                            const backY = my - (len / 2) * sin;
+                            const p1X = backX - halfWidth * sin;
+                            const p1Y = backY + halfWidth * cos;
+                            const p2X = backX + halfWidth * sin;
+                            const p2Y = backY - halfWidth * cos;
+                            return `M ${p1X.toFixed(1)} ${p1Y.toFixed(1)} L ${tipX.toFixed(1)} ${tipY.toFixed(1)} L ${p2X.toFixed(1)} ${p2Y.toFixed(1)} Z`;
+                        }
+
+                        // 1. Solar Panels (top-left) -> Inverter
+                        const solCardPt = getCardBorderPoint(rSolar, invCx, invCy);
+                        const invSolPt = getCircleBorderPoint(solCardPt.x, solCardPt.y);
+                        pSolar = `M ${solCardPt.x.toFixed(1)} ${solCardPt.y.toFixed(1)} L ${invSolPt.x.toFixed(1)} ${invSolPt.y.toFixed(1)}`;
+                        const midSolX = (solCardPt.x + invSolPt.x) / 2;
+                        const midSolY = (solCardPt.y + invSolPt.y) / 2;
+                        const angleSolar = Math.atan2(invSolPt.y - solCardPt.y, invSolPt.x - solCardPt.x);
+                        dArrowSolar = makeArrow(midSolX, midSolY, angleSolar);
+                        dotSolarInvPt = { x: invSolPt.x, y: invSolPt.y };
+
+                        // 2. Inverter <-> Grid (top-right)
+                        const grdCardPt = getCardBorderPoint(rGrid, invCx, invCy);
+                        const invGrdPt = getCircleBorderPoint(grdCardPt.x, grdCardPt.y);
+                        pGrid = `M ${invGrdPt.x.toFixed(1)} ${invGrdPt.y.toFixed(1)} L ${grdCardPt.x.toFixed(1)} ${grdCardPt.y.toFixed(1)}`;
+                        const midGrdX = (invGrdPt.x + grdCardPt.x) / 2;
+                        const midGrdY = (invGrdPt.y + grdCardPt.y) / 2;
+                        const angleGrid = isGridExporting
+                            ? Math.atan2(grdCardPt.y - invGrdPt.y, grdCardPt.x - invGrdPt.x)
+                            : Math.atan2(invGrdPt.y - grdCardPt.y, invGrdPt.x - grdCardPt.x);
+                        dArrowGrid = makeArrow(midGrdX, midGrdY, angleGrid);
+                        dotGridInvPt = { x: invGrdPt.x, y: invGrdPt.y };
+                        dotGridEndPt = { x: grdCardPt.x, y: grdCardPt.y };
+
+                        // 3. Inverter <-> Battery (bottom-left)
+                        const batCardPt = getCardBorderPoint(rBattery, invCx, invCy);
+                        const invBatPt = getCircleBorderPoint(batCardPt.x, batCardPt.y);
+                        pBattery = `M ${invBatPt.x.toFixed(1)} ${invBatPt.y.toFixed(1)} L ${batCardPt.x.toFixed(1)} ${batCardPt.y.toFixed(1)}`;
+                        const midBatX = (invBatPt.x + batCardPt.x) / 2;
+                        const midBatY = (invBatPt.y + batCardPt.y) / 2;
+                        const angleBat = isBatteryCharging
+                            ? Math.atan2(batCardPt.y - invBatPt.y, batCardPt.x - invBatPt.x)
+                            : Math.atan2(invBatPt.y - batCardPt.y, invBatPt.x - batCardPt.x);
+                        dArrowBattery = makeArrow(midBatX, midBatY, angleBat);
+                        dotBatteryInvPt = { x: invBatPt.x, y: invBatPt.y };
+                        dotBatteryEndPt = { x: batCardPt.x, y: batCardPt.y };
+
+                        // 4. Inverter -> Home / Usage (bottom-right)
+                        const homCardPt = getCardBorderPoint(rHome, invCx, invCy);
+                        const invHomPt = getCircleBorderPoint(homCardPt.x, homCardPt.y);
+                        pHome = `M ${invHomPt.x.toFixed(1)} ${invHomPt.y.toFixed(1)} L ${homCardPt.x.toFixed(1)} ${homCardPt.y.toFixed(1)}`;
+                        const midHomX = (invHomPt.x + homCardPt.x) / 2;
+                        const midHomY = (invHomPt.y + homCardPt.y) / 2;
+                        const angleHome = Math.atan2(homCardPt.y - invHomPt.y, homCardPt.x - invHomPt.x);
+                        dArrowHome = makeArrow(midHomX, midHomY, angleHome);
+                        dotHomeInvPt = { x: invHomPt.x, y: invHomPt.y };
+                        dotHomeEndPt = { x: homCardPt.x, y: homCardPt.y };
                     }
 
-                    const userPkgs = getUserPackages();
+                    // 1. Apply Solar Path, Anim, Arrow, and Dot
+                    const lineSolar = document.getElementById("flowLineSolar");
+                    const lineSolarAnim = document.getElementById("flowLineSolarAnim");
+                    const arrowSolar = document.getElementById("arrowSolar");
+                    const dotSolarInv = document.getElementById("dotSolarInv");
+                    if (lineSolar) lineSolar.setAttribute("d", pSolar);
+                    if (lineSolarAnim) lineSolarAnim.setAttribute("d", pSolar);
+                    if (arrowSolar) arrowSolar.setAttribute("d", dArrowSolar);
+                    if (dotSolarInv) {
+                        dotSolarInv.setAttribute("cx", dotSolarInvPt.x);
+                        dotSolarInv.setAttribute("cy", dotSolarInvPt.y);
+                    }
 
-                    userPkgs.forEach(pkg => {
-                        const activated = isSystemActivated(pkg);
-                        const card = document.createElement("article");
-                        card.className = `system-card ${activated ? "activated-card" : "deactivated-card"}`;
-                        card.setAttribute("role", "button");
-                        card.setAttribute("tabindex", "0");
-                        card.setAttribute("data-package-id", pkg.id);
-                        card.setAttribute("aria-label", `${pkg.name}, ${pkg.capacity}. Status: ${activated ? 'Active' : 'Deactivated, activation required'}`);
+                    // 2. Apply Home Path, Anim, Arrow, and Dots
+                    const lineHome = document.getElementById("flowLineHome");
+                    const lineHomeAnim = document.getElementById("flowLineHomeAnim");
+                    const arrowHome = document.getElementById("arrowHome");
+                    const dotHomeInv = document.getElementById("dotHomeInv");
+                    const dotHomeEnd = document.getElementById("dotHomeEnd");
+                    if (lineHome) lineHome.setAttribute("d", pHome);
+                    if (lineHomeAnim) lineHomeAnim.setAttribute("d", pHome);
+                    if (arrowHome) arrowHome.setAttribute("d", dArrowHome);
+                    if (dotHomeInv) {
+                        dotHomeInv.setAttribute("cx", dotHomeInvPt.x);
+                        dotHomeInv.setAttribute("cy", dotHomeInvPt.y);
+                    }
+                    if (dotHomeEnd) {
+                        dotHomeEnd.setAttribute("cx", dotHomeEndPt.x);
+                        dotHomeEnd.setAttribute("cy", dotHomeEndPt.y);
+                    }
 
-                        card.innerHTML = `
+                    // 3. Apply Battery Path, Anim, Arrow, and Dots
+                    const lineBattery = document.getElementById("flowLineBattery");
+                    const lineBatteryAnim = document.getElementById("flowLineBatteryAnim");
+                    const arrowBattery = document.getElementById("arrowBattery");
+                    const dotBatteryInv = document.getElementById("dotBatteryInv");
+                    const dotBatteryEnd = document.getElementById("dotBatteryEnd");
+                    if (lineBattery) lineBattery.setAttribute("d", pBattery);
+                    if (lineBatteryAnim) lineBatteryAnim.setAttribute("d", pBattery);
+                    if (arrowBattery) arrowBattery.setAttribute("d", dArrowBattery);
+                    if (dotBatteryInv) {
+                        dotBatteryInv.setAttribute("cx", dotBatteryInvPt.x);
+                        dotBatteryInv.setAttribute("cy", dotBatteryInvPt.y);
+                    }
+                    if (dotBatteryEnd) {
+                        dotBatteryEnd.setAttribute("cx", dotBatteryEndPt.x);
+                        dotBatteryEnd.setAttribute("cy", dotBatteryEndPt.y);
+                    }
+
+                    // 4. Apply Grid Path, Anim, Arrow, and Dots
+                    const lineGrid = document.getElementById("flowLineGrid");
+                    const lineGridAnim = document.getElementById("flowLineGridAnim");
+                    const arrowGrid = document.getElementById("arrowGrid");
+                    const dotGridInv = document.getElementById("dotGridInv");
+                    const dotGridEnd = document.getElementById("dotGridEnd");
+                    if (lineGrid) lineGrid.setAttribute("d", pGrid);
+                    if (lineGridAnim) lineGridAnim.setAttribute("d", pGrid);
+                    if (arrowGrid) arrowGrid.setAttribute("d", dArrowGrid);
+                    if (dotGridInv) {
+                        dotGridInv.setAttribute("cx", dotGridInvPt.x);
+                        dotGridInv.setAttribute("cy", dotGridInvPt.y);
+                    }
+                    if (dotGridEnd) {
+                        dotGridEnd.setAttribute("cx", dotGridEndPt.x);
+                        dotGridEnd.setAttribute("cy", dotGridEndPt.y);
+                    }
+                });
+            }
+
+            window.addEventListener("resize", () => {
+                updateFlowConnectors();
+                const sDetail = document.getElementById("systemDetailView");
+                if (sDetail && sDetail.classList.contains("active")) {
+                    const isMobile = window.innerWidth <= 768;
+                    sDetail.style.display = isMobile ? "flex" : "block";
+                    if (isMobile) {
+                        sDetail.classList.add("mobile-fullscreen");
+                        document.body.classList.add("modal-open");
+                    } else {
+                        sDetail.classList.remove("mobile-fullscreen");
+                        document.body.classList.remove("modal-open");
+                    }
+                }
+            });
+            if (window.ResizeObserver) {
+                const stageEl = document.querySelector(".power-flow-stage");
+                if (stageEl) {
+                    const ro = new ResizeObserver(() => updateFlowConnectors());
+                    ro.observe(stageEl);
+                }
+            }
+
+            // --------------------------------------------------------------------------
+            // 6. SYSTEMS OVERVIEW GRID RENDERING
+            // --------------------------------------------------------------------------
+            const systemsOverviewView = document.getElementById("systemsOverviewView");
+            const systemDetailView = document.getElementById("systemDetailView");
+            const systemsGrid = document.getElementById("systemsGrid");
+            const customerGreetingName = document.getElementById("customerGreetingName");
+            const backToSystemsBtn = document.getElementById("backToSystemsBtn");
+
+            function getSelectedPackageId() {
+                if (window.HelloSolar && typeof window.HelloSolar.getActivePackageId === "function") {
+                    return window.HelloSolar.getActivePackageId();
+                }
+                const key = `hello_solar_active_package_id:${userIdent}`;
+                return localStorage.getItem(key) || localStorage.getItem("hello_solar_active_package_id") || "";
+            }
+
+            function setSelectedPackageId(id) {
+                if (!id) return;
+                const key = `hello_solar_active_package_id:${userIdent}`;
+                try {
+                    localStorage.setItem(key, id);
+                    localStorage.setItem("hello_solar_active_package_id", id);
+                } catch (e) { }
+                if (window.HelloSolar && typeof window.HelloSolar.setActivePackageId === "function") {
+                    window.HelloSolar.setActivePackageId(id);
+                }
+            }
+
+            function updateSelectedCardHighlight(packageId) {
+                if (!systemsGrid) return;
+                const cards = systemsGrid.querySelectorAll(".system-card");
+                cards.forEach(c => {
+                    const matches = c.getAttribute("data-package-id") === packageId;
+                    if (matches) {
+                        c.classList.add("selected");
+                        c.setAttribute("aria-selected", "true");
+                    } else {
+                        c.classList.remove("selected");
+                        c.setAttribute("aria-selected", "false");
+                    }
+                });
+            }
+
+            function renderSystemsGrid() {
+                if (!systemsGrid) return;
+                systemsGrid.innerHTML = "";
+
+                if (customerGreetingName) {
+                    customerGreetingName.textContent = activeCustomer.name || "Juan Dela Cruz";
+                }
+
+                const userPkgs = getUserPackages();
+                let activePackageId = getSelectedPackageId();
+
+                const matchedPkg = userPkgs.find(p => p.id === activePackageId || p.accountNo === activePackageId);
+                if (matchedPkg) {
+                    activePackageId = matchedPkg.id;
+                } else if (userPkgs.length > 0) {
+                    activePackageId = userPkgs[0].id;
+                    setSelectedPackageId(activePackageId);
+                }
+
+                userPkgs.forEach(pkg => {
+                    const activated = isSystemActivated(pkg);
+                    const accepted = isModelAccepted(pkg);
+                    const isSelected = (pkg.id === activePackageId);
+                    const card = document.createElement("article");
+                    card.className = `system-card ${activated ? "activated-card" : "deactivated-card"}${isSelected ? " selected" : ""}`;
+                    card.setAttribute("role", "button");
+                    card.setAttribute("tabindex", "0");
+                    card.setAttribute("aria-disabled", accepted ? "false" : "true");
+                    card.setAttribute("data-package-id", pkg.id);
+                    card.setAttribute("aria-selected", isSelected ? "true" : "false");
+                    card.setAttribute("aria-label", `${pkg.name}, ${pkg.capacity}. Status: ${activated ? 'Active' : 'Deactivated'}. Model: ${accepted ? 'Accepted by installer' : 'Pending installer acceptance, unavailable'}`);
+
+                    card.innerHTML = `
                             <div>
                                 <div class="system-card-header">
                                     <div class="system-card-title-wrap">
                                         <h2 class="system-card-model">${pkg.name}</h2>
                                         <span class="system-card-capacity-pill">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/></svg>
                                             ${pkg.capacity}
                                         </span>
                                     </div>
+                                    <div class="system-card-statuses">
                                     <span class="system-card-status-badge ${activated ? 'badge-active' : 'badge-deactivated'}">
                                         <span class="badge-dot"></span>
                                         ${activated ? 'Active' : 'Deactivated'}
                                     </span>
+                                    <span class="system-card-status-badge ${accepted ? 'badge-active' : 'badge-model-pending'}" title="${accepted ? 'Installer accepted this Hello Solar model' : 'Waiting for an installer to accept this Hello Solar model'}">
+                                        <span class="badge-dot"></span>
+                                        ${accepted ? 'Accepted' : 'Pending'}
+                                    </span>
+                                    </div>
                                 </div>
 
                                 <div class="system-card-body">
@@ -990,7 +1664,7 @@
                                         </svg>
                                         <span>Account ID: <strong>${pkg.accountNo || 'HS-Pending'}</strong></span>
                                     </div>
-                                    ${!activated ? `
+                                    ${accepted && !activated ? `
                                     <div class="system-card-activation-note">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -1003,7 +1677,7 @@
 
                             <div class="system-card-footer">
                                 <span class="system-card-action-text">
-                                    ${activated ? 'View Live Details' : 'Complete Activation'}
+                                    ${!accepted ? 'Awaiting installer acceptance' : activated ? 'View Live Details' : 'Complete Activation'}
                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                         <polyline points="9 18 15 12 9 6"/>
                                     </svg>
@@ -1011,33 +1685,36 @@
                             </div>
                         `;
 
-                        function handleCardSelect() {
-                            lastTriggerElement = card;
-                            if (activated) {
-                                openSystemDetail(pkg);
-                            } else {
-                                openActivationModal(pkg);
-                            }
+                    function handleCardSelect() {
+                        if (!isModelAccepted(pkg)) return;
+                        lastTriggerElement = card;
+                        setSelectedPackageId(pkg.id);
+                        updateSelectedCardHighlight(pkg.id);
+                        if (activated) {
+                            openSystemDetail(pkg);
+                        } else {
+                            openActivationModal(pkg);
                         }
+                    }
 
-                        card.addEventListener("click", handleCardSelect);
-                        card.addEventListener("keydown", (e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                handleCardSelect();
-                            }
-                        });
-
-                        systemsGrid.appendChild(card);
+                    card.addEventListener("click", handleCardSelect);
+                    card.addEventListener("keydown", (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            handleCardSelect();
+                        }
                     });
 
-                    // Add Account Card in the grid
-                    const addCard = document.createElement("div");
-                    addCard.className = "add-account-card";
-                    addCard.setAttribute("role", "button");
-                    addCard.setAttribute("tabindex", "0");
-                    addCard.setAttribute("aria-label", "Link another solar account");
-                    addCard.innerHTML = `
+                    systemsGrid.appendChild(card);
+                });
+
+                // Add Account Card in the grid
+                const addCard = document.createElement("div");
+                addCard.className = "add-account-card";
+                addCard.setAttribute("role", "button");
+                addCard.setAttribute("tabindex", "0");
+                addCard.setAttribute("aria-label", "Link another solar account");
+                addCard.innerHTML = `
                         <div class="add-account-card-icon" aria-hidden="true">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="12" y1="5" x2="12" y2="19"/>
@@ -1050,225 +1727,249 @@
                         </div>
                     `;
 
-                    addCard.addEventListener("click", () => {
+                addCard.addEventListener("click", () => {
+                    lastTriggerElement = addCard;
+                    openAddAccountModalDialog();
+                });
+                addCard.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
                         lastTriggerElement = addCard;
                         openAddAccountModalDialog();
-                    });
-                    addCard.addEventListener("keydown", (e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            lastTriggerElement = addCard;
-                            openAddAccountModalDialog();
-                        }
-                    });
-
-                    systemsGrid.appendChild(addCard);
-                }
-
-                // --------------------------------------------------------------------------
-                // 7. SYSTEM DETAIL VIEW CONTROLLER
-                // --------------------------------------------------------------------------
-                const detailModelTitle = document.getElementById("detailModelTitle");
-                const detailCapacityPill = document.getElementById("detailCapacityPill");
-                const detailAccountMeta = document.getElementById("detailAccountMeta");
-                const paymentStatusDot = document.getElementById("paymentStatusDot");
-                const paymentStatusLabel = document.getElementById("paymentStatusLabel");
-                const savingsAmountDisplay = document.getElementById("savingsAmountDisplay");
-
-                function openSystemDetail(pkg) {
-                    if (!pkg) return;
-                    currentPackage = pkg;
-                    currentPackageGeneration++;
-
-                    previousScrollY = window.scrollY;
-
-                    // Switch view containers
-                    if (systemsOverviewView) systemsOverviewView.style.display = "none";
-                    if (systemDetailView) {
-                        const isMobile = window.innerWidth <= 768;
-                        systemDetailView.style.display = isMobile ? "flex" : "block";
-                        systemDetailView.classList.add("active");
-
-                        // Check mobile viewport for full-screen app experience
-                        if (isMobile) {
-                            systemDetailView.classList.add("mobile-fullscreen");
-                            document.body.classList.add("modal-open", "detail-view-open");
-                        } else {
-                            systemDetailView.classList.remove("mobile-fullscreen");
-                            document.body.classList.remove("modal-open", "detail-view-open");
-                        }
-
-                        const detailContent = systemDetailView.querySelector(".system-detail-content");
-                        if (detailContent) {
-                            detailContent.scrollTop = 0;
-                        }
-                    }
-
-                    // 1. Detail Header
-                    if (detailModelTitle) detailModelTitle.textContent = pkg.name;
-                    if (detailAccountMeta) {
-                        const loc = (pkg.location || "").trim();
-                        const acc = (pkg.accountNo || "").trim();
-                        if (loc && acc && !loc.includes(acc)) {
-                            detailAccountMeta.textContent = `${loc} · ${acc}`;
-                        } else {
-                            detailAccountMeta.textContent = loc || acc || "";
-                        }
-                    }
-                    if (detailCapacityPill) detailCapacityPill.textContent = pkg.capacity || "—";
-
-                    // 2. Payment Status Card (Only heading + gently pulsing dot and label)
-                    // Green: Paid | Orange: Due | Red: Unpaid
-                    if (paymentStatusDot && paymentStatusLabel) {
-                        const payData = pkg.payments || {};
-                        const status = (payData.status || "").toLowerCase();
-                        const standing = (payData.standing || "").toLowerCase();
-
-                        paymentStatusDot.className = "payment-status-indicator";
-
-                        if (standing === "good" || status === "paid") {
-                            paymentStatusDot.classList.add("status-paid");
-                            paymentStatusLabel.textContent = "Paid";
-                        } else if (standing === "due soon" || status === "due soon" || status === "due" || status === "upcoming") {
-                            paymentStatusDot.classList.add("status-due");
-                            paymentStatusLabel.textContent = "Due";
-                        } else if (status === "overdue" || status === "unpaid") {
-                            paymentStatusDot.classList.add("status-unpaid");
-                            paymentStatusLabel.textContent = "Unpaid";
-                        } else {
-                            paymentStatusDot.classList.add("status-due");
-                            paymentStatusLabel.textContent = "Due";
-                        }
-                    }
-
-                    // 3. Estimated Savings Card (Only heading + savings amount in currency, or "—")
-                    if (savingsAmountDisplay) {
-                        const savedAmt = (pkg.energy && pkg.energy.billSaved)
-                            || (pkg.estimatedSavings && pkg.estimatedSavings.amount);
-                        savingsAmountDisplay.textContent = savedAmt || "—";
-                    }
-
-                    // 4. Update Telemetry Base Values & Display
-                    if (pkg.telemetry) {
-                        baseSolar = pkg.telemetry.baseSolar || 3.48;
-                        baseHome = pkg.telemetry.baseHome || 1.85;
-                        baseBattery = pkg.telemetry.baseBattery || 1.15;
-                        currentBatterySoc = pkg.telemetry.batterySoc || 92;
-                    }
-
-                    updateTelemetryDisplay();
-
-                    // Synchronize portal active package ID
-                    if (window.HelloSolar && window.HelloSolar.setActivePackageId) {
-                        window.HelloSolar.setActivePackageId(pkg.id);
-                    }
-
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-
-                    if (backToSystemsBtn) {
-                        setTimeout(() => backToSystemsBtn.focus(), 100);
-                    }
-                }
-
-                function closeSystemDetail() {
-                    if (systemDetailView) {
-                        systemDetailView.style.display = "none";
-                        systemDetailView.classList.remove("active", "mobile-fullscreen");
-                    }
-                    document.body.classList.remove("modal-open", "detail-view-open");
-
-                    if (systemsOverviewView) {
-                        systemsOverviewView.style.display = "block";
-                    }
-
-                    window.scrollTo({ top: previousScrollY, behavior: "auto" });
-
-                    if (lastTriggerElement && typeof lastTriggerElement.focus === "function") {
-                        lastTriggerElement.focus();
-                    }
-                }
-
-                if (backToSystemsBtn) {
-                    backToSystemsBtn.addEventListener("click", closeSystemDetail);
-                }
-
-                window.addEventListener("resize", () => {
-                    if (systemDetailView && systemDetailView.classList.contains("active")) {
-                        const isMobile = window.innerWidth <= 768;
-                        systemDetailView.style.display = isMobile ? "flex" : "block";
-                        if (isMobile) {
-                            systemDetailView.classList.add("mobile-fullscreen");
-                            document.body.classList.add("modal-open", "detail-view-open");
-                        } else {
-                            systemDetailView.classList.remove("mobile-fullscreen");
-                            document.body.classList.remove("modal-open", "detail-view-open");
-                        }
                     }
                 });
 
-                // --------------------------------------------------------------------------
-                // 8. PER-SYSTEM INSTALLATION & ACTIVATION MODAL
-                // --------------------------------------------------------------------------
-                const activationModalBackdrop = document.getElementById("activationModalBackdrop");
-                const closeActivationModalBtn = document.getElementById("closeActivationModalBtn");
-                const closeActivationFooterBtn = document.getElementById("closeActivationFooterBtn");
-                const advanceMilestoneBtn = document.getElementById("advanceMilestoneBtn");
-                const activateSystemBtn = document.getElementById("activateSystemBtn");
-                const activationModalModelName = document.getElementById("activationModalModelName");
-                const activationModalAccountNo = document.getElementById("activationModalAccountNo");
-                const activationRequirementsNotice = document.getElementById("activationRequirementsNotice");
-                const activationStepsList = document.getElementById("activationStepsList");
+                systemsGrid.appendChild(addCard);
 
-                let targetActivationPackage = null;
-                let activeMilestones = [];
+                // Auto-open live details if specified in URL query or hash
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get("view") === "live" || window.location.hash === "#live") {
+                    const targetPkg = userPkgs.find(p => p.id === activePackageId) || userPkgs[0];
+                    if (targetPkg && isSystemActivated(targetPkg)) {
+                        openSystemDetail(targetPkg);
+                    }
+                }
+            }
 
-                function openActivationModal(pkg) {
-                    if (!pkg) return;
-                    targetActivationPackage = pkg;
-                    activeMilestones = getSystemMilestones(pkg);
+            // --------------------------------------------------------------------------
+            // 7. SYSTEM DETAIL VIEW CONTROLLER
+            // --------------------------------------------------------------------------
+            const detailModelTitle = document.getElementById("detailModelTitle");
+            const detailCapacityPill = document.getElementById("detailCapacityPill");
+            const detailAccountMeta = document.getElementById("detailAccountMeta");
+            const paymentStatusValue = document.getElementById("paymentStatusValue");
+            const systemStatusValue = document.getElementById("systemStatusValue");
+            const systemStatusLabel = document.getElementById("systemStatusLabel");
+            const paymentStatusLabel = document.getElementById("paymentStatusLabel");
+            function getPaymentSummary(payData = {}) {
+                if (payData.hasBills === false) return "Pending";
+                const status = String(payData.status || payData.standing || "").trim().toLowerCase();
+                const overdue = (payData.schedule || []).some(bill => /^(overdue|unpaid)$/i.test(bill.status));
+                if (overdue || ["unpaid", "overdue", "due", "due soon"].includes(status)) return "Unpaid";
+                if (["paid", "good"].includes(status)) return "Paid";
+                return "Pending";
+            }
 
-                    if (activationModalModelName) activationModalModelName.textContent = pkg.name;
-                    if (activationModalAccountNo) activationModalAccountNo.textContent = pkg.accountNo || pkg.location || "HS-Pending";
+            function openSystemDetail(pkg) {
+                if (!isModelAccepted(pkg)) return;
+                currentPackage = pkg;
+                currentPackageGeneration++;
 
-                    renderActivationMilestones();
+                previousScrollY = window.scrollY;
 
-                    if (activationModalBackdrop) {
-                        activationModalBackdrop.classList.add("open");
-                        activationModalBackdrop.setAttribute("aria-hidden", "false");
+                // Switch view containers
+                if (systemsOverviewView) systemsOverviewView.style.display = "none";
+                if (systemDetailView) {
+                    const isMobile = window.innerWidth <= 768;
+                    systemDetailView.style.display = isMobile ? "flex" : "block";
+                    systemDetailView.classList.add("active");
+
+                    // Mark detail view open on body for state binding
+                    document.body.classList.add("detail-view-open");
+
+                    // Check mobile viewport for full-screen app experience
+                    if (isMobile) {
+                        systemDetailView.classList.add("mobile-fullscreen");
                         document.body.classList.add("modal-open");
-                        if (closeActivationModalBtn) setTimeout(() => closeActivationModalBtn.focus(), 80);
+                    } else {
+                        systemDetailView.classList.remove("mobile-fullscreen");
+                        document.body.classList.remove("modal-open");
+                    }
+
+                    const detailContent = systemDetailView.querySelector(".system-detail-content");
+                    if (detailContent) {
+                        detailContent.scrollTop = 0;
                     }
                 }
 
-                function closeActivationModal() {
-                    if (activationModalBackdrop) {
-                        activationModalBackdrop.classList.remove("open");
-                        activationModalBackdrop.setAttribute("aria-hidden", "true");
-                    }
-                    document.body.classList.remove("modal-open");
-                    if (lastTriggerElement && typeof lastTriggerElement.focus === "function") {
-                        lastTriggerElement.focus();
+                // 1. Detail Header
+                if (detailModelTitle) detailModelTitle.textContent = pkg.name;
+                if (detailAccountMeta) {
+                    const loc = (pkg.location || "").trim();
+                    const acc = (pkg.accountNo || "").trim();
+                    if (loc && acc && !loc.includes(acc)) {
+                        detailAccountMeta.textContent = `${loc} · ${acc}`;
+                    } else {
+                        detailAccountMeta.textContent = loc || acc || "";
                     }
                 }
+                if (detailCapacityPill) detailCapacityPill.textContent = pkg.capacity || "—";
 
-                function renderActivationMilestones() {
-                    if (!activationStepsList) return;
-                    activationStepsList.innerHTML = "";
+                // Keep activation and billing independent, with text as well as color.
+                const active = isSystemActivated(pkg);
+                systemStatusLabel.textContent = active ? "Active" : "Deactivated";
+                systemStatusValue.dataset.status = active ? "paid" : "unpaid";
+                document.getElementById("detailSystemStatusCard").setAttribute("aria-label",
+                    `System Status: ${systemStatusLabel.textContent}. View system details`);
 
-                    let allCompleted = true;
-                    let firstIncompleteIdx = -1;
+                const paymentSummary = getPaymentSummary(pkg.payments);
+                paymentStatusLabel.textContent = paymentSummary;
+                paymentStatusValue.dataset.status = paymentSummary.toLowerCase();
+                document.getElementById("detailPaymentStatusCard").setAttribute("aria-label",
+                    `Payment Status: ${paymentSummary}. View payments`);
 
-                    activeMilestones.forEach((m, idx) => {
-                        const isDone = m.status === "Completed";
-                        if (!isDone && allCompleted) {
-                            allCompleted = false;
-                            firstIncompleteIdx = idx;
-                        }
+                // 4. Update Telemetry Base Values & Display
+                if (pkg.telemetry) {
+                    baseSolar = pkg.telemetry.baseSolar || 3.48;
+                    baseHome = pkg.telemetry.baseHome || 1.85;
+                    baseBattery = pkg.telemetry.baseBattery || 1.15;
+                    currentBatterySoc = pkg.telemetry.batterySoc || 92;
+                }
 
-                        const item = document.createElement("div");
-                        item.className = `activation-step-item ${isDone ? 'completed' : (idx === firstIncompleteIdx ? 'active' : '')}`;
+                updateTelemetryDisplay();
+                setTimeout(updateFlowConnectors, 40);
+                setTimeout(updateFlowConnectors, 250);
 
-                        item.innerHTML = `
+                // Synchronize portal active package ID
+                setSelectedPackageId(pkg.id);
+                updateSelectedCardHighlight(pkg.id);
+
+                window.scrollTo({ top: 0, behavior: "smooth" });
+
+                if (backToSystemsBtn) {
+                    setTimeout(() => backToSystemsBtn.focus(), 100);
+                }
+            }
+
+            function closeSystemDetail() {
+                if (systemDetailView) {
+                    systemDetailView.style.display = "none";
+                    systemDetailView.classList.remove("active", "mobile-fullscreen");
+                }
+                document.body.classList.remove("modal-open", "detail-view-open");
+
+                if (systemsOverviewView) {
+                    systemsOverviewView.style.display = "block";
+                }
+
+                window.scrollTo({ top: previousScrollY, behavior: "auto" });
+
+                if (lastTriggerElement && typeof lastTriggerElement.focus === "function") {
+                    lastTriggerElement.focus();
+                }
+            }
+
+            if (backToSystemsBtn) {
+                backToSystemsBtn.addEventListener("click", closeSystemDetail);
+            }
+
+            const detailPaymentStatusCard = document.getElementById("detailPaymentStatusCard");
+            const detailSystemStatusCard = document.getElementById("detailSystemStatusCard");
+
+            function syncSelectedPackageBeforeNav() {
+                if (currentPackage && currentPackage.id) {
+                    setSelectedPackageId(currentPackage.id);
+                }
+            }
+
+            if (detailPaymentStatusCard) {
+                detailPaymentStatusCard.addEventListener("click", syncSelectedPackageBeforeNav);
+            }
+            if (detailSystemStatusCard) {
+                detailSystemStatusCard.addEventListener("click", syncSelectedPackageBeforeNav);
+            }
+
+            window.addEventListener("resize", () => {
+                if (systemDetailView && systemDetailView.classList.contains("active")) {
+                    const isMobile = window.innerWidth <= 768;
+                    systemDetailView.style.display = isMobile ? "flex" : "block";
+                    document.body.classList.add("detail-view-open");
+                    if (isMobile) {
+                        systemDetailView.classList.add("mobile-fullscreen");
+                        document.body.classList.add("modal-open");
+                    } else {
+                        systemDetailView.classList.remove("mobile-fullscreen");
+                        document.body.classList.remove("modal-open");
+                    }
+                }
+            });
+
+            // --------------------------------------------------------------------------
+            // 8. PER-SYSTEM INSTALLATION & ACTIVATION MODAL
+            // --------------------------------------------------------------------------
+            const activationModalBackdrop = document.getElementById("activationModalBackdrop");
+            // Keep the fixed overlay outside potentially transformed app containers.
+            if (activationModalBackdrop) document.body.appendChild(activationModalBackdrop);
+            const closeActivationModalBtn = document.getElementById("closeActivationModalBtn");
+            const closeActivationFooterBtn = document.getElementById("closeActivationFooterBtn");
+            const advanceMilestoneBtn = document.getElementById("advanceMilestoneBtn");
+            const activateSystemBtn = document.getElementById("activateSystemBtn");
+            const activationModalModelName = document.getElementById("activationModalModelName");
+            const activationModalAccountNo = document.getElementById("activationModalAccountNo");
+            const activationRequirementsNotice = document.getElementById("activationRequirementsNotice");
+            const activationStepsList = document.getElementById("activationStepsList");
+
+            let targetActivationPackage = null;
+            let activeMilestones = [];
+
+            function openActivationModal(pkg) {
+                if (!isModelAccepted(pkg)) return;
+                if (!pkg) return;
+                targetActivationPackage = pkg;
+                activeMilestones = getSystemMilestones(pkg);
+
+                if (activationModalModelName) activationModalModelName.textContent = pkg.name;
+                if (activationModalAccountNo) activationModalAccountNo.textContent = pkg.accountNo || pkg.location || "HS-Pending";
+
+                renderActivationMilestones();
+
+                if (activationModalBackdrop) {
+                    activationModalBackdrop.classList.add("open");
+                    activationModalBackdrop.setAttribute("aria-hidden", "false");
+                    document.body.classList.add("modal-open");
+                    if (closeActivationModalBtn) setTimeout(() => closeActivationModalBtn.focus(), 80);
+                }
+            }
+
+            function closeActivationModal() {
+                if (activationModalBackdrop) {
+                    activationModalBackdrop.classList.remove("open");
+                    activationModalBackdrop.setAttribute("aria-hidden", "true");
+                }
+                document.body.classList.remove("modal-open");
+                if (lastTriggerElement && typeof lastTriggerElement.focus === "function") {
+                    lastTriggerElement.focus();
+                }
+            }
+
+            function renderActivationMilestones() {
+                if (!activationStepsList) return;
+                activationStepsList.innerHTML = "";
+
+                let allCompleted = true;
+                let firstIncompleteIdx = -1;
+
+                activeMilestones.forEach((m, idx) => {
+                    const isDone = m.status === "Completed";
+                    if (!isDone && allCompleted) {
+                        allCompleted = false;
+                        firstIncompleteIdx = idx;
+                    }
+
+                    const item = document.createElement("div");
+                    item.className = `activation-step-item ${isDone ? 'completed' : (idx === firstIncompleteIdx ? 'active' : '')}`;
+
+                    item.innerHTML = `
                             <div class="activation-step-indicator" aria-hidden="true">
                                 ${isDone ? '✓' : m.num}
                             </div>
@@ -1281,345 +1982,353 @@
                             </div>
                         `;
 
-                        activationStepsList.appendChild(item);
-                    });
+                    activationStepsList.appendChild(item);
+                });
 
-                    // Update Notice and Activate button state
-                    if (allCompleted) {
-                        if (activateSystemBtn) activateSystemBtn.disabled = false;
-                        if (advanceMilestoneBtn) advanceMilestoneBtn.style.display = "none";
-                        if (activationRequirementsNotice) {
-                            activationRequirementsNotice.innerHTML = `<strong>Requirements Met:</strong> All 5 installation milestones are completed. You may now commission and activate this solar system.`;
-                            activationRequirementsNotice.style.background = "#ecfdf5";
-                            activationRequirementsNotice.style.borderColor = "#a7f3d0";
-                            activationRequirementsNotice.style.color = "#065f46";
-                        }
-                    } else {
-                        if (activateSystemBtn) activateSystemBtn.disabled = true;
-                        if (advanceMilestoneBtn) {
-                            advanceMilestoneBtn.style.display = "inline-flex";
-                            const btnSpan = advanceMilestoneBtn.querySelector("span");
-                            if (btnSpan) btnSpan.textContent = `Complete Stage ${firstIncompleteIdx + 1} of 5`;
-                        }
-                        if (activationRequirementsNotice) {
-                            activationRequirementsNotice.innerHTML = `<strong>Activation Notice:</strong> System activation requires completion of all 5 installation milestones and engineering sign-off. Clicking a card does not activate automatically.`;
-                            activationRequirementsNotice.style.background = "#fffbeb";
-                            activationRequirementsNotice.style.borderColor = "#fed7aa";
-                            activationRequirementsNotice.style.color = "#9a3412";
-                        }
+                // Update Notice and Activate button state
+                if (allCompleted) {
+                    if (activateSystemBtn) activateSystemBtn.disabled = false;
+                    if (advanceMilestoneBtn) advanceMilestoneBtn.style.display = "none";
+                    if (activationRequirementsNotice) {
+                        activationRequirementsNotice.innerHTML = `<strong>Requirements Met:</strong> All 5 installation milestones are completed. You may now commission and activate this solar system.`;
+                        activationRequirementsNotice.style.background = "#ecfdf5";
+                        activationRequirementsNotice.style.borderColor = "#a7f3d0";
+                        activationRequirementsNotice.style.color = "#065f46";
+                    }
+                } else {
+                    if (activateSystemBtn) activateSystemBtn.disabled = true;
+                    if (advanceMilestoneBtn) {
+                        advanceMilestoneBtn.style.display = "inline-flex";
+                        const btnSpan = advanceMilestoneBtn.querySelector("span");
+                        if (btnSpan) btnSpan.textContent = `Complete Stage ${firstIncompleteIdx + 1} of 5`;
+                    }
+                    if (activationRequirementsNotice) {
+                        activationRequirementsNotice.innerHTML = `<strong>Activation Notice:</strong> System activation requires completion of all 5 installation milestones and engineering sign-off. Clicking a card does not activate automatically.`;
+                        activationRequirementsNotice.style.background = "#fffbeb";
+                        activationRequirementsNotice.style.borderColor = "#fed7aa";
+                        activationRequirementsNotice.style.color = "#9a3412";
                     }
                 }
+            }
 
-                // Advance incomplete milestone
-                if (advanceMilestoneBtn) {
-                    advanceMilestoneBtn.addEventListener("click", () => {
-                        if (!targetActivationPackage) return;
-                        const idx = activeMilestones.findIndex(m => m.status !== "Completed");
-                        if (idx !== -1) {
-                            const todayStr = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-                            activeMilestones[idx].status = "Completed";
-                            activeMilestones[idx].date = `Completed ${todayStr}`;
-                            saveSystemMilestones(targetActivationPackage.id, activeMilestones);
-                            renderActivationMilestones();
-
-                            if (window.HelloSolar && window.HelloSolar.toast) {
-                                window.HelloSolar.toast(
-                                    "Stage Progressed",
-                                    `Milestone ${idx + 1} marked completed for ${targetActivationPackage.name}.`
-                                );
-                            }
-                        }
-                    });
-                }
-
-                // Activate System Button
-                if (activateSystemBtn) {
-                    activateSystemBtn.addEventListener("click", () => {
-                        if (!targetActivationPackage) return;
-
-                        // Save activated state in localStorage
-                        setSystemActivated(targetActivationPackage.id, true);
-                        targetActivationPackage.status = "Online · Normal";
-
-                        // Provide default telemetry if previously null
-                        if (!targetActivationPackage.telemetry) {
-                            targetActivationPackage.telemetry = {
-                                baseSolar: 4.50,
-                                baseHome: 2.20,
-                                baseBattery: 0,
-                                pvStrings: "PV1: 340V · PV2: 338V",
-                                gridSync: "230.5 V · 60.0 Hz",
-                                inverterTemp: "39.2°C (Optimal)"
-                            };
-                        }
+            // Advance incomplete milestone
+            if (advanceMilestoneBtn) {
+                advanceMilestoneBtn.addEventListener("click", () => {
+                    if (!targetActivationPackage) return;
+                    const idx = activeMilestones.findIndex(m => m.status !== "Completed");
+                    if (idx !== -1) {
+                        const todayStr = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                        activeMilestones[idx].status = "Completed";
+                        activeMilestones[idx].date = `Completed ${todayStr}`;
+                        saveSystemMilestones(targetActivationPackage.id, activeMilestones);
+                        renderActivationMilestones();
 
                         if (window.HelloSolar && window.HelloSolar.toast) {
                             window.HelloSolar.toast(
-                                "System Activated!",
-                                `${targetActivationPackage.name} is now energized and generating solar power.`
+                                "Stage Progressed",
+                                `Milestone ${idx + 1} marked completed for ${targetActivationPackage.name}.`
                             );
                         }
-
-                        closeActivationModal();
-                        renderSystemsGrid();
-                        openSystemDetail(targetActivationPackage);
-                    });
-                }
-
-                if (closeActivationModalBtn) closeActivationModalBtn.addEventListener("click", closeActivationModal);
-                if (closeActivationFooterBtn) closeActivationFooterBtn.addEventListener("click", closeActivationModal);
-
-                if (activationModalBackdrop) {
-                    activationModalBackdrop.addEventListener("click", (e) => {
-                        if (e.target === activationModalBackdrop) closeActivationModal();
-                    });
-                }
-
-                // --------------------------------------------------------------------------
-                // 9. IN-PAGE SUPPORT MODAL (PRE-ASSOCIATED WITH SELECTED SYSTEM)
-                // --------------------------------------------------------------------------
-                const openSystemSupportBtn = document.getElementById("openSystemSupportBtn");
-                const systemSupportModalBackdrop = document.getElementById("systemSupportModalBackdrop");
-                const closeSupportModalBtn = document.getElementById("closeSupportModalBtn");
-                const cancelSupportModalBtn = document.getElementById("cancelSupportModalBtn");
-                const systemSupportForm = document.getElementById("systemSupportForm");
-                const supportModalSystemName = document.getElementById("supportModalSystemName");
-                const supportModalAccountNo = document.getElementById("supportModalAccountNo");
-                const supportModalSubject = document.getElementById("supportModalSubject");
-
-                function openSystemSupportModal() {
-                    const pkg = currentPackage || getUserPackages()[0];
-                    if (!pkg) return;
-
-                    lastTriggerElement = openSystemSupportBtn;
-
-                    if (supportModalSystemName) supportModalSystemName.textContent = pkg.name;
-                    if (supportModalAccountNo) supportModalAccountNo.textContent = pkg.accountNo || pkg.location || "HS-Pending";
-
-                    if (systemSupportModalBackdrop) {
-                        systemSupportModalBackdrop.classList.add("open");
-                        systemSupportModalBackdrop.setAttribute("aria-hidden", "false");
-                        document.body.classList.add("modal-open");
-                        if (supportModalSubject) {
-                            setTimeout(() => supportModalSubject.focus(), 100);
-                        }
                     }
-                }
+                });
+            }
 
-                function closeSystemSupportModal() {
-                    if (systemSupportModalBackdrop) {
-                        systemSupportModalBackdrop.classList.remove("open");
-                        systemSupportModalBackdrop.setAttribute("aria-hidden", "true");
+            // Activate System Button
+            if (activateSystemBtn) {
+                activateSystemBtn.addEventListener("click", () => {
+                    if (!targetActivationPackage) return;
+
+                    // Save activated state in localStorage
+                    setSystemActivated(targetActivationPackage.id, true);
+                    targetActivationPackage.status = "Online · Normal";
+
+                    // Provide default telemetry if previously null
+                    if (!targetActivationPackage.telemetry) {
+                        targetActivationPackage.telemetry = {
+                            baseSolar: 4.50,
+                            baseHome: 2.20,
+                            baseBattery: 0,
+                            pvStrings: "PV1: 340V · PV2: 338V",
+                            gridSync: "230.5 V · 60.0 Hz",
+                            inverterTemp: "39.2°C (Optimal)"
+                        };
                     }
-                    document.body.classList.remove("modal-open");
-                    if (openSystemSupportBtn && typeof openSystemSupportBtn.focus === "function") {
-                        openSystemSupportBtn.focus();
+
+                    if (window.HelloSolar && window.HelloSolar.toast) {
+                        window.HelloSolar.toast(
+                            "System Activated!",
+                            `${targetActivationPackage.name} is now energized and generating solar power.`
+                        );
                     }
-                }
 
-                if (openSystemSupportBtn) {
-                    openSystemSupportBtn.addEventListener("click", openSystemSupportModal);
-                }
+                    closeActivationModal();
+                    renderSystemsGrid();
+                    openSystemDetail(targetActivationPackage);
+                });
+            }
 
-                if (closeSupportModalBtn) closeSupportModalBtn.addEventListener("click", closeSystemSupportModal);
-                if (cancelSupportModalBtn) cancelSupportModalBtn.addEventListener("click", closeSystemSupportModal);
+            if (closeActivationModalBtn) closeActivationModalBtn.addEventListener("click", closeActivationModal);
+            if (closeActivationFooterBtn) closeActivationFooterBtn.addEventListener("click", closeActivationModal);
+
+            if (activationModalBackdrop) {
+                activationModalBackdrop.addEventListener("click", (e) => {
+                    if (e.target === activationModalBackdrop) closeActivationModal();
+                });
+            }
+
+            // --------------------------------------------------------------------------
+            // 9. IN-PAGE SUPPORT MODAL (PRE-ASSOCIATED WITH SELECTED SYSTEM)
+            // --------------------------------------------------------------------------
+            const openSystemSupportBtn = document.getElementById("openSystemSupportBtn");
+            const systemSupportModalBackdrop = document.getElementById("systemSupportModalBackdrop");
+            const closeSupportModalBtn = document.getElementById("closeSupportModalBtn");
+            const cancelSupportModalBtn = document.getElementById("cancelSupportModalBtn");
+            const systemSupportForm = document.getElementById("systemSupportForm");
+            const supportModalSystemName = document.getElementById("supportModalSystemName");
+            const supportModalAccountNo = document.getElementById("supportModalAccountNo");
+            const supportModalSubject = document.getElementById("supportModalSubject");
+
+            function openSystemSupportModal() {
+                const pkg = currentPackage || getUserPackages()[0];
+                if (!pkg) return;
+
+                lastTriggerElement = openSystemSupportBtn;
+
+                if (supportModalSystemName) supportModalSystemName.textContent = pkg.name;
+                if (supportModalAccountNo) supportModalAccountNo.textContent = pkg.accountNo || pkg.location || "HS-Pending";
 
                 if (systemSupportModalBackdrop) {
-                    systemSupportModalBackdrop.addEventListener("click", (e) => {
-                        if (e.target === systemSupportModalBackdrop) closeSystemSupportModal();
-                    });
-                }
-
-                if (systemSupportForm) {
-                    systemSupportForm.addEventListener("submit", (e) => {
-                        e.preventDefault();
-                        const pkg = currentPackage || getUserPackages()[0];
-                        const subject = supportModalSubject ? supportModalSubject.value.trim() : "System Inquiry";
-
-                        closeSystemSupportModal();
-                        if (systemSupportForm) systemSupportForm.reset();
-
-                        if (window.HelloSolar && window.HelloSolar.toast) {
-                            window.HelloSolar.toast(
-                                "Support Request Sent",
-                                `Ticket logged for ${pkg.name} (${pkg.accountNo || 'HS-Account'}): "${subject}". Our team will respond shortly.`
-                            );
-                        }
-                    });
-                }
-
-                // --------------------------------------------------------------------------
-                // 10. ADD ACCOUNT MODAL CONTROLLER
-                // --------------------------------------------------------------------------
-                const openAddAccountOverviewBtn = document.getElementById("openAddAccountOverviewBtn");
-                const addAccountModalBackdrop = document.getElementById("addAccountModalBackdrop");
-                const closeAddAccountModal = document.getElementById("closeAddAccountModal");
-                const cancelAddAccountBtn = document.getElementById("cancelAddAccountBtn");
-                const submitAddAccountBtn = document.getElementById("submitAddAccountBtn");
-                const serviceAccountIdInput = document.getElementById("serviceAccountIdInput");
-
-                function openAddAccountModalDialog() {
-                    if (addAccountModalBackdrop) {
-                        addAccountModalBackdrop.classList.add("open");
-                        addAccountModalBackdrop.setAttribute("aria-hidden", "false");
-                        document.body.classList.add("modal-open");
-                        if (serviceAccountIdInput) {
-                            setTimeout(() => serviceAccountIdInput.focus(), 100);
-                        }
+                    systemSupportModalBackdrop.classList.add("open");
+                    systemSupportModalBackdrop.setAttribute("aria-hidden", "false");
+                    document.body.classList.add("modal-open");
+                    if (supportModalSubject) {
+                        setTimeout(() => supportModalSubject.focus(), 100);
                     }
                 }
+            }
 
-                function closeAddAccountModalDialog() {
-                    if (addAccountModalBackdrop) {
-                        addAccountModalBackdrop.classList.remove("open");
-                        addAccountModalBackdrop.setAttribute("aria-hidden", "true");
-                    }
-                    document.body.classList.remove("modal-open");
-                    if (serviceAccountIdInput) serviceAccountIdInput.value = "";
-                    if (lastTriggerElement && typeof lastTriggerElement.focus === "function") {
-                        lastTriggerElement.focus();
-                    }
+            function closeSystemSupportModal() {
+                if (systemSupportModalBackdrop) {
+                    systemSupportModalBackdrop.classList.remove("open");
+                    systemSupportModalBackdrop.setAttribute("aria-hidden", "true");
                 }
-
-                if (openAddAccountOverviewBtn) {
-                    openAddAccountOverviewBtn.addEventListener("click", (e) => {
-                        lastTriggerElement = openAddAccountOverviewBtn;
-                        openAddAccountModalDialog();
-                    });
+                document.body.classList.remove("modal-open");
+                if (openSystemSupportBtn && typeof openSystemSupportBtn.focus === "function") {
+                    openSystemSupportBtn.focus();
                 }
+            }
 
-                if (closeAddAccountModal) closeAddAccountModal.addEventListener("click", closeAddAccountModalDialog);
-                if (cancelAddAccountBtn) cancelAddAccountBtn.addEventListener("click", closeAddAccountModalDialog);
+            if (openSystemSupportBtn) {
+                openSystemSupportBtn.addEventListener("click", openSystemSupportModal);
+            }
 
-                if (addAccountModalBackdrop) {
-                    addAccountModalBackdrop.addEventListener("click", (e) => {
-                        if (e.target === addAccountModalBackdrop) closeAddAccountModalDialog();
-                    });
-                }
+            if (closeSupportModalBtn) closeSupportModalBtn.addEventListener("click", closeSystemSupportModal);
+            if (cancelSupportModalBtn) cancelSupportModalBtn.addEventListener("click", closeSystemSupportModal);
 
-                if (submitAddAccountBtn) {
-                    submitAddAccountBtn.addEventListener("click", () => {
-                        const val = serviceAccountIdInput ? serviceAccountIdInput.value.trim() : "";
-                        if (!val) {
-                            if (serviceAccountIdInput) serviceAccountIdInput.focus();
-                            return;
-                        }
+            if (systemSupportModalBackdrop) {
+                systemSupportModalBackdrop.addEventListener("click", (e) => {
+                    if (e.target === systemSupportModalBackdrop) closeSystemSupportModal();
+                });
+            }
 
-                        // Create linked account object
-                        const cleanId = `pkg-user-${Date.now().toString().slice(-4)}`;
-                        const newSystem = {
-                            id: cleanId,
-                            name: `Solar Unit (${val})`,
-                            shortLabel: `Solar Unit — 5.0 kW`,
-                            capacity: "5.0 kW",
-                            location: `Service Account · ${val}`,
-                            accountNo: val,
-                            status: "Deactivated",
-                            isCustomAdded: true,
-                            telemetry: null,
-                            payments: { status: "Due Soon", standing: "Due Soon" },
-                            energy: { billSaved: "—" },
-                            install: {
-                                completionPct: 20,
-                                milestones: JSON.parse(JSON.stringify(DEFAULT_5_MILESTONES))
-                            }
-                        };
+            if (systemSupportForm) {
+                systemSupportForm.addEventListener("submit", (e) => {
+                    e.preventDefault();
+                    const pkg = currentPackage || getUserPackages()[0];
+                    const subject = supportModalSubject ? supportModalSubject.value.trim() : "System Inquiry";
 
-                        saveUserLinkedAccount(newSystem);
-                        closeAddAccountModalDialog();
-                        renderSystemsGrid();
+                    closeSystemSupportModal();
+                    if (systemSupportForm) systemSupportForm.reset();
 
-                        if (window.HelloSolar && window.HelloSolar.toast) {
-                            window.HelloSolar.toast(
-                                "Account Linked",
-                                `Account ${val} added to your solar systems. Complete installation activation to energize.`
-                            );
-                        }
-                    });
-                }
-
-                // Global Escape Key Listener
-                document.addEventListener("keydown", (e) => {
-                    if (e.key === "Escape") {
-                        if (systemSupportModalBackdrop && systemSupportModalBackdrop.classList.contains("open")) {
-                            closeSystemSupportModal();
-                        } else if (activationModalBackdrop && activationModalBackdrop.classList.contains("open")) {
-                            closeActivationModal();
-                        } else if (addAccountModalBackdrop && addAccountModalBackdrop.classList.contains("open")) {
-                            closeAddAccountModalDialog();
-                        } else if (systemDetailView && systemDetailView.classList.contains("mobile-fullscreen")) {
-                            closeSystemDetail();
-                        }
+                    if (window.HelloSolar && window.HelloSolar.toast) {
+                        window.HelloSolar.toast(
+                            "Support Request Sent",
+                            `Ticket logged for ${pkg.name} (${pkg.accountNo || 'HS-Account'}): "${subject}". Our team will respond shortly.`
+                        );
                     }
                 });
+            }
 
-                // --------------------------------------------------------------------------
-                // 11. TIMING & INITIALIZATION
-                // --------------------------------------------------------------------------
-                // Initialize Overview Grid
-                renderSystemsGrid();
+            // --------------------------------------------------------------------------
+            // 10. ADD ACCOUNT MODAL CONTROLLER
+            // --------------------------------------------------------------------------
+            const openAddAccountOverviewBtn = document.getElementById("openAddAccountOverviewBtn");
+            const addAccountModalBackdrop = document.getElementById("addAccountModalBackdrop");
+            const closeAddAccountModal = document.getElementById("closeAddAccountModal");
+            const cancelAddAccountBtn = document.getElementById("cancelAddAccountBtn");
+            const submitAddAccountBtn = document.getElementById("submitAddAccountBtn");
+            const serviceAccountIdInput = document.getElementById("serviceAccountIdInput");
 
-                // Periodic telemetry jitter (every 4s)
-                if (telemetryIntervalId) clearInterval(telemetryIntervalId);
-                telemetryIntervalId = setInterval(updateTelemetryDisplay, 4000);
-
-                // Periodic seconds ticker
-                if (tickerIntervalId) clearInterval(tickerIntervalId);
-                tickerIntervalId = setInterval(() => {
-                    secondsSinceSync++;
-                    if (telemetryTimestampEl) {
-                        telemetryTimestampEl.textContent = `Sync: ${secondsSinceSync}s ago`;
+            function openAddAccountModalDialog() {
+                if (addAccountModalBackdrop) {
+                    addAccountModalBackdrop.classList.add("open");
+                    addAccountModalBackdrop.setAttribute("aria-hidden", "false");
+                    document.body.classList.add("modal-open");
+                    if (serviceAccountIdInput) {
+                        setTimeout(() => serviceAccountIdInput.focus(), 100);
                     }
-                }, 1000);
+                }
+            }
 
-                // Manual Sync Button Handler
-                if (telemetrySyncBtn) {
-                    telemetrySyncBtn.addEventListener("click", () => {
-                        telemetrySyncBtn.classList.add("syncing");
-                        if (syncBtnLabel) syncBtnLabel.textContent = "Syncing...";
+            function closeAddAccountModalDialog() {
+                if (addAccountModalBackdrop) {
+                    addAccountModalBackdrop.classList.remove("open");
+                    addAccountModalBackdrop.setAttribute("aria-hidden", "true");
+                }
+                document.body.classList.remove("modal-open");
+                if (serviceAccountIdInput) serviceAccountIdInput.value = "";
+                if (lastTriggerElement && typeof lastTriggerElement.focus === "function") {
+                    lastTriggerElement.focus();
+                }
+            }
+
+            if (openAddAccountOverviewBtn) {
+                openAddAccountOverviewBtn.addEventListener("click", (e) => {
+                    lastTriggerElement = openAddAccountOverviewBtn;
+                    openAddAccountModalDialog();
+                });
+            }
+
+            if (closeAddAccountModal) closeAddAccountModal.addEventListener("click", closeAddAccountModalDialog);
+            if (cancelAddAccountBtn) cancelAddAccountBtn.addEventListener("click", closeAddAccountModalDialog);
+
+            if (addAccountModalBackdrop) {
+                addAccountModalBackdrop.addEventListener("click", (e) => {
+                    if (e.target === addAccountModalBackdrop) closeAddAccountModalDialog();
+                });
+            }
+
+            if (submitAddAccountBtn) {
+                submitAddAccountBtn.addEventListener("click", () => {
+                    const val = serviceAccountIdInput ? serviceAccountIdInput.value.trim() : "";
+                    if (!val) {
+                        if (serviceAccountIdInput) serviceAccountIdInput.focus();
+                        return;
+                    }
+
+                    // Create linked account object
+                    const cleanId = `pkg-user-${Date.now().toString().slice(-4)}`;
+                    const newSystem = {
+                        id: cleanId,
+                        name: `Solar Unit (${val})`,
+                        shortLabel: `Solar Unit — 5.0 kW`,
+                        capacity: "5.0 kW",
+                        location: `Service Account · ${val}`,
+                        accountNo: val,
+                        status: "Deactivated",
+                        installerAcceptanceStatus: "pending",
+                        isCustomAdded: true,
+                        telemetry: null,
+                        payments: { status: "Due Soon", standing: "Due Soon" },
+                        energy: { billSaved: "—" },
+                        install: {
+                            completionPct: 20,
+                            milestones: JSON.parse(JSON.stringify(DEFAULT_5_MILESTONES))
+                        }
+                    };
+
+                    saveUserLinkedAccount(newSystem);
+                    closeAddAccountModalDialog();
+                    renderSystemsGrid();
+
+                    if (window.HelloSolar && window.HelloSolar.toast) {
+                        window.HelloSolar.toast(
+                            "Account Linked",
+                            `Account ${val} added to your solar systems. Complete installation activation to energize.`
+                        );
+                    }
+                });
+            }
+
+            // Global Escape Key Listener
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") {
+                    if (systemSupportModalBackdrop && systemSupportModalBackdrop.classList.contains("open")) {
+                        closeSystemSupportModal();
+                    } else if (activationModalBackdrop && activationModalBackdrop.classList.contains("open")) {
+                        closeActivationModal();
+                    } else if (addAccountModalBackdrop && addAccountModalBackdrop.classList.contains("open")) {
+                        closeAddAccountModalDialog();
+                    } else if (systemDetailView && systemDetailView.classList.contains("mobile-fullscreen")) {
+                        closeSystemDetail();
+                    }
+                }
+            });
+
+            // --------------------------------------------------------------------------
+            // 11. TIMING & INITIALIZATION
+            // --------------------------------------------------------------------------
+            // Initialize Overview Grid
+            renderSystemsGrid();
+
+            // Periodic telemetry jitter (every 4s)
+            if (telemetryIntervalId) clearInterval(telemetryIntervalId);
+            telemetryIntervalId = setInterval(updateTelemetryDisplay, 4000);
+
+            // Periodic seconds ticker
+            if (tickerIntervalId) clearInterval(tickerIntervalId);
+            tickerIntervalId = setInterval(() => {
+                secondsSinceSync++;
+                if (telemetryTimestampEl) {
+                    telemetryTimestampEl.textContent = `Sync: ${secondsSinceSync}s ago`;
+                }
+            }, 1000);
+
+            // Manual Sync Button Handler
+            if (telemetrySyncBtn) {
+                telemetrySyncBtn.addEventListener("click", () => {
+                    telemetrySyncBtn.classList.add("syncing");
+                    if (syncBtnLabel) syncBtnLabel.textContent = "Syncing...";
+
+                    setTimeout(() => {
+                        updateTelemetryDisplay();
+                        telemetrySyncBtn.classList.remove("syncing");
+                        if (syncBtnLabel) syncBtnLabel.textContent = "Synced";
+
+                        if (window.HelloSolar && window.HelloSolar.toast) {
+                            window.HelloSolar.toast(
+                                "Live Telemetry Synchronized",
+                                `Inverter telemetry verified for ${currentPackage ? currentPackage.name : "system"}.`
+                            );
+                        }
 
                         setTimeout(() => {
-                            updateTelemetryDisplay();
-                            telemetrySyncBtn.classList.remove("syncing");
-                            if (syncBtnLabel) syncBtnLabel.textContent = "Synced";
+                            if (syncBtnLabel) syncBtnLabel.textContent = "Sync";
+                        }, 1800);
+                    }, 600);
+                });
+            }
 
-                            if (window.HelloSolar && window.HelloSolar.toast) {
-                                window.HelloSolar.toast(
-                                    "Live Telemetry Synchronized",
-                                    `Inverter telemetry verified for ${currentPackage ? currentPackage.name : "system"}.`
-                                );
-                            }
-
-                            setTimeout(() => {
-                                if (syncBtnLabel) syncBtnLabel.textContent = "Sync";
-                            }, 1800);
-                        }, 600);
-                    });
+            // Listen for async JSON dataset load
+            window.addEventListener("helloSolarDataLoaded", (e) => {
+                if (e.detail && Array.isArray(e.detail.packages)) {
+                    packages = e.detail.packages;
+                    renderSystemsGrid();
                 }
+            });
 
-                // Listen for async JSON dataset load
-                window.addEventListener("helloSolarDataLoaded", (e) => {
-                    if (e.detail && Array.isArray(e.detail.packages)) {
-                        packages = e.detail.packages;
-                        renderSystemsGrid();
-                    }
-                });
+            // Listen for package changes triggered from elsewhere
+            window.addEventListener("helloSolarPackageChanged", (e) => {
+                if (e.detail && e.detail.packageId) {
+                    updateSelectedCardHighlight(e.detail.packageId);
+                }
+            });
 
-                // Handle window resize for mobile-fullscreen class on detail view
-                window.addEventListener("resize", () => {
-                    if (systemDetailView && systemDetailView.classList.contains("active")) {
-                        if (window.innerWidth <= 768) {
-                            systemDetailView.classList.add("mobile-fullscreen");
-                            document.body.classList.add("modal-open", "detail-view-open");
-                        } else {
-                            systemDetailView.classList.remove("mobile-fullscreen");
-                            document.body.classList.remove("modal-open", "detail-view-open");
-                        }
+            // Handle window resize for mobile-fullscreen class on detail view
+            window.addEventListener("resize", () => {
+                if (systemDetailView && systemDetailView.classList.contains("active")) {
+                    if (window.innerWidth <= 768) {
+                        systemDetailView.classList.add("mobile-fullscreen");
+                        document.body.classList.add("modal-open", "detail-view-open");
+                    } else {
+                        systemDetailView.classList.remove("mobile-fullscreen");
+                        document.body.classList.remove("modal-open", "detail-view-open");
                     }
-                });
-            })();
-        </script>
-        <script src="assets/js/notifications.js"></script>
+                }
+            });
+        })();
+    </script>
+    <script src="assets/js/notifications.js"></script>
 </body>
 
 </html>

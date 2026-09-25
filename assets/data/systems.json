@@ -1,0 +1,62 @@
+[
+  {
+    "id": "pkg-home-5k4",
+    "installerAcceptanceStatus": "accepted",
+    "accountNo": "HS-88219",
+    "name": "Home Primary",
+    "shortLabel": "Home — 5.4 kW",
+    "capacityKw": 5.4,
+    "capacity": "5.4 kW",
+    "location": "Quezon City · HS-88219",
+    "status": "Online · Normal",
+    "systemType": "Residential Hybrid",
+    "hasBattery": true,
+    "installationDate": "2025-03-15",
+    "notice": "Primary residential hybrid solar system"
+  },
+  {
+    "id": "pkg-villa-10k8",
+    "installerAcceptanceStatus": "accepted",
+    "accountNo": "HS-99402",
+    "name": "Tagaytay Villa",
+    "shortLabel": "Villa — 10.8 kW",
+    "capacityKw": 10.8,
+    "capacity": "10.8 kW",
+    "location": "Tagaytay, Cavite · HS-99402",
+    "status": "Online · Normal",
+    "systemType": "Residential Hybrid",
+    "hasBattery": true,
+    "installationDate": "2026-01-20",
+    "notice": "High-capacity residential estate with dual battery storage"
+  },
+  {
+    "id": "pkg-farm-3k6",
+    "installerAcceptanceStatus": "accepted",
+    "accountNo": "HS-77310",
+    "name": "Batangas Farmhouse",
+    "shortLabel": "Farmhouse — 3.6 kW",
+    "capacityKw": 3.6,
+    "capacity": "3.6 kW",
+    "location": "Lipa, Batangas · HS-77310",
+    "status": "Online · Normal",
+    "systemType": "Residential Hybrid",
+    "hasBattery": true,
+    "installationDate": "2026-07-15",
+    "notice": "Provincial farmhouse solar with critical load battery backup"
+  },
+  {
+    "id": "pkg-biz-6k0",
+    "installerAcceptanceStatus": "pending",
+    "accountNo": "HS-10492",
+    "name": "Commercial Unit B",
+    "shortLabel": "Business — 6.0 kW",
+    "capacityKw": 6.0,
+    "capacity": "6.0 kW",
+    "location": "Ortigas, Pasig · HS-10492",
+    "status": "Setup Pending",
+    "systemType": "Commercial Grid-Tied (Battery Not Included)",
+    "hasBattery": false,
+    "installationDate": "2026-10-05",
+    "notice": "Direct daytime solar export architecture pending final commissioning"
+  }
+]

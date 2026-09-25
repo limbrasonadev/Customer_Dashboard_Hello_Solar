@@ -13,6 +13,7 @@
   "packages": [
     {
       "id": "pkg-home-5k4",
+      "installerAcceptanceStatus": "accepted",
       "name": "Home Primary",
       "shortLabel": "Home — 5.4 kW",
       "capacity": "5.4 kW",
@@ -228,6 +229,7 @@
     },
     {
       "id": "pkg-villa-10k8",
+      "installerAcceptanceStatus": "accepted",
       "name": "Tagaytay Villa",
       "shortLabel": "Villa — 10.8 kW",
       "capacity": "10.8 kW",
@@ -427,6 +429,7 @@
     },
     {
       "id": "pkg-farm-3k6",
+      "installerAcceptanceStatus": "accepted",
       "name": "Batangas Farmhouse",
       "shortLabel": "Farmhouse — 3.6 kW",
       "capacity": "3.6 kW",
@@ -617,6 +620,7 @@
     },
     {
       "id": "pkg-biz-6k0",
+      "installerAcceptanceStatus": "pending",
       "name": "Business Annex",
       "shortLabel": "Business — 6.0 kW",
       "capacity": "6.0 kW",

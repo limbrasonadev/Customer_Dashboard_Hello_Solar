@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Hello Solar — Submit customer support requests, report inverter issues, and access installer dispatch.">
-    <title>Hello Solar — Support</title>
+        content="Hello Solar — Report a problem, contact your support team, and check your service requests.">
+    <title>Hello Solar — Help &amp; Support</title>
 
     <!-- Immediate Authentication Guard -->
     <script>
@@ -25,218 +25,1587 @@
     <link rel="icon" type="image/png" href="assets/images/logofortab.png">
 
     <!-- Design System CSS -->
-    <link rel="stylesheet" href="assets/css/portal.css">
+    <link rel="stylesheet" href="assets/css/dashboard-theme.css">
 
     <style>
-        .support-layout {
-            display: grid;
-            grid-template-columns: 1.8fr 1fr;
-            gap: 20px;
-        }
+        /* Page layout stays below the shared dashboard theme in the cascade. */
+        @layer dashboard-legacy {
 
-        .routing-banner {
-            background: #fff8ec;
-            border: 1px solid #fed7aa;
-            border-radius: var(--radius-md);
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-        }
+            /* Layout and containment */
+            .main {
+                min-height: auto;
+            }
 
-        .routing-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+            .content {
+                flex: 0 0 auto;
+                padding: 28px 32px 0;
+                max-width: 1360px;
+                width: 100%;
+                margin: 0 auto;
+                box-sizing: border-box;
+            }
 
-        .routing-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-sm);
-            background: #ffedd5;
-            color: var(--solar-orange-dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
+            .page-intro {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 16px;
+                margin-bottom: 20px;
+            }
 
-        .routing-icon svg {
-            width: 20px;
-            height: 20px;
-            stroke-width: 2;
-        }
+            .page-intro .cta-group {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
 
-        .routing-text-title {
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--navy);
-        }
+            .page-intro .cta-group .btn-secondary,
+            .page-intro .cta-group .btn-outline {
+                background: var(--white);
+                border: 1px solid var(--gray-300);
+                color: var(--gray-700);
+                font-weight: 600;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+                transition: all var(--transition-fast);
+            }
 
-        .routing-text-sub {
-            font-size: 12.5px;
-            color: #9a3412;
-        }
+            .page-intro .cta-group .btn-secondary:hover,
+            .page-intro .cta-group .btn-outline:hover {
+                background: var(--gray-50);
+                border-color: var(--gray-400);
+                color: var(--navy);
+            }
 
-        /* Form styling */
-        .support-card {
-            padding: 28px 26px;
-        }
+            /* --------------------------------------------------------------------------
+           1. ESSENTIAL SUMMARY: 3 EQUAL-SIZED BALANCED SUMMARY CARDS
+           -------------------------------------------------------------------------- */
+            .support-summaries-grid {
+                display: grid;
+                grid-template-columns: 1.3fr 1fr 1fr;
+                gap: 16px;
+                margin-bottom: 24px;
+            }
 
-        .support-card h2 {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--navy);
-            margin-bottom: 6px;
-        }
+            .support-summary-card {
+                background: var(--white);
+                border: 1px solid var(--gray-200);
+                border-radius: var(--radius-md);
+                padding: 18px 20px;
+                box-shadow: var(--shadow-xs);
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                min-height: 146px;
+                position: relative;
+                overflow: hidden;
+                transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+            }
 
-        .support-card p.subtitle {
-            font-size: 13.5px;
-            color: var(--gray-500);
-            margin-bottom: 22px;
-        }
+            .support-summary-card:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-sm);
+                border-color: #cbd5e1;
+            }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
+            .support-summary-card.highlight-card {
+                background: #fffdfa;
+                border-color: #fed7aa;
+                border-left: 4px solid var(--solar-orange);
+                box-shadow: 0 2px 8px rgba(244, 119, 24, 0.06);
+            }
 
-        .ticket-success-alert {
-            display: none;
-            background: var(--green-bg);
-            border: 1px solid var(--green-border);
-            border-radius: var(--radius-md);
-            padding: 18px 20px;
-            margin-top: 20px;
-            color: #065f46;
-        }
+            .support-summary-top {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                margin-bottom: 8px;
+            }
 
-        .ticket-success-alert.visible {
-            display: block;
-        }
+            .support-summary-label {
+                font-size: 11.5px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--gray-500);
+            }
 
-        .ticket-success-title {
-            font-size: 15px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 4px;
-        }
+            .support-summary-icon {
+                width: 34px;
+                height: 34px;
+                border-radius: 8px;
+                background: #fff7ed;
+                color: var(--solar-orange-dark);
+                border: 1px solid #fed7aa;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
 
-        .ticket-success-msg {
-            font-size: 13px;
-            line-height: 1.4;
-        }
+            .support-summary-icon svg {
+                width: 17px;
+                height: 17px;
+            }
 
-        /* FAQ Accordion */
-        .faq-card {
-            padding: 24px;
-        }
+            .support-summary-val {
+                font-size: 22px;
+                font-weight: 800;
+                color: var(--navy);
+                letter-spacing: -0.02em;
+                line-height: 1.2;
+                margin-bottom: 4px;
+            }
 
-        .faq-item {
-            border-bottom: 1px solid var(--gray-100);
-            padding: 14px 0;
-        }
+            .support-summary-meta {
+                font-size: 12.5px;
+                color: var(--gray-600);
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                flex-wrap: wrap;
+            }
 
-        .faq-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
+            .contact-lead-role {
+                font-size: 11.5px;
+                color: var(--solar-orange-dark);
+                background: #fff7ed;
+                padding: 2px 8px;
+                border-radius: 9999px;
+                border: 1px solid #fed7aa;
+                font-weight: 700;
+                display: inline-block;
+            }
 
-        .faq-question {
-            width: 100%;
-            text-align: left;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--navy);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            cursor: pointer;
-        }
+            .contact-phone-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                font-size: 12.5px;
+                font-weight: 600;
+                color: var(--navy);
+                text-decoration: none;
+                padding: 3px 8px;
+                background: var(--white);
+                border: 1px solid var(--gray-200);
+                border-radius: 6px;
+                transition: all var(--transition-fast);
+            }
 
-        .faq-question:hover {
-            color: var(--solar-orange-dark);
-        }
+            .contact-phone-link:hover {
+                background: #fff7ed;
+                border-color: #fed7aa;
+                color: var(--solar-orange-dark);
+            }
 
-        .faq-arrow {
-            transition: transform var(--transition-fast);
-            color: var(--gray-400);
-            flex-shrink: 0;
-        }
+            .contact-phone-link svg {
+                color: var(--solar-orange);
+                width: 12px;
+                height: 12px;
+            }
 
-        .faq-item.open .faq-arrow {
-            transform: rotate(180deg);
-            color: var(--solar-orange-dark);
-        }
+            .routing-toggle-btn {
+                background: transparent;
+                border: 1px solid #fed7aa;
+                border-radius: 9999px;
+                padding: 3px 9px;
+                font-size: 11.5px;
+                font-weight: 600;
+                color: var(--gray-600);
+                font-family: inherit;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                cursor: pointer;
+                transition: all var(--transition-fast);
+                margin-left: auto;
+            }
 
-        .faq-answer {
-            display: none;
-            font-size: 13px;
-            color: var(--gray-500);
-            line-height: 1.5;
-            margin-top: 8px;
-            padding-right: 16px;
-        }
+            .routing-toggle-btn:hover {
+                background: #fff7ed;
+                color: var(--navy);
+                border-color: #fdba74;
+            }
 
-        .faq-item.open .faq-answer {
-            display: block;
-        }
+            .routing-toggle-btn:focus-visible {
+                outline: 2px solid var(--solar-orange);
+                outline-offset: 2px;
+            }
 
-        /* Channels sidebar */
-        .contact-channels {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+            .routing-toggle-btn .toggle-chevron {
+                width: 12px;
+                height: 12px;
+                transition: transform 0.25s ease;
+            }
 
-        .channel-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px;
-            background: var(--gray-50);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-sm);
-        }
+            .routing-toggle-btn[aria-expanded="true"] .toggle-chevron {
+                transform: rotate(180deg);
+            }
 
-        .channel-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--white);
-            color: var(--solar-orange-dark);
-            border: 1px solid var(--gray-200);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
+            .routing-drawer {
+                border-top: 1px solid #fed7aa;
+                margin-top: 10px;
+                padding-top: 10px;
+                display: none;
+            }
 
-        @media (max-width: 1024px) {
-            .support-layout {
-                grid-template-columns: 1fr;
+            .routing-drawer.is-open {
+                display: block;
+            }
+
+            .routing-drawer p {
+                font-size: 12px;
+                color: var(--gray-600);
+                line-height: 1.45;
+                margin: 0 0 6px 0;
+            }
+
+            .routing-drawer .routing-note {
+                font-size: 11.5px;
+                color: var(--gray-500);
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            /* --------------------------------------------------------------------------
+           2. MAIN WORKSPACE: PRIMARY ACTION & SUPPORTING CHANNELS / FAQS
+           -------------------------------------------------------------------------- */
+            .support-workspace-grid {
+                display: grid;
+                grid-template-columns: 1.45fr 1fr;
+                gap: 20px;
+                margin-bottom: 24px;
+                align-items: start;
+            }
+
+            .support-card {
+                padding: 22px 24px;
+                background: var(--white);
+                border: 1px solid var(--gray-200);
+                border-radius: var(--radius-md);
+                box-shadow: var(--shadow-xs);
+            }
+
+            .support-card-header-bar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 18px;
+                flex-wrap: wrap;
+                gap: 12px;
+                padding-bottom: 14px;
+                border-bottom: 1px solid var(--gray-100);
+            }
+
+            .form-title-wrap {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .form-title-icon {
+                width: 38px;
+                height: 38px;
+                border-radius: 8px;
+                background: #fff7ed;
+                border: 1px solid #fed7aa;
+                color: var(--solar-orange-dark);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+
+            .form-title-icon svg {
+                width: 19px;
+                height: 19px;
+            }
+
+            .support-card h2 {
+                font-size: 17px;
+                font-weight: 800;
+                color: var(--navy);
+                margin: 0 0 2px 0;
+                letter-spacing: -0.01em;
+            }
+
+            .support-card p.subtitle {
+                font-size: 12.5px;
+                color: var(--gray-500);
+                margin: 0;
+            }
+
+            .selected-system-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: #f8fafc;
+                border: 1px solid var(--gray-200);
+                padding: 5px 12px;
+                border-radius: 9999px;
+                font-size: 12px;
+                max-width: 100%;
+            }
+
+            .selected-system-pill .pill-label {
+                color: var(--gray-500);
+                font-weight: 600;
+            }
+
+            .selected-system-pill strong {
+                color: var(--navy);
+                font-weight: 700;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 240px;
             }
 
             .form-row {
-                grid-template-columns: 1fr;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 14px;
             }
-        }
 
-        @media (max-width: 600px) {
-            .routing-banner {
-                flex-direction: column;
-                align-items: flex-start;
+            .support-card .form-group {
+                margin-bottom: 14px;
             }
+
+            .support-card .form-input,
+            .support-card .form-select,
+            .support-card .form-textarea {
+                width: 100%;
+                font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background-color: #ffffff;
+                border: 1px solid #cbd5e1;
+                color: var(--navy);
+                border-radius: var(--radius-sm);
+                font-size: 14px;
+                line-height: 1.45;
+                padding: 10px 14px;
+                min-height: 42px;
+                box-sizing: border-box;
+                transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+            }
+
+            /* Custom Accessible Dropdown Component */
+            .custom-dropdown {
+                position: relative;
+                width: 100%;
+            }
+
+            .custom-dropdown-trigger {
+                width: 100%;
+                min-height: 42px;
+                height: 42px;
+                padding: 0 14px;
+                background: #FFFFFF;
+                border: 1px solid #CBD5E1;
+                border-radius: var(--radius-sm, 8px);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                font-size: 13.5px;
+                color: var(--navy, #101A2E);
+                cursor: pointer;
+                box-sizing: border-box;
+                text-align: left;
+                outline: none;
+                -webkit-tap-highlight-color: transparent;
+                transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            }
+
+            .custom-dropdown-trigger:hover {
+                border-color: var(--solar-orange, #FF8400);
+            }
+
+            .custom-dropdown.open .custom-dropdown-trigger,
+            .custom-dropdown-trigger:focus-visible {
+                border-color: var(--solar-orange, #FF8400) !important;
+                box-shadow: 0 0 0 3px rgba(255, 132, 0, 0.15) !important;
+            }
+
+            .custom-dropdown-selected {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                padding-right: 8px;
+                color: var(--navy, #101A2E);
+                font-weight: 500;
+                font-size: 13.5px;
+            }
+
+            .custom-dropdown-arrow {
+                width: 16px;
+                height: 16px;
+                stroke: var(--solar-orange, #FF8400);
+                flex-shrink: 0;
+                transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .custom-dropdown.open .custom-dropdown-arrow {
+                transform: rotate(180deg);
+            }
+
+            .custom-dropdown-menu {
+                display: none;
+                position: absolute;
+                top: calc(100% + 4px);
+                left: 0;
+                width: 100%;
+                background: #FFFFFF;
+                border: 1.5px solid #FFD8A8;
+                border-radius: 10px;
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.10), 0 4px 10px -2px rgba(255, 132, 0, 0.06);
+                list-style: none;
+                margin: 0;
+                padding: 5px;
+                z-index: 1000;
+                box-sizing: border-box;
+                animation: customDropdownFade 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+                max-height: 270px;
+                overflow-y: auto;
+                overscroll-behavior: contain;
+            }
+
+            @keyframes customDropdownFade {
+                from {
+                    opacity: 0;
+                    transform: translateY(-4px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .custom-dropdown.open .custom-dropdown-menu {
+                display: block;
+            }
+
+            .custom-dropdown-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 9px 12px;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--navy, #101A2E);
+                cursor: pointer;
+                transition: background-color 0.15s ease, color 0.15s ease;
+                outline: none;
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+                min-height: 38px;
+                box-sizing: border-box;
+                gap: 8px;
+            }
+
+            .custom-dropdown-item:hover,
+            .custom-dropdown-item:focus-visible {
+                background-color: #FFF7ED;
+                color: #EA580C;
+            }
+
+            .custom-dropdown-item.active {
+                background-color: #FFF2E5;
+                color: var(--solar-orange, #FF8400);
+                font-weight: 700;
+            }
+
+            .custom-dropdown-check {
+                width: 15px;
+                height: 15px;
+                stroke: var(--solar-orange, #FF8400);
+                opacity: 0;
+                flex-shrink: 0;
+                transition: opacity 0.15s ease;
+            }
+
+            .custom-dropdown-item.active .custom-dropdown-check {
+                opacity: 1;
+            }
+
+            /* Hidden backing select element */
+            .support-native-select-hidden {
+                position: absolute !important;
+                width: 1px !important;
+                height: 1px !important;
+                padding: 0 !important;
+                margin: -1px !important;
+                overflow: hidden !important;
+                clip: rect(0, 0, 0, 0) !important;
+                white-space: nowrap !important;
+                border: 0 !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
+
+            .support-card .form-select {
+                appearance: none !important;
+                -webkit-appearance: none !important;
+                -moz-appearance: none !important;
+                background-color: #ffffff !important;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23FF8400%22 stroke-width=%222.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22/%3E%3C/svg%3E") !important;
+                background-repeat: no-repeat !important;
+                background-position: right 14px center !important;
+                background-size: 16px 16px !important;
+                padding-right: 40px !important;
+                cursor: pointer;
+            }
+
+            .support-card .form-select option {
+                font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                font-size: 14px;
+                color: var(--navy);
+                background-color: #ffffff;
+                padding: 8px 12px;
+            }
+
+            .support-card .form-input:focus,
+            .support-card .form-select:focus,
+            .support-card .form-textarea:focus {
+                background: #ffffff;
+                border-color: var(--solar-orange);
+                box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.12);
+                outline: none;
+            }
+
+            .support-card .form-label {
+                display: block;
+                font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                font-size: 13px;
+                font-weight: 600;
+                color: #1e293b;
+                margin-bottom: 6px;
+                line-height: 1.4;
+            }
+
+            .support-card .form-textarea {
+                min-height: 95px;
+                resize: vertical;
+            }
+
+            /* Form Actions Row */
+            .form-actions-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 18px;
+                padding-top: 14px;
+                border-top: 1px solid var(--gray-100);
+            }
+
+            .form-primary-actions {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .form-secondary-actions {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .support-secondary-btn {
+                background: #f8fafc;
+                border: 1px solid #cbd5e1;
+                color: var(--navy);
+                font-family: inherit;
+                font-size: 12.5px;
+                font-weight: 600;
+                padding: 8px 13px;
+                border-radius: var(--radius-sm);
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                cursor: pointer;
+                transition: all var(--transition-fast);
+            }
+
+            .support-secondary-btn:hover {
+                background: #f1f5f9;
+                border-color: #94a3b8;
+                color: var(--navy);
+            }
+
+            .support-secondary-btn:focus-visible {
+                outline: 2px solid var(--solar-orange);
+                outline-offset: 2px;
+            }
+
+            .support-secondary-btn svg {
+                stroke: currentColor;
+                width: 14px;
+                height: 14px;
+            }
+
+            .form-demo-note {
+                font-size: 11.5px;
+                color: var(--gray-400);
+                margin: 12px 0 0 0;
+                line-height: 1.45;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .ticket-success-alert {
+                display: none;
+                background: var(--green-bg);
+                border: 1px solid var(--green-border);
+                border-radius: var(--radius-md);
+                padding: 14px 16px;
+                margin-top: 16px;
+                color: #065f46;
+            }
+
+            .ticket-success-alert.visible {
+                display: block;
+                animation: fadeIn 0.25s ease-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-4px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .ticket-success-title {
+                font-size: 14px;
+                font-weight: 800;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 3px;
+            }
+
+            .ticket-success-msg {
+                font-size: 12.5px;
+                line-height: 1.45;
+                margin: 0;
+            }
+
+            /* Supporting Side Column: Channels & FAQs */
+            .support-side-stack {
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+            }
+
+            .channels-card {
+                background: var(--white);
+                border: 1px solid var(--gray-200);
+                border-radius: var(--radius-md);
+                padding: 20px 22px;
+                box-shadow: var(--shadow-xs);
+            }
+
+            .contact-channels {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 12px;
+            }
+
+            .channel-row {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 11px 13px;
+                background: #f8fafc;
+                border: 1px solid var(--gray-200);
+                border-radius: var(--radius-sm);
+                text-decoration: none;
+                color: inherit;
+                transition: all var(--transition-fast);
+            }
+
+            .channel-row:hover {
+                background: #fff7ed;
+                border-color: #fed7aa;
+            }
+
+            .channel-icon {
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                background: #fff7ed;
+                color: var(--solar-orange-dark);
+                border: 1px solid #fed7aa;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+
+            .channel-info strong {
+                font-size: 13px;
+                color: var(--navy);
+                display: block;
+            }
+
+            .channel-info span {
+                font-size: 12px;
+                color: var(--gray-500);
+            }
+
+            .channel-action-badge {
+                margin-left: auto;
+                font-size: 11.5px;
+                font-weight: 700;
+                color: var(--solar-orange-dark);
+                background: #fff7ed;
+                padding: 3px 8px;
+                border-radius: 4px;
+                border: 1px solid #fed7aa;
+            }
+
+            /* FAQ Accordion */
+            .faq-card {
+                padding: 20px 22px;
+                background: var(--white);
+                border: 1px solid var(--gray-200);
+                border-radius: var(--radius-md);
+                box-shadow: var(--shadow-xs);
+            }
+
+            .faq-item {
+                border-bottom: 1px solid var(--gray-100);
+                padding: 11px 0;
+            }
+
+            .faq-item:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            .faq-question {
+                width: 100%;
+                text-align: left;
+                font-size: 13px;
+                font-weight: 700;
+                color: var(--navy);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                cursor: pointer;
+                background: none;
+                border: none;
+                padding: 0;
+                font-family: inherit;
+                transition: color var(--transition-fast);
+            }
+
+            .faq-question:hover {
+                color: #ff8a00;
+            }
+
+            .faq-question:focus-visible {
+                outline: 2px solid var(--solar-orange);
+                outline-offset: 4px;
+                border-radius: 2px;
+            }
+
+            .faq-arrow {
+                transition: transform var(--transition-fast);
+                color: var(--gray-400);
+                flex-shrink: 0;
+                font-size: 11px;
+            }
+
+            .faq-item.open .faq-arrow {
+                transform: rotate(180deg);
+                color: var(--solar-orange-dark);
+            }
+
+            .faq-answer {
+                display: none;
+                font-size: 12.5px;
+                color: var(--gray-600);
+                line-height: 1.5;
+                margin-top: 8px;
+                padding-right: 12px;
+            }
+
+            .faq-item.open .faq-answer {
+                display: block;
+            }
+
+            /* --------------------------------------------------------------------------
+           3. RECORDS & MAIN CONTENT: SUPPORT REQUESTS HISTORY
+           -------------------------------------------------------------------------- */
+            .support-requests-card {
+                background: var(--white);
+                border: 1px solid var(--gray-200);
+                border-radius: var(--radius-md);
+                padding: 22px 24px;
+                box-shadow: var(--shadow-xs);
+                margin-bottom: 24px;
+            }
+
+            .section-heading-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 8px;
+                background: #fff7ed;
+                border: 1px solid #fed7aa;
+                color: var(--solar-orange-dark);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+
+            .section-heading-icon svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            /* Interactive Filter Bar matching Payments */
+            .support-filter-bar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 16px;
+                flex-wrap: wrap;
+            }
+
+            .support-search-wrap {
+                position: relative;
+                flex: 1 1 280px;
+                min-width: 220px;
+                max-width: 420px;
+                height: 38px;
+            }
+
+            .support-search-wrap svg {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 15px !important;
+                height: 15px !important;
+                color: var(--gray-400);
+                pointer-events: none;
+                flex-shrink: 0;
+                z-index: 2;
+            }
+
+            .support-search-input {
+                width: 100%;
+                height: 38px;
+                padding: 8px 12px 8px 36px;
+                background: var(--white);
+                border: 1px solid var(--gray-200);
+                border-radius: var(--radius-sm);
+                font-size: 13px;
+                font-family: inherit;
+                color: var(--navy);
+                outline: none;
+                transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+                box-sizing: border-box;
+                line-height: normal;
+            }
+
+            .support-search-input:focus {
+                border-color: var(--solar-orange);
+                box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.12);
+            }
+
+            .support-filter-chips {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .filter-chip {
+                padding: 6px 13px;
+                border-radius: 999px;
+                background: var(--gray-100);
+                border: 1px solid transparent;
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--gray-600);
+                cursor: pointer;
+                transition: all var(--transition-fast);
+            }
+
+            .filter-chip:hover {
+                color: var(--navy);
+                background: var(--gray-200);
+            }
+
+            .filter-chip.active {
+                background: var(--navy);
+                color: var(--white);
+            }
+
+            /* Desktop Table vs Mobile Stacked Cards */
+            .support-requests-table-wrap {
+                display: block;
+            }
+
+            .support-requests-cards {
+                display: none;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .btn-ticket-view {
+                background: #f8fafc;
+                border: 1px solid var(--gray-200);
+                color: var(--navy);
+                font-size: 12px;
+                font-weight: 700;
+                padding: 5px 11px;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all var(--transition-fast);
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .btn-ticket-view:hover {
+                background: #fff7ed;
+                border-color: #fed7aa;
+                color: var(--solar-orange-dark);
+            }
+
+            /* Mobile Card Design */
+            .support-card-item {
+                background: var(--white);
+                border: 1px solid var(--gray-200);
+                border-radius: var(--radius-md);
+                padding: 14px 16px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                box-shadow: 0 1px 3px rgba(16, 26, 46, 0.03);
+                transition: border-color var(--transition-fast);
+            }
+
+            .support-card-item:hover {
+                border-color: #cbd5e1;
+            }
+
+            .support-card-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+            }
+
+            .support-card-id {
+                font-size: 13.5px;
+                font-weight: 800;
+                color: var(--navy);
+            }
+
+            .support-card-subject {
+                font-size: 14px;
+                font-weight: 700;
+                color: #0f172a;
+                line-height: 1.35;
+            }
+
+            .support-card-body {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                background: #f8fafc;
+                border-radius: var(--radius-sm);
+                padding: 8px 12px;
+                gap: 12px;
+            }
+
+            .support-card-col {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .support-card-label {
+                font-size: 10.5px;
+                font-weight: 700;
+                text-transform: uppercase;
+                color: #64748b;
+                letter-spacing: 0.04em;
+            }
+
+            .support-card-val {
+                font-size: 12.5px;
+                font-weight: 600;
+                color: var(--navy);
+            }
+
+            .support-card-footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                margin-top: 2px;
+            }
+
+            .support-card-category {
+                background: #fff7ed;
+                border: 1px solid #fed7aa;
+                padding: 2px 8px;
+                border-radius: 4px;
+                font-size: 11.5px;
+                color: var(--solar-orange-dark);
+                font-weight: 700;
+            }
+
+            /* See More / See Less Toggle */
+            .support-history-toggle-wrap {
+                display: flex;
+                justify-content: center;
+                padding-top: 14px;
+                margin-top: 12px;
+                border-top: 1px solid #f1f5f9;
+            }
+
+            .support-history-toggle-btn {
+                background: transparent;
+                border: 1px solid transparent;
+                color: var(--solar-orange);
+                font-family: inherit;
+                font-size: 13px;
+                font-weight: 700;
+                padding: 7px 18px;
+                border-radius: 9999px;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                transition: all var(--transition-fast);
+            }
+
+            .support-history-toggle-btn:hover {
+                color: var(--solar-orange-dark);
+                background: rgba(255, 122, 0, 0.08);
+            }
+
+            .support-history-toggle-btn:focus-visible {
+                outline: 2px solid var(--solar-orange);
+                outline-offset: 2px;
+                border-color: var(--solar-orange-light);
+            }
+
+            .support-history-toggle-btn .toggle-chevron {
+                width: 14px;
+                height: 14px;
+                transition: transform 0.25s ease;
+                stroke: currentColor;
+            }
+
+            .support-history-toggle-btn[aria-expanded="true"] .toggle-chevron {
+                transform: rotate(180deg);
+            }
+
+            /* --------------------------------------------------------------------------
+           4. PROGRESSIVE DISCLOSURE MODAL: TICKET DETAILS
+           -------------------------------------------------------------------------- */
+            .ticket-modal-backdrop {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(11, 25, 44, 0.55);
+                backdrop-filter: blur(4px);
+                z-index: 1000;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+
+            .ticket-modal-backdrop.is-active {
+                display: flex;
+                animation: fadeIn 0.2s ease-out;
+            }
+
+            .ticket-modal-panel {
+                background: var(--white);
+                border-radius: var(--radius-lg);
+                border: 1px solid var(--gray-200);
+                box-shadow: var(--shadow-xl);
+                width: 100%;
+                max-width: 520px;
+                max-height: 90vh;
+                overflow-y: auto;
+                position: relative;
+                padding: 24px;
+                box-sizing: border-box;
+            }
+
+            .ticket-modal-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding-bottom: 14px;
+                border-bottom: 1px solid var(--gray-100);
+                margin-bottom: 16px;
+            }
+
+            .ticket-modal-close-btn {
+                background: #f1f5f9;
+                border: none;
+                border-radius: 50%;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--gray-600);
+                cursor: pointer;
+                transition: all var(--transition-fast);
+            }
+
+            .ticket-modal-close-btn:hover {
+                background: #e2e8f0;
+                color: var(--navy);
+            }
+
+            .ticket-modal-row {
+                margin-bottom: 14px;
+            }
+
+            .ticket-modal-label {
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                color: var(--gray-500);
+                margin-bottom: 4px;
+            }
+
+            .ticket-modal-val {
+                font-size: 13.5px;
+                color: var(--navy);
+                font-weight: 600;
+            }
+
+            /* --------------------------------------------------------------------------
+           5. RESPONSIVE BREAKPOINTS
+           -------------------------------------------------------------------------- */
+            @media (max-width: 1024px) {
+                .support-summaries-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .support-workspace-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .form-row {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .content {
+                    min-height: auto !important;
+                    flex: initial !important;
+                    padding: 12px 14px calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 12px) !important;
+                }
+
+                .page-intro {
+                    margin-bottom: 12px;
+                }
+
+                .page-intro h1 {
+                    font-size: 22px;
+                    margin-bottom: 2px;
+                }
+
+                .page-intro p {
+                    font-size: 12px;
+                    margin: 0;
+                    color: var(--gray-600);
+                }
+
+                .support-summaries-grid {
+                    gap: 10px;
+                    margin-bottom: 14px;
+                }
+
+                .support-summary-card {
+                    padding: 14px;
+                    min-height: auto;
+                }
+
+                .support-workspace-grid {
+                    gap: 14px;
+                    margin-bottom: 16px;
+                }
+
+                .support-card {
+                    padding: 14px 14px;
+                    border-radius: 12px;
+                }
+
+                .support-card-header-bar {
+                    margin-bottom: 10px;
+                    padding-bottom: 8px;
+                }
+
+                .support-card h2 {
+                    font-size: 15px !important;
+                    font-weight: 700 !important;
+                    letter-spacing: -0.01em !important;
+                }
+
+                .form-title-icon {
+                    width: 30px !important;
+                    height: 30px !important;
+                    border-radius: 6px !important;
+                }
+
+                .form-title-icon svg {
+                    width: 15px !important;
+                    height: 15px !important;
+                }
+
+                .support-card .form-group {
+                    margin-bottom: 10px !important;
+                }
+
+                .support-card .form-label {
+                    font-size: 12px !important;
+                    font-weight: 600 !important;
+                    margin-bottom: 4px !important;
+                }
+
+                .support-card .form-input,
+                .support-card .form-select {
+                    font-size: 13.5px !important;
+                    padding: 8px 12px !important;
+                    height: 40px !important;
+                    min-height: 40px !important;
+                    line-height: 1.4 !important;
+                    border-radius: 8px !important;
+                    background-color: #ffffff !important;
+                }
+
+                .support-card .form-select {
+                    padding-right: 36px !important;
+                    background-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23FF8400%22 stroke-width=%222.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22/%3E%3C/svg%3E") !important;
+                    background-position: right 12px center !important;
+                    background-size: 15px 15px !important;
+                    background-repeat: no-repeat !important;
+                }
+
+                .support-card .form-select option {
+                    font-size: 13.5px !important;
+                    padding: 8px 10px !important;
+                }
+
+                .support-card .form-textarea {
+                    min-height: 68px !important;
+                    font-size: 13.5px !important;
+                    padding: 8px 12px !important;
+                    border-radius: 8px !important;
+                    line-height: 1.4 !important;
+                    background-color: #ffffff !important;
+                }
+
+                /* Custom Dropdown Mobile View Styles */
+                .custom-dropdown-trigger {
+                    height: 40px !important;
+                    min-height: 40px !important;
+                    padding: 0 12px !important;
+                    font-size: 13.5px !important;
+                    border-radius: 8px !important;
+                    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+                }
+
+                .custom-dropdown-selected {
+                    font-size: 13.5px !important;
+                    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+                }
+
+                .custom-dropdown-arrow {
+                    width: 15px !important;
+                    height: 15px !important;
+                    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                }
+
+                .custom-dropdown.open .custom-dropdown-arrow {
+                    transform: rotate(180deg) !important;
+                }
+
+                .custom-dropdown-menu {
+                    border-radius: 8px !important;
+                    padding: 4px !important;
+                    max-height: 270px !important;
+                    border: 1.5px solid #FFD8A8 !important;
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(255, 132, 0, 0.08) !important;
+                    z-index: 1050 !important;
+                }
+
+                .custom-dropdown.open .custom-dropdown-menu {
+                    display: block !important;
+                }
+
+                .custom-dropdown-item {
+                    min-height: 38px !important;
+                    padding: 8px 10px !important;
+                    font-size: 13px !important;
+                    border-radius: 6px !important;
+                    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+                }
+
+                .custom-dropdown-check {
+                    width: 14px !important;
+                    height: 14px !important;
+                }
+
+                .form-actions-row {
+                    margin-top: 10px !important;
+                    padding-top: 8px !important;
+                }
+
+                .form-primary-actions {
+                    width: 100% !important;
+                }
+
+                #submitTicketBtn {
+                    width: 100% !important;
+                    min-height: 44px !important;
+                    font-size: 14px !important;
+                    font-weight: 700 !important;
+                    justify-content: center !important;
+                    border-radius: 8px !important;
+                }
+
+                .channels-card,
+                .faq-card,
+                .support-requests-card {
+                    padding: 18px 16px;
+                }
+
+                .support-requests-table-wrap {
+                    display: none;
+                }
+
+                .support-filter-bar {
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 10px;
+                    margin-bottom: 14px;
+                }
+
+                .support-search-wrap {
+                    flex: none !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    min-width: 0 !important;
+                    height: 38px !important;
+                }
+
+                .support-search-input {
+                    width: 100% !important;
+                    height: 38px !important;
+                }
+
+                .support-filter-chips {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    flex-wrap: wrap;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .content {
+                    padding-left: 12px;
+                    padding-right: 12px;
+                }
+
+                .support-filter-bar {
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 10px;
+                    margin-bottom: 14px;
+                }
+
+                .support-search-wrap {
+                    flex: none !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    min-width: 0 !important;
+                    height: 38px !important;
+                }
+
+                .support-search-input {
+                    width: 100% !important;
+                    height: 38px !important;
+                }
+
+                .support-filter-chips {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    flex-wrap: wrap;
+                }
+            }
+
+            /* Layout only: reuse the existing FAQ, form and support card styling. */
+            .support-faq-wide {
+                margin-bottom: 20px;
+                min-width: 0;
+            }
+
+            .support-faq-wide>div:first-child {
+                justify-content: center;
+            }
+
+            .support-faq-wide>div:first-child>div {
+                text-align: center;
+            }
+
+            .support-workspace-grid {
+                grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+            }
+
+            .support-workspace-grid>*,
+            .support-side-stack>* {
+                min-width: 0;
+            }
+
+            .support-side-stack .support-summaries-grid {
+                grid-template-columns: minmax(0, 1fr);
+                margin-bottom: 0;
+            }
+
+            .help-support-heading {
+                font-size: 15px;
+                font-weight: 800;
+                color: var(--navy);
+                margin: 0;
+            }
+
+            @media (max-width: 1024px) {
+                .support-workspace-grid {
+                    grid-template-columns: minmax(0, 1fr);
+                }
+            }
+
+            /* Refined alignment and spacing; retain the existing visual design. */
+            .support-workspace-grid {
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+
+            .support-side-stack {
+                gap: 14px;
+            }
+
+            .support-side-stack .support-summaries-grid {
+                gap: 14px;
+            }
+
+            .support-side-stack .support-summary-card {
+                min-height: 0;
+                padding: 18px 20px;
+                gap: 12px;
+            }
+
+            .support-side-stack .support-summary-meta {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .help-support-heading {
+                line-height: 1.4;
+            }
+
+            .support-faq-wide {
+                width: 100%;
+                box-sizing: border-box;
+                margin: 0 0 24px;
+                padding: 20px 22px;
+            }
+
+            .support-faq-wide>div:first-child {
+                justify-content: flex-start;
+            }
+
+            .support-faq-wide>div:first-child>div {
+                text-align: left;
+            }
+
+            .support-faq-wide .faq-question {
+                min-height: 44px;
+                padding: 8px 0;
+                line-height: 1.5;
+                align-items: center;
+            }
+
+            .support-faq-wide .faq-item {
+                padding: 4px 0;
+            }
+
+            .support-faq-wide .faq-arrow {
+                flex: 0 0 16px;
+                text-align: center;
+            }
+
+            .support-faq-wide .faq-answer {
+                max-width: 85ch;
+                line-height: 1.65;
+            }
+
+            .support-faq-wide .faq-question:focus-visible {
+                outline: 2px solid var(--solar-orange);
+                outline-offset: 2px;
+                border-radius: 4px;
+            }
+
+            @media (max-width: 768px) {
+                .support-workspace-grid {
+                    gap: 18px;
+                    margin-bottom: 18px;
+                }
+
+                .support-faq-wide {
+                    padding: 16px;
+                }
+
+                .support-side-stack .support-summary-card {
+                    padding: 16px;
+                }
+            }
+
         }
     </style>
-    <link rel="stylesheet" href="assets/css/notifications.css">
+    <link rel="stylesheet" href="assets/css/support.css">
 </head>
 
 <body>
@@ -269,7 +1638,7 @@
                         stroke-linejoin="round">
                         <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
                     </svg>
-                    Energy
+                    Equipment Details
                 </a>
 
                 <a href="payments.html" class="nav-link">
@@ -281,7 +1650,6 @@
                     </svg>
                     My Payments
                 </a>
-
 
                 <a href="support.html" class="nav-link active" aria-current="page">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
@@ -298,10 +1666,9 @@
             <div class="sidebar-bottom">
                 <div class="sidebar-status-card">
                     <div class="sidebar-status-info">
-                        <span class="sidebar-status-label">Assigned Installer</span>
-                        <span class="sidebar-status-val">Carlos Villanueva</span>
+                        <span class="sidebar-status-label" id="sidebarContactRole">Support contact</span>
+                        <span class="sidebar-status-val" id="sidebarContactName">Loading contact…</span>
                     </div>
-                    <span class="status-dot pulsing" title="Installer available"></span>
                 </div>
 
                 <div class="sidebar-divider"></div>
@@ -332,22 +1699,7 @@
                 </div>
 
                 <div class="topbar-right">
-                    <a href="support.html" class="quick-support-link active"
-                        style="color: var(--solar-orange-dark); font-weight: 700;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M3 11a9 9 0 0 1 18 0" />
-                            <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
-                            <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
-                            <path d="M17 17c0 2-2 3-5 3" />
-                        </svg>
-                        Need Help?
-                    </a>
-
                     <div class="profile">
-                        <div class="profile-text">
-                            <span class="profile-name" id="profileName">Juan Dela Cruz</span>
-                            <span class="profile-role">Customer Account</span>
-                        </div>
                         <div class="profile-avatar" id="profileAvatar">JD</div>
                     </div>
                 </div>
@@ -355,282 +1707,366 @@
 
             <!-- CONTENT -->
             <div class="content">
+                <!-- 1. PAGE TITLE -->
                 <section class="page-intro">
                     <div>
-                        <p class="eyebrow">Customer Care</p>
-                        <h1>Support <span>Request</span></h1>
-                        <p>Need technical assistance or routine maintenance? Your ticket is auto-routed to your
-                            installer.</p>
-                    </div>
-                    <div class="cta-group">
-                        <div class="package-selector-slot" id="pagePackageSelector"></div>
-                        <a href="tel:09175550101" class="btn btn-primary" id="supportHotlineBtn">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path
-                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                            </svg>
-                            <span id="supportHotlineText">Hotline (+63 917 555 0101)</span>
-                        </a>
-                        <a href="mysystem.html" class="btn btn-secondary">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="4" />
-                                <path d="M12 2v2" />
-                                <path d="M12 20v2" />
-                                <path d="m4.93 4.93 1.41 1.41" />
-                                <path d="m17.66 17.66 1.41 1.41" />
-                                <path d="M2 12h2" />
-                                <path d="M20 12h2" />
-                            </svg>
-                            My System
-                        </a>
+                        <h1>Help &amp; Support</h1>
+
                     </div>
                 </section>
 
-                <!-- AUTO-ROUTING BANNER -->
-                <div class="routing-banner">
-                    <div class="routing-info">
-                        <div class="routing-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                                <circle cx="8.5" cy="7" r="4" />
-                                <polyline points="17 11 19 13 23 9" />
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="routing-text-title">Smart Installer Routing Enabled</div>
-                            <div class="routing-text-sub" id="routingBannerSubText">
-                                Tickets route straight to <strong id="routingBannerLeadHighlight">Carlos Villanueva
-                                    (Assigned Installer · +63 917 555 0101)</strong>. Hello Solar Support HQ is copied
-                                on all dispatches.
-                            </div>
-                        </div>
-                    </div>
-                    <span class="badge badge-online">
-                        <span class="status-dot pulsing"></span> Auto-Routed
-                    </span>
-                </div>
-
-                <!-- SUPPORT LAYOUT -->
-                <div class="support-layout">
-                    <!-- Left Column: Form & Ticket History -->
-                    <div style="display: flex; flex-direction: column; gap: 24px;">
-                        <!-- Support Form -->
-                        <section class="panel support-card">
-                            <div
-                                style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+                <!-- 2. MAIN WORKSPACE: REQUEST FORM & CONTACT DETAILS -->
+                <div class="support-workspace-grid">
+                    <!-- Left Column: Submit Support Request Form -->
+                    <section class="panel support-card">
+                        <div class="support-card-header-bar">
+                            <div class="form-title-wrap">
+                                <div class="form-title-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                    </svg>
+                                </div>
                                 <div>
-                                    <h2 style="margin-bottom: 4px;">Submit a Service Request</h2>
-                                    <p class="subtitle" style="margin-bottom: 0;">Provide details for triage and
-                                        scheduling on-site support.</p>
-                                </div>
-                                <div
-                                    style="display: inline-flex; align-items: center; gap: 8px; background: #fff5e5; border: 1px solid #ffd8a8; padding: 6px 12px; border-radius: var(--radius-sm); font-size: 12.5px;">
-                                    <span style="color: var(--gray-500);">System:</span>
-                                    <strong style="color: var(--navy);" id="ticketTargetPackageLabel">Home — 5.4 kW
-                                        (#HS-88219)</strong>
+                                    <h2>Submit a Support Request</h2>
                                 </div>
                             </div>
+                        </div>
 
-                            <form id="supportTicketForm" novalidate>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label class="form-label" for="categorySelect">Issue Category</label>
-                                        <select class="form-select" id="categorySelect" required>
-                                            <option value="inverter">Inverter Warning / Fault Code</option>
-                                            <option value="app">Mobile App / Monitoring Gateway</option>
-                                            <option value="battery">Battery Storage / Backup Duration</option>
-                                            <option value="cleaning">Panel Cleaning / Physical Inspection</option>
-                                            <option value="billing">Billing or Net-Metering Question</option>
-                                            <option value="other">Other Inquiries</option>
+                        <form id="supportTicketForm" novalidate>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="categoryTrigger" id="categoryLabel">Issue Category <span
+                                            class="required-mark">*</span></label>
+                                    <div class="custom-dropdown" id="categoryDropdown">
+                                        <button type="button" class="custom-dropdown-trigger" id="categoryTrigger"
+                                            aria-haspopup="listbox" aria-expanded="false" aria-labelledby="categoryLabel categorySelected">
+                                            <span class="custom-dropdown-selected" id="categorySelected">Choose a topic</span>
+                                            <svg class="custom-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </button>
+                                        <ul class="custom-dropdown-menu" id="categoryMenu" role="listbox" aria-labelledby="categoryLabel" tabindex="-1">
+                                            <li class="custom-dropdown-item active" role="option" aria-selected="true" data-value="" tabindex="0">
+                                                <span class="custom-dropdown-item-text">Choose a topic</span>
+                                                <svg class="custom-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            </li>
+                                            <li class="custom-dropdown-item" role="option" aria-selected="false" data-value="inverter" tabindex="0">
+                                                <span class="custom-dropdown-item-text">Inverter or error code</span>
+                                                <svg class="custom-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            </li>
+                                            <li class="custom-dropdown-item" role="option" aria-selected="false" data-value="app" tabindex="0">
+                                                <span class="custom-dropdown-item-text">App or monitoring</span>
+                                                <svg class="custom-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            </li>
+                                            <li class="custom-dropdown-item" role="option" aria-selected="false" data-value="battery" tabindex="0">
+                                                <span class="custom-dropdown-item-text">Battery or backup power</span>
+                                                <svg class="custom-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            </li>
+                                            <li class="custom-dropdown-item" role="option" aria-selected="false" data-value="cleaning" tabindex="0">
+                                                <span class="custom-dropdown-item-text">Panel cleaning or inspection</span>
+                                                <svg class="custom-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            </li>
+                                            <li class="custom-dropdown-item" role="option" aria-selected="false" data-value="billing" tabindex="0">
+                                                <span class="custom-dropdown-item-text">Billing or net metering</span>
+                                                <svg class="custom-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            </li>
+                                            <li class="custom-dropdown-item" role="option" aria-selected="false" data-value="other" tabindex="0">
+                                                <span class="custom-dropdown-item-text">General inquiry / Other</span>
+                                                <svg class="custom-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            </li>
+                                        </ul>
+                                        <select id="categorySelect" name="categorySelect" class="support-native-select-hidden" tabindex="-1" aria-hidden="true">
+                                            <option value="" selected>Choose a topic</option>
+                                            <option value="inverter">Inverter or error code</option>
+                                            <option value="app">App or monitoring</option>
+                                            <option value="battery">Battery or backup power</option>
+                                            <option value="cleaning">Panel cleaning or inspection</option>
+                                            <option value="billing">Billing or net metering</option>
+                                            <option value="other">General inquiry / Other</option>
                                         </select>
                                     </div>
+                                </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label" for="prioritySelect">Urgency Level</label>
-                                        <select class="form-select" id="prioritySelect" required>
-                                            <option value="normal">Normal (Response within 24 hours)</option>
+                                <div class="form-group">
+                                    <label class="form-label" for="priorityTrigger" id="priorityLabel">Priority</label>
+                                    <div class="custom-dropdown" id="priorityDropdown">
+                                        <button type="button" class="custom-dropdown-trigger" id="priorityTrigger"
+                                            aria-haspopup="listbox" aria-expanded="false" aria-labelledby="priorityLabel prioritySelected">
+                                            <span class="custom-dropdown-selected" id="prioritySelected">General inquiry / Normal</span>
+                                            <svg class="custom-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </button>
+                                        <ul class="custom-dropdown-menu" id="priorityMenu" role="listbox" aria-labelledby="priorityLabel" tabindex="-1">
+                                            <li class="custom-dropdown-item active" role="option" aria-selected="true" data-value="normal" tabindex="0">
+                                                <span class="custom-dropdown-item-text">General inquiry / Normal</span>
+                                                <svg class="custom-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            </li>
+                                            <li class="custom-dropdown-item" role="option" aria-selected="false" data-value="urgent" tabindex="0">
+                                                <span class="custom-dropdown-item-text">Urgent — Inverter offline / No power</span>
+                                                <svg class="custom-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            </li>
+                                        </ul>
+                                        <select id="prioritySelect" name="prioritySelect" class="support-native-select-hidden" tabindex="-1" aria-hidden="true">
+                                            <option value="normal" selected>General inquiry / Normal</option>
                                             <option value="urgent">Urgent — Inverter offline / No power</option>
                                         </select>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="form-group">
-                                    <label class="form-label" for="ticketSubject">Subject Summary</label>
-                                    <input class="form-input" id="ticketSubject" type="text"
-                                        placeholder="e.g. Inverter LED blinking yellow, reading 0W" required>
-                                </div>
+                            <div class="form-group">
+                                <label class="form-label" for="ticketSubject">Subject</label>
+                                <input class="form-input" id="ticketSubject" type="text"
+                                    placeholder="Brief summary of the issue">
+                            </div>
 
-                                <div class="form-group">
-                                    <label class="form-label" for="ticketDescription">Detailed Description</label>
-                                    <textarea class="form-textarea" id="ticketDescription"
-                                        placeholder="Describe the symptom, what time it occurred, or any error code displayed on your screen..."
-                                        required></textarea>
-                                </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label" for="ticketDescription">Description <span
+                                        class="required-mark">*</span></label>
+                                <textarea class="form-textarea" id="ticketDescription"
+                                    placeholder="Describe what's happening, error codes, or questions..."
+                                    required></textarea>
+                            </div>
 
-                                <div
-                                    style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; align-items: center;">
+                            <div class="form-actions-row">
+                                <div class="form-primary-actions">
                                     <button type="submit" class="btn btn-primary" id="submitTicketBtn"
-                                        style="padding: 12px 24px;">
-                                        <span id="submitBtnText">Send Service Request</span>
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                        style="padding: 10px 24px;">
+                                        <span id="submitBtnText">Submit Request</span>
+                                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                             stroke-linejoin="round">
-                                            <line x1="22" y1="2" x2="11" y2="13" />
-                                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                                         </svg>
                                     </button>
-                                    <button type="button" class="btn btn-secondary" id="saveDraftBtn">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z">
-                                            </path>
-                                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                                            <polyline points="7 3 7 8 15 8"></polyline>
-                                        </svg>
-                                        <span>Save Draft</span>
-                                    </button>
-                                    <button type="button" class="btn btn-outline" id="downloadDraftBtn">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                            <polyline points="7 10 12 15 17 10"></polyline>
-                                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                                        </svg>
-                                        <span>Download Draft</span>
-                                    </button>
                                 </div>
-                                <p
-                                    style="font-size: 11.5px; color: var(--gray-400); margin-top: 10px; line-height: 1.4;">
-                                    Demo Mode: Automatic technician dispatch requires live helpdesk API integration. In
-                                    this environment, requests are logged locally and drafts persist across package
-                                    switches.
-                                </p>
-                            </form>
+                            </div>
+                            <p class="support-form-error" id="ticketErrorAlert" role="alert" hidden></p>
+                            <p class="support-draft-feedback" id="draftFeedback" role="status"></p>
+                        </form>
 
-                            <div class="ticket-success-alert" id="ticketSuccessAlert" role="status">
-                                <div class="ticket-success-title">
-                                    <span>✓</span>
-                                    <span id="ticketNumberDisplay">Ticket #HS-SR-9042 Created</span>
-                                </div>
-                                <p class="ticket-success-msg" id="ticketSuccessMsg">
-                                    Demo Mode: Your request has been logged locally.
-                                </p>
+                        <div class="ticket-success-alert" id="ticketSuccessAlert" role="status">
+                            <div class="ticket-success-title">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="m5 12 4 4L19 6" />
+                                </svg>
+                                <span id="ticketNumberDisplay">Request Submitted Successfully</span>
+                            </div>
+                            <p class="ticket-success-msg" id="ticketSuccessMsg">
+                                Your service request has been received. Our team will follow up within 24 hours.
+                            </p>
+                        </div>
+                    </section>
+
+                    <aside class="support-side-stack" aria-label="Contact information">
+                        <section class="support-summary-card" id="supportContactSummary"
+                            aria-labelledby="supportContactHeading">
+                            <div class="support-summary-top">
+                                <h2 id="supportContactHeading">Your Support Contact</h2>
+                                <svg class="support-contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path
+                                        d="M3 12a9 9 0 0 1 18 0M3 12v5h4v-6H5a2 2 0 0 0-2 2M21 12v5h-4v-6h2a2 2 0 0 1 2 2M17 17c0 3-2 4-5 4" />
+                                </svg>
+                            </div>
+                            <h3 id="routingLeadName">Hello Solar Support</h3>
+                            <p id="routingLeadRole">Support Specialist</p>
+                            <a href="mailto:support@hellosolarph.com" class="contact-phone-link"
+                                id="routingLeadPhoneLink">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path
+                                        d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 2.09 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72l.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45l2.81.7A2 2 0 0 1 22 16.92Z" />
+                                </svg>
+                                <span id="routingLeadPhone">Contact support</span>
+                            </a>
+                            <p class="support-contact-availability" id="contactAvailability" hidden></p>
+                            <div id="installerContact" class="support-installer-contact" hidden>
+                                <span class="support-context-label">Installer</span>
+                                <strong id="installerContactName"></strong>
+                                <span id="installerContactRole"></span>
+                                <a id="installerContactPhone"></a>
                             </div>
                         </section>
-
-                        <!-- System-Specific Ticket History -->
-                        <section class="panel" style="padding: 24px;">
-                            <div class="panel-header"
-                                style="padding: 0 0 16px; border-bottom: 1px solid var(--gray-100); margin-bottom: 16px;">
-                                <div>
-                                    <h3 class="panel-title" style="font-size: 16px;">Ticket History for this System</h3>
-                                    <p class="panel-subtitle" id="ticketHistorySubtitle" style="font-size: 12.5px;">
-                                        Recent maintenance and support records</p>
-                                </div>
-                                <span class="badge badge-neutral" id="ticketCountBadge">2 Tickets</span>
+                        <section class="support-summary-card support-response-card" aria-labelledby="responseHeading">
+                            <div class="support-summary-top">
+                                <h2 id="responseHeading">Expected Response Time</h2>
+                                <svg class="support-contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="9" />
+                                    <path d="M12 7v5l3 2" />
+                                </svg>
                             </div>
-
-                            <div id="ticketHistoryContainer">
-                                <!-- Populated dynamically via JS -->
-                            </div>
+                            <strong class="support-response-target" id="responseTarget">Within 24 hours</strong>
+                            <p class="support-hours"><strong>Support hours:</strong> <span id="supportHours">Mon–Sat,
+                                    8am–6pm</span></p>
                         </section>
-                    </div>
-
-                    <!-- Sidebar: FAQs and Hotline -->
-                    <div style="display: flex; flex-direction: column; gap: 20px;">
-                        <section class="panel panel-body">
-                            <h3 style="font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 12px;">
-                                Direct Hello Solar Contacts</h3>
-                            <div class="contact-channels">
-                                <div class="channel-row">
-                                    <div class="channel-icon">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path
-                                                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <strong style="font-size: 13.5px; color: var(--navy);">Dispatch Hotline</strong>
-                                        <div style="font-size: 12px; color: var(--gray-500);" id="sidebarHotlinePhone">
-                                            +63 917 555 0101 (Carlos)</div>
-                                    </div>
-                                </div>
-
-                                <div class="channel-row">
-                                    <div class="channel-icon">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <rect x="2" y="4" width="20" height="16" rx="2" />
-                                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <strong style="font-size: 13.5px; color: var(--navy);">Email Support</strong>
-                                        <div style="font-size: 12px; color: var(--gray-500);">support@hellosolarph.com
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-
-                        <!-- Common Troubleshooting FAQs -->
-                        <section class="panel faq-card">
-                            <h3 style="font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 12px;">
-                                Quick Troubleshooting</h3>
-
-                            <div class="faq-item">
-                                <button type="button" class="faq-question">
-                                    <span>Why is the inverter reading 0W at night?</span>
-                                    <span class="faq-arrow">▼</span>
-                                </button>
-                                <div class="faq-answer">
-                                    This is completely normal. Solar photovoltaic panels require sunlight to produce
-                                    electricity. At dusk and nighttime, the Solis inverter enters standby mode.
-                                </div>
-                            </div>
-
-                            <div class="faq-item">
-                                <button type="button" class="faq-question">
-                                    <span>What happens during a brownout?</span>
-                                    <span class="faq-arrow">▼</span>
-                                </button>
-                                <div class="faq-answer">
-                                    Your 10 kWh lithium-ion battery and Automatic Transfer Switch (ATS) instantly power
-                                    your dedicated backup circuits within 10 milliseconds without flickering your
-                                    appliances.
-                                </div>
-                            </div>
-
-                            <div class="faq-item">
-                                <button type="button" class="faq-question">
-                                    <span>How often should panels be cleaned?</span>
-                                    <span class="faq-arrow">▼</span>
-                                </button>
-                                <div class="faq-answer">
-                                    In the Philippines, periodic rainfall washes off light dust. We recommend a
-                                    professional gentle rinse every 4 to 6 months to maintain peak 21.8% cell
-                                    efficiency.
-                                </div>
-                            </div>
-                        </section>
-                    </div>
+                    </aside>
                 </div>
+
+                <section class="faq-card support-faq-wide" id="supportFaqSection"
+                    aria-label="Frequently asked questions">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                        <span class="section-heading-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" y1="17" x2="12.01" y2="17" />
+                            </svg>
+                        </span>
+                        <div>
+                            <h3 style="font-size: 15px; font-weight: 800; color: var(--navy); margin: 0;">
+                                Frequently Asked Questions</h3>
+
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button type="button" class="faq-question" aria-expanded="false">
+                            <span>Why is the inverter reading 0W at night?</span>
+                            <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                aria-hidden="true">
+                                <path d="m6 9 6 6 6-6" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            This is completely normal. Solar photovoltaic panels require sunlight to produce
+                            electricity. At dusk and nighttime, the Solis inverter enters standby mode.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button type="button" class="faq-question" aria-expanded="false">
+                            <span>What happens during a brownout?</span>
+                            <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                aria-hidden="true">
+                                <path d="m6 9 6 6 6-6" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            Your 10 kWh lithium-ion battery and Automatic Transfer Switch (ATS) instantly power
+                            your dedicated backup circuits within 10 milliseconds without flickering your
+                            appliances.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button type="button" class="faq-question" aria-expanded="false">
+                            <span>How often should panels be cleaned?</span>
+                            <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                aria-hidden="true">
+                                <path d="m6 9 6 6 6-6" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            In the Philippines, periodic rainfall washes off light dust. We recommend a
+                            professional gentle rinse every 4 to 6 months to maintain peak 21.8% cell
+                            efficiency.
+                        </div>
+                    </div>
+                </section>
+
             </div>
 
             <!-- FOOTER -->
             <footer class="portal-footer">
-                <span>© 2026 Hello Solar Inc. Clean energy. Lower bills. Brighter future.</span>
+                <span>© 2026 Hello Solar Inc.</span>
                 <span>hellosolarph.com · support@hellosolarph.com</span>
             </footer>
         </main>
+    </div>
+
+    <!-- PROGRESSIVE DISCLOSURE MODAL: TICKET DETAILS -->
+    <div class="ticket-modal-backdrop" id="ticketDetailModal" role="dialog" aria-modal="true"
+        aria-labelledby="modalTicketTitle">
+        <div class="ticket-modal-panel">
+            <div class="ticket-modal-header">
+                <div>
+                    <span class="support-summary-label">Service Request Detail</span>
+                    <h3 id="modalTicketTitle"
+                        style="font-size: 18px; font-weight: 800; color: var(--navy); margin: 2px 0 0 0;">HS-SR-8120
+                    </h3>
+                </div>
+                <button type="button" class="ticket-modal-close-btn" id="modalCloseBtn"
+                    aria-label="Close dialog">✕</button>
+            </div>
+            <div class="ticket-modal-row">
+                <div class="ticket-modal-label">Status</div>
+                <div id="modalTicketStatus"></div>
+            </div>
+            <div class="ticket-modal-row">
+                <div class="ticket-modal-label">Summary</div>
+                <div class="ticket-modal-val" id="modalTicketSubject">Annual Inverter Efficiency & Panel Inspection
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                <div>
+                    <div class="ticket-modal-label">Category</div>
+                    <div class="ticket-modal-val" id="modalTicketCategory">Routine Maintenance</div>
+                </div>
+                <div>
+                    <div class="ticket-modal-label">Date Logged</div>
+                    <div class="ticket-modal-val" id="modalTicketDate">July 12, 2026</div>
+                </div>
+            </div>
+            <div class="ticket-modal-row">
+                <div class="ticket-modal-label">Assigned technician</div>
+                <div class="ticket-modal-val" id="modalTicketTechnician">Carlos Villanueva</div>
+            </div>
+            <div class="ticket-modal-row">
+                <div class="ticket-modal-label">Priority</div>
+                <div class="ticket-modal-val" id="modalTicketPriority"></div>
+            </div>
+            <div class="ticket-modal-row" style="margin-bottom: 0;">
+                <div class="ticket-modal-label">Description &amp; notes</div>
+                <div style="font-size: 13px; color: var(--gray-600); line-height: 1.5; background: #f8fafc; border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 10px 12px;"
+                    id="modalTicketNotes">
+                    Inspection completed successfully. Inverter efficiency verified at 98.4%. Solar panel array cleaned
+                    and operating at optimal rating.
+                </div>
+            </div>
+            <div style="margin-top: 18px; display: flex; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" id="modalCloseBtnBottom"
+                    style="padding: 8px 18px; font-size: 13px;">Close</button>
+            </div>
+        </div>
     </div>
 
     <!-- MOBILE BOTTOM NAVIGATION (5-PILLAR CUSTOMER APP NAV) -->
@@ -654,7 +2090,7 @@
                     stroke-linejoin="round">
                     <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
                 </svg>
-                <span>Energy</span>
+                <span>Equipment Details</span>
             </a>
             <a href="payments.html" class="mobile-nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
@@ -678,350 +2114,13 @@
         </div>
     </nav>
 
+    <!-- Shared Data Loader -->
+    <script src="assets/js/data-loader.js"></script>
+
     <!-- Core Portal JavaScript -->
     <script src="assets/js/portal.js"></script>
 
-    <script>
-        (function () {
-            "use strict";
-
-            const supportTicketForm = document.getElementById("supportTicketForm");
-            const submitTicketBtn = document.getElementById("submitTicketBtn");
-            const submitBtnText = document.getElementById("submitBtnText");
-            const ticketSuccessAlert = document.getElementById("ticketSuccessAlert");
-            const ticketNumberDisplay = document.getElementById("ticketNumberDisplay");
-            const ticketSuccessMsg = document.getElementById("ticketSuccessMsg");
-            const ticketSubject = document.getElementById("ticketSubject");
-            const ticketDescription = document.getElementById("ticketDescription");
-            const categorySelect = document.getElementById("categorySelect");
-            const prioritySelect = document.getElementById("prioritySelect");
-
-            const ticketTargetPackageLabel = document.getElementById("ticketTargetPackageLabel");
-            const routingBannerSubText = document.getElementById("routingBannerSubText");
-            const supportHotlineBtn = document.getElementById("supportHotlineBtn");
-            const supportHotlineText = document.getElementById("supportHotlineText");
-            const sidebarHotlinePhone = document.getElementById("sidebarHotlinePhone");
-
-            const ticketHistoryContainer = document.getElementById("ticketHistoryContainer");
-            const ticketHistorySubtitle = document.getElementById("ticketHistorySubtitle");
-            const ticketCountBadge = document.getElementById("ticketCountBadge");
-
-            let currentPackage = null;
-            let renderToken = 0;
-            const packageTicketDrafts = {};
-
-            // ----------------------------------------------------------------------
-            // 1. UNFINISHED INPUT / DRAFT PROTECTION
-            // ----------------------------------------------------------------------
-            function saveCurrentDraft() {
-                if (!currentPackage) return;
-                const subj = ticketSubject ? ticketSubject.value.trim() : "";
-                const desc = ticketDescription ? ticketDescription.value.trim() : "";
-                if (subj || desc) {
-                    packageTicketDrafts[currentPackage.id] = {
-                        category: categorySelect ? categorySelect.value : "inverter",
-                        priority: prioritySelect ? prioritySelect.value : "normal",
-                        subject: ticketSubject ? ticketSubject.value : "",
-                        description: ticketDescription ? ticketDescription.value : ""
-                    };
-                } else {
-                    delete packageTicketDrafts[currentPackage.id];
-                }
-            }
-
-            function restoreDraft(pkgId) {
-                const draft = packageTicketDrafts[pkgId];
-                if (draft) {
-                    if (categorySelect) categorySelect.value = draft.category || "inverter";
-                    if (prioritySelect) prioritySelect.value = draft.priority || "normal";
-                    if (ticketSubject) ticketSubject.value = draft.subject || "";
-                    if (ticketDescription) ticketDescription.value = draft.description || "";
-                } else {
-                    if (ticketSubject) ticketSubject.value = "";
-                    if (ticketDescription) ticketDescription.value = "";
-                    if (categorySelect) categorySelect.value = "inverter";
-                    if (prioritySelect) prioritySelect.value = "normal";
-                }
-                if (ticketSuccessAlert) ticketSuccessAlert.classList.remove("visible");
-            }
-
-            if (window.HelloSolar && window.HelloSolar.registerDirtyCheck) {
-                window.HelloSolar.registerDirtyCheck(() => {
-                    const subj = ticketSubject ? ticketSubject.value.trim() : "";
-                    const desc = ticketDescription ? ticketDescription.value.trim() : "";
-                    if (subj || desc) {
-                        return "a support ticket for this system is being written";
-                    }
-                    return null;
-                });
-            }
-
-            // ----------------------------------------------------------------------
-            // 2. RENDER SUPPORT FOR ACTIVE PACKAGE
-            // ----------------------------------------------------------------------
-            function renderSupportPage(pkg) {
-                if (!pkg) return;
-                renderToken++;
-                const thisToken = renderToken;
-
-                // Save draft for previous package before switching
-                if (currentPackage && currentPackage.id !== pkg.id) {
-                    saveCurrentDraft();
-                }
-
-                currentPackage = pkg;
-
-                // Restore draft for new package
-                restoreDraft(pkg.id);
-
-                // 1. Update Target System Label
-                if (ticketTargetPackageLabel) {
-                    ticketTargetPackageLabel.textContent = `${pkg.name} (${pkg.capacity}) · #${pkg.accountNo}`;
-                }
-
-                // 2. Update Lead Technician Information & Routing Banner
-                const supp = pkg.support || {
-                    leadTechnician: "Hello Solar Dispatch",
-                    leadPhone: "+63 2 8888 0100",
-                    leadContact: "+63 2 8888 0100 (Dispatch)",
-                    tickets: []
-                };
-
-                const techName = supp.leadTechnician || "Hello Solar Dispatch";
-                const techPhone = supp.leadPhone || "+63 2 8888 0100";
-                const techContact = supp.leadContact || techPhone;
-
-                if (routingBannerSubText) {
-                    routingBannerSubText.innerHTML = `Tickets route straight to <strong>${techContact}</strong>. Hello Solar Support HQ is copied on all dispatches.`;
-                }
-
-                // 3. Update Hotline Call CTA
-                if (supportHotlineBtn) {
-                    supportHotlineBtn.href = `tel:${techPhone.replace(/[^0-9+]/g, '')}`;
-                }
-                if (supportHotlineText) {
-                    supportHotlineText.textContent = `Hotline (${techPhone})`;
-                }
-
-                // 4. Update Sidebar Hotline
-                if (sidebarHotlinePhone) {
-                    sidebarHotlinePhone.textContent = `${techPhone} (${techName.split(' ')[0]})`;
-                }
-
-                // 5. Render Ticket History
-                if (ticketHistoryContainer) {
-                    ticketHistoryContainer.innerHTML = "";
-                    const tickets = supp.tickets || [];
-
-                    if (ticketCountBadge) {
-                        ticketCountBadge.textContent = `${tickets.length} Ticket${tickets.length === 1 ? '' : 's'}`;
-                    }
-                    if (ticketHistorySubtitle) {
-                        ticketHistorySubtitle.textContent = tickets.length > 0
-                            ? `Recent service and dispatch records for ${pkg.name}`
-                            : `No prior service requests for ${pkg.name}`;
-                    }
-
-                    if (tickets.length > 0) {
-                        const tableWrap = document.createElement("div");
-                        tableWrap.className = "table-responsive";
-                        let rowsHtml = "";
-
-                        tickets.forEach(t => {
-                            const badgeClass = (t.status === "Resolved" || t.status === "Closed") ? "badge-paid" : "badge-upcoming";
-                            rowsHtml += `
-                                <tr>
-                                    <td><strong style="color: var(--navy);">${t.id}</strong></td>
-                                    <td><div style="font-weight: 700; color: var(--navy);">${t.subject}</div><div style="font-size: 11.5px; color: var(--gray-400);">${t.category}</div></td>
-                                    <td>${t.date}</td>
-                                    <td><span class="badge ${badgeClass}">${t.status}</span></td>
-                                </tr>
-                            `;
-                        });
-
-                        tableWrap.innerHTML = `
-                            <table class="portal-table" aria-label="Ticket history for active system">
-                                <thead>
-                                    <tr>
-                                        <th>Ticket ID</th>
-                                        <th>Summary & Category</th>
-                                        <th>Date</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${rowsHtml}
-                                </tbody>
-                            </table>
-                        `;
-                        ticketHistoryContainer.appendChild(tableWrap);
-                    } else {
-                        // Distinguish missing ticket history cleanly
-                        ticketHistoryContainer.innerHTML = `
-                            <div style="text-align: center; padding: 36px 16px; color: var(--gray-400);">
-                                <div style="font-size: 30px; margin-bottom: 8px;">🛡️</div>
-                                <strong style="color: var(--navy); display: block; margin-bottom: 4px; font-size: 14.5px;">No Service Tickets Yet</strong>
-                                <p style="font-size: 12.5px; color: var(--gray-500); margin: 0 auto; max-width: 420px; line-height: 1.5;">
-                                    No technical incidents or maintenance requests have been logged for ${pkg.name} (#${pkg.accountNo}). Use the form above if you ever need technician assistance.
-                                </p>
-                            </div>
-                        `;
-                    }
-                }
-            }
-
-            // ----------------------------------------------------------------------
-            // 3. TICKET FORM SUBMISSION
-            // ----------------------------------------------------------------------
-            if (supportTicketForm) {
-                supportTicketForm.addEventListener("submit", (e) => {
-                    e.preventDefault();
-
-                    const subj = ticketSubject ? ticketSubject.value.trim() : "";
-                    const desc = ticketDescription ? ticketDescription.value.trim() : "";
-
-                    if (!subj || !desc) {
-                        if (window.HelloSolar && window.HelloSolar.toast) {
-                            window.HelloSolar.toast("Incomplete Form", "Please provide a subject summary and detailed description.");
-                        } else {
-                            alert("Please fill in both subject and description.");
-                        }
-                        return;
-                    }
-
-                    const pkg = currentPackage || (window.HelloSolar && window.HelloSolar.getActivePackage());
-                    const lead = (pkg && pkg.support && pkg.support.leadTechnician) || "Hello Solar Support";
-                    const firstLeadName = lead.split(" ")[0];
-
-                    if (submitTicketBtn) submitTicketBtn.disabled = true;
-                    if (submitBtnText) submitBtnText.textContent = `Routing to ${firstLeadName}...`;
-
-                    setTimeout(() => {
-                        const randomId = Math.floor(1000 + Math.random() * 9000);
-                        if (ticketNumberDisplay) {
-                            ticketNumberDisplay.textContent = `Ticket #HS-SR-${randomId} Logged for ${pkg ? pkg.name : "System"}`;
-                        }
-                        if (ticketSuccessMsg) {
-                            ticketSuccessMsg.textContent = `Demo Mode: Service request recorded for ${pkg ? pkg.name : "System"} (#${pkg ? pkg.accountNo : ""}). In production, ${lead} receives an instant dispatch notification.`;
-                        }
-                        if (ticketSuccessAlert) ticketSuccessAlert.classList.add("visible");
-                        if (submitBtnText) submitBtnText.textContent = "Request Dispatched ✓";
-
-                        if (window.HelloSolar && window.HelloSolar.toast) {
-                            window.HelloSolar.toast(
-                                "Support Ticket Logged",
-                                `Ticket #HS-SR-${randomId} created for ${pkg.name}. Dispatched to ${lead}.`
-                            );
-                        }
-
-                        // Clear draft and form
-                        if (pkg) delete packageTicketDrafts[pkg.id];
-                        supportTicketForm.reset();
-
-                        setTimeout(() => {
-                            if (submitTicketBtn) submitTicketBtn.disabled = false;
-                            if (submitBtnText) submitBtnText.textContent = "Send Service Request";
-                        }, 3500);
-                    }, 750);
-                });
-            }
-
-            const saveDraftBtn = document.getElementById("saveDraftBtn");
-            const downloadDraftBtn = document.getElementById("downloadDraftBtn");
-
-            if (saveDraftBtn) {
-                saveDraftBtn.addEventListener("click", () => {
-                    saveCurrentDraft();
-                    const pkg = currentPackage || (window.HelloSolar && window.HelloSolar.getActivePackage());
-                    const pkgName = pkg ? pkg.name : "Active System";
-                    if (window.HelloSolar && window.HelloSolar.toast) {
-                        window.HelloSolar.toast(
-                            "Draft Saved",
-                            `Service draft preserved for ${pkgName}. It will remain available when switching packages.`
-                        );
-                    } else {
-                        alert(`Draft saved for ${pkgName}.`);
-                    }
-                });
-            }
-
-            if (downloadDraftBtn) {
-                downloadDraftBtn.addEventListener("click", () => {
-                    saveCurrentDraft();
-                    const pkg = currentPackage || (window.HelloSolar && window.HelloSolar.getActivePackage());
-                    const draft = (pkg && packageTicketDrafts[pkg.id]) || {
-                        category: categorySelect ? categorySelect.value : "inverter",
-                        priority: prioritySelect ? prioritySelect.value : "normal",
-                        subject: ticketSubject ? ticketSubject.value : "",
-                        description: ticketDescription ? ticketDescription.value : ""
-                    };
-
-                    const draftContent = [
-                        `HELLO SOLAR CUSTOMER SERVICE REQUEST DRAFT`,
-                        `Generated: ${new Date().toLocaleString()}`,
-                        `Customer: Juan Dela Cruz`,
-                        `System: ${pkg ? pkg.name : "N/A"} (${pkg ? pkg.accountNo : "N/A"})`,
-                        `Capacity: ${pkg ? pkg.capacity : "N/A"}`,
-                        `----------------------------------------------------`,
-                        `Category: ${draft.category}`,
-                        `Priority: ${draft.priority}`,
-                        `Subject: ${draft.subject || "(No subject entered)"}`,
-                        `----------------------------------------------------`,
-                        `Description:`,
-                        draft.description || "(No description entered)",
-                        `----------------------------------------------------`,
-                        `Assigned Technician: ${(pkg && pkg.support && pkg.support.leadTechnician) || "Hello Solar Dispatch"}`
-                    ].join("\n");
-
-                    const blob = new Blob([draftContent], { type: "text/plain;charset=utf-8" });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = `hello-solar-support-draft-${(pkg ? pkg.id : "system")}.txt`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-
-                    if (window.HelloSolar && window.HelloSolar.toast) {
-                        window.HelloSolar.toast(
-                            "Draft Downloaded",
-                            `Service request draft saved as text file for your records.`
-                        );
-                    }
-                });
-            }
-
-            // FAQ Accordion
-            document.querySelectorAll(".faq-question").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const item = btn.closest(".faq-item");
-                    if (item) item.classList.toggle("open");
-                });
-            });
-
-            // Initial render
-            const initialPkg = (window.HelloSolar && window.HelloSolar.getActivePackage)
-                ? window.HelloSolar.getActivePackage()
-                : null;
-            if (initialPkg) renderSupportPage(initialPkg);
-
-            // Listen for package changes from other tabs / sources
-            window.addEventListener("helloSolarPackageChanged", (e) => {
-                if (e.detail && e.detail.package) {
-                    renderSupportPage(e.detail.package);
-                }
-            });
-
-            // Listen for dataset async load completion
-            window.addEventListener("helloSolarDataLoaded", () => {
-                const active = window.HelloSolar ? window.HelloSolar.getActivePackage() : null;
-                if (active) {
-                    renderSupportPage(active);
-                }
-            });
-        })();
-    </script>
+    <script src="assets/js/support.js"></script>
     <script src="assets/js/notifications.js"></script>
 </body>
 

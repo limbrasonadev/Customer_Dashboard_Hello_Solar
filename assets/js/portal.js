@@ -962,6 +962,7 @@
     const LINKED_PACKAGES = [
         {
             id: "pkg-home-5k4",
+            installerAcceptanceStatus: "accepted",
             name: "Home Primary",
             shortLabel: "Home — 5.4 kW",
             capacity: "5.4 kW",
@@ -1080,6 +1081,7 @@
         },
         {
             id: "pkg-villa-10k8",
+            installerAcceptanceStatus: "accepted",
             name: "Tagaytay Villa",
             shortLabel: "Villa — 10.8 kW",
             capacity: "10.8 kW",
@@ -1196,6 +1198,7 @@
         },
         {
             id: "pkg-farm-3k6",
+            installerAcceptanceStatus: "accepted",
             name: "Batangas Farmhouse",
             shortLabel: "Farmhouse — 3.6 kW",
             capacity: "3.6 kW",
@@ -1311,6 +1314,7 @@
         },
         {
             id: "pkg-biz-6k0",
+            installerAcceptanceStatus: "pending",
             name: "Business Annex",
             shortLabel: "Business — 6.0 kW",
             capacity: "6.0 kW",
@@ -1398,7 +1402,10 @@
             let activeDueItem = null;
 
             pkg.payments.schedule.forEach(item => {
-                const num = parseFloat((item.amount || "").replace(/[^0-9.]/g, "")) || 0;
+                // Accept both the modular JSON fields and the legacy display fields.
+                item.due = item.due ?? item.dueDate ?? "—";
+                item.amount = item.formattedAmount ?? item.amount;
+                const num = parseFloat(String(item.amount ?? "").replace(/[^0-9.]/g, "")) || 0;
                 if (item.status === "Paid") {
                     totalPaidSum += num;
                     paidCount++;
@@ -1484,6 +1491,29 @@
             }
         }
 
+        // 1. First try shared DataLoader module (browser-native fetch of purpose-organized JSON)
+        let loaded = null;
+        if (window.HelloSolarDataLoader && typeof window.HelloSolarDataLoader.loadAll === "function") {
+            try {
+                loaded = await window.HelloSolarDataLoader.loadAll();
+            } catch (e) {
+                console.warn("[Portal] DataLoader.loadAll error:", e);
+            }
+        }
+
+        if (loaded && Array.isArray(loaded.packages) && loaded.packages.length > 0) {
+            activePackagesStore = loaded.packages.map(p => enrichPackageMetrics(p));
+            if (Array.isArray(loaded.faqs)) cachedFaqs = loaded.faqs;
+            if (loaded.customer && typeof loaded.customer === "object") {
+                const existingCust = getCustomer();
+                // User-saved localStorage modifications strictly take precedence over default JSON values
+                setCustomer({ ...loaded.customer, ...existingCust });
+            }
+            window.dispatchEvent(new CustomEvent("helloSolarDataLoaded", { detail: { packages: activePackagesStore, faqs: cachedFaqs } }));
+            return { packages: activePackagesStore, faqs: cachedFaqs };
+        }
+
+        // 2. Direct fetch fallback for legacy customer.json
         try {
             const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
             const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
@@ -1499,14 +1529,14 @@
                     if (Array.isArray(data.faqs)) cachedFaqs = data.faqs;
                     if (data.customer && typeof data.customer === "object") {
                         const existingCust = getCustomer();
-                        setCustomer({ ...existingCust, ...data.customer });
+                        setCustomer({ ...data.customer, ...existingCust });
                     }
                     window.dispatchEvent(new CustomEvent("helloSolarDataLoaded", { detail: { packages: activePackagesStore, faqs: cachedFaqs } }));
                     return { packages: activePackagesStore, faqs: cachedFaqs };
                 }
             }
         } catch (err) {
-            console.warn("[Portal] Automated fetch of customer.json failed (likely file:/// protocol or offline). Operating in offline mode.", err);
+            console.warn("[Portal] Automated fetch of customer dataset failed (likely file:/// protocol or offline). Operating in offline mode.", err);
         }
 
         return { packages: activePackagesStore, faqs: cachedFaqs };
@@ -1608,6 +1638,21 @@
 
         container.innerHTML = `
             <div class="package-selector" id="packageSelector">
+                <button type="button" class="package-selector-btn" id="packageSelectorBtn"
+                    aria-haspopup="listbox" aria-expanded="false" aria-controls="packageDropdownMenu">
+                    <span class="package-btn-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m3 10 9-7 9 7M5 9v11h14V9M9 20v-7h6v7"/>
+                        </svg>
+                    </span>
+                    <span class="package-btn-content">
+                        <span class="package-btn-label">System</span>
+                        <span class="package-btn-name" id="selectedPackageName"></span>
+                    </span>
+                    <svg class="package-dropdown-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="m6 9 6 6 6-6"/>
+                    </svg>
+                </button>
                 <div class="package-dropdown-menu" id="packageDropdownMenu" role="listbox" aria-label="Available solar packages" tabindex="-1">
                     <div class="package-dropdown-header">
                         <span>Linked Solar Systems</span>
@@ -1631,6 +1676,8 @@
         const menu = container.querySelector("#packageDropdownMenu");
         const list = container.querySelector("#packageItemsList");
         const addBtn = container.querySelector("#openAddAccountBtn");
+        container.querySelector("#selectedPackageName").textContent = currentPkg
+            ? (currentPkg.shortLabel || currentPkg.name) : "Select system";
 
         function renderItems() {
             if (!list) return;
@@ -1877,7 +1924,8 @@
         requestPackageSwitch,
         registerDirtyCheck,
         unregisterDirtyCheck,
-        openAddAccountModal
+        openAddAccountModal,
+        dataLoader: window.HelloSolarDataLoader || null
     };
 
     // Auto-init on DOMContentLoaded

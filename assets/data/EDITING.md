@@ -81,3 +81,14 @@ Shared customer knowledge base answers. Kept separate from system-specific recor
    When served over HTTP/HTTPS, `portal.js` automatically loads `assets/data/customer.json` using `fetch()`.
 2. **Direct `file:///` Access**:
    When opened directly from a local filesystem where CORS restricts local JSON fetches, `portal.js` falls back safely to its embedded baseline dataset and allows loading custom JSON files via the user settings modal.
+# Installer acceptance on dashboard model cards
+
+Set `installerAcceptanceStatus` on each model in `systems.json` (or each package
+in a custom dataset / legacy `customer.json`) to `"pending"` or `"accepted"`.
+Pending, missing, and unknown values show an orange Pending badge beneath the
+activation badge and block opening the model card with mouse, keyboard, or a live
+details URL. Accepted models retain the existing activation and live-details flow.
+Acceptance is independent of telemetry, installer assignment, and activation.
+Newly linked accounts start pending. An installer/backend integration must supply
+the accepted value and reload the dataset; customers cannot grant acceptance.
+
