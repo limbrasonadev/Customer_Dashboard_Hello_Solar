@@ -9,11 +9,10 @@
     <title>Hello Solar — My Payments</title>
 
     <!-- Immediate Authentication Guard -->
-    <script>
-        if (localStorage.getItem("hello_solar_logged_in") !== "true") {
-            window.location.replace("login.html");
-        }
-    </script>
+    <script src="../shared/hello-solar-config.js"></script>
+    <script src="../hello_solar_super_admin/data.js"></script>
+    <script src="../shared/hello-solar-shared.js"></script>
+    <script src="js/payments-page.js"></script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,1652 +24,12 @@
     <link rel="icon" type="image/png" href="assets/images/logofortab.png">
 
     <!-- Design System CSS -->
-    <link rel="stylesheet" href="assets/css/dashboard-theme.css">
+    <link rel="stylesheet" href="css/dashboard-theme.css">
 
-    <style>
-        /* Page layout stays below the shared dashboard theme in the cascade. */
-        @layer dashboard-legacy {
+    <link rel="stylesheet" href="css/payments-page.css">
 
-            /* Layout and bottom spacing */
-            .main {
-                min-height: auto;
-            }
-
-            .content {
-                flex: 0 0 auto;
-                padding: 32px 36px 0;
-                max-width: 1360px;
-                width: 100%;
-                margin: 0 auto;
-            }
-
-            /* 1. Main Next Payment + Secondary Summary Cards */
-            .payment-summaries-wrap {
-                display: grid;
-                grid-template-columns: 1.25fr 2.75fr;
-                gap: 16px;
-                margin-bottom: 24px;
-            }
-
-            .next-payment-card {
-                background: #ffffff;
-                border: 1px solid #fed7aa;
-                border-radius: var(--radius-md);
-                padding: 20px 22px;
-                box-shadow: 0 2px 8px rgba(244, 119, 24, 0.08);
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                position: relative;
-                overflow: hidden;
-            }
-
-            .next-payment-card::before {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 3.5px;
-                background: var(--solar-gradient);
-            }
-
-            .summary-icon.highlight {
-                color: var(--solar-orange-dark);
-            }
-
-            .summary-value.large-val {
-                font-size: 32px;
-                font-weight: 800;
-                color: var(--navy);
-                letter-spacing: -0.02em;
-                margin: 4px 0 2px 0;
-            }
-
-            .summary-meta.due-meta {
-                font-size: 13.5px;
-                font-weight: 700;
-                color: var(--solar-orange-dark);
-            }
-
-            .secondary-summaries-grid {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 14px;
-            }
-
-            .summary-card.secondary-card {
-                background: var(--white);
-                border: 1px solid var(--gray-200);
-                border-radius: var(--radius-md);
-                padding: 18px;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                box-shadow: var(--shadow-xs);
-            }
-
-            .summary-card.secondary-card .summary-value {
-                font-size: 20px;
-                font-weight: 800;
-                color: var(--navy);
-                margin: 4px 0 2px 0;
-            }
-
-            .summary-card.secondary-card .summary-meta {
-                font-size: 12.5px;
-                color: var(--gray-500);
-            }
-
-            /* 2. Middle Row: How to Pay & Upload Your Receipt */
-            .payments-action-grid {
-                display: grid;
-                grid-template-columns: 1.15fr 1fr;
-                gap: 20px;
-                margin-bottom: 24px;
-            }
-
-            .due-callout {
-                background: #fff5e5;
-                border-left: 4px solid var(--solar-orange);
-                border-radius: 0 var(--radius-md) var(--radius-md) 0;
-                padding: 14px 18px;
-                margin-bottom: 16px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 16px;
-            }
-
-            .due-amount-large {
-                font-size: 22px;
-                font-weight: 800;
-                color: var(--navy);
-            }
-
-            .payment-methods-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 12px;
-                margin-bottom: 16px;
-            }
-
-            .payment-method-box {
-                padding: 14px;
-                background: var(--gray-50);
-                border: 1px solid var(--gray-200);
-                border-radius: var(--radius-sm);
-                display: flex;
-                flex-direction: column;
-                gap: 3px;
-            }
-
-            .method-tag {
-                font-size: 11px;
-                font-weight: 700;
-                color: var(--solar-orange-dark);
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-            }
-
-            .method-detail {
-                font-size: 13.5px;
-                font-weight: 800;
-                color: var(--navy);
-                letter-spacing: -0.01em;
-            }
-
-            .method-sub {
-                font-size: 11.5px;
-                color: var(--gray-500);
-            }
-
-            .payment-instructions-box {
-                background: #f8fafc;
-                border: 1px solid #e2e8f0;
-                border-radius: var(--radius-sm);
-                padding: 12px 16px;
-                font-size: 12.5px;
-                color: #475569;
-                line-height: 1.5;
-            }
-
-            .payment-instructions-box strong {
-                color: var(--navy);
-                display: block;
-                margin-bottom: 4px;
-            }
-
-            .payment-instructions-box ol {
-                padding-left: 18px;
-                margin: 0;
-                list-style: decimal;
-            }
-
-            .payment-instructions-box li {
-                margin-bottom: 3px;
-            }
-
-            .payment-instructions-box li:last-child {
-                margin-bottom: 0;
-            }
-
-            /* Upload Receipt */
-            .verification-notice-box {
-                background: #fffbeb;
-                border: 1px solid #fef3c7;
-                border-radius: var(--radius-sm);
-                padding: 10px 14px;
-                margin-bottom: 14px;
-                display: flex;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .upload-dropzone {
-                border: 2px dashed var(--gray-300);
-                border-radius: var(--radius-md);
-                padding: 22px 18px;
-                text-align: center;
-                background: #fffdf9;
-                cursor: pointer;
-                transition: all var(--transition-fast);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 8px;
-            }
-
-            .upload-dropzone:hover,
-            .upload-dropzone.dragover {
-                border-color: var(--solar-orange);
-                background: #fff8eb;
-            }
-
-            .upload-icon-circle {
-                width: 44px;
-                height: 44px;
-                border-radius: 50%;
-                background: #fff0d4;
-                color: var(--solar-orange-dark);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .upload-icon-circle svg {
-                width: 22px;
-                height: 22px;
-                stroke-width: 2;
-            }
-
-            .upload-file-input {
-                position: absolute;
-                width: 1px;
-                height: 1px;
-                opacity: 0;
-                overflow: hidden;
-            }
-
-            .selected-file-badge {
-                display: none;
-                align-items: center;
-                gap: 8px;
-                background: var(--green-bg);
-                border: 1px solid var(--green-border);
-                padding: 8px 14px;
-                border-radius: var(--radius-sm);
-                font-size: 13px;
-                font-weight: 600;
-                color: var(--green);
-                margin-top: 10px;
-                word-break: break-all;
-            }
-
-            .selected-file-badge.visible {
-                display: inline-flex;
-            }
-
-            /* 3. Payment History Section */
-            #paymentHistorySection {
-                margin-bottom: 24px;
-                /* leaves ~24px between final content and footer */
-            }
-
-            .payments-table-controls {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 12px;
-                margin-bottom: 16px;
-                flex-wrap: wrap;
-            }
-
-            .payments-search-wrap {
-                position: relative;
-                flex: 1 1 280px;
-                min-width: 220px;
-            }
-
-            .payments-search-wrap svg {
-                position: absolute;
-                left: 12px;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 16px !important;
-                height: 16px !important;
-                color: var(--gray-400);
-                pointer-events: none;
-                flex-shrink: 0;
-            }
-
-            .payments-search-input {
-                width: 100%;
-                padding: 9px 12px 9px 38px;
-                background: var(--white);
-                border: 1px solid var(--gray-200);
-                border-radius: var(--radius-sm);
-                font-size: 13px;
-                font-family: inherit;
-                color: var(--navy);
-                outline: none;
-                transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-                box-sizing: border-box;
-            }
-
-            .payments-search-input:focus {
-                border-color: var(--solar-orange);
-                box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.12);
-            }
-
-            .payments-filter-chips {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                flex-wrap: wrap;
-            }
-
-            .filter-chip {
-                padding: 6px 14px;
-                border-radius: 999px;
-                background: var(--gray-100);
-                border: 1px solid transparent;
-                font-size: 12px;
-                font-weight: 600;
-                color: var(--gray-600);
-                cursor: pointer;
-                transition: all var(--transition-fast);
-            }
-
-            .filter-chip:hover {
-                color: var(--navy);
-                background: var(--gray-200);
-            }
-
-            .filter-chip.active {
-                background: var(--navy);
-                color: var(--white);
-            }
-
-            /* Desktop Table vs Mobile Stacked Cards */
-            .desktop-only-table {
-                display: block;
-            }
-
-            .mobile-only-cards {
-                display: none;
-            }
-
-            .payment-mobile-card {
-                background: var(--white);
-                border: 1px solid #e2e8f0;
-                border-radius: var(--radius-md);
-                padding: 14px 16px;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                box-shadow: 0 1px 3px rgba(16, 26, 46, 0.03);
-                transition: border-color var(--transition-fast);
-            }
-
-            .mobile-card-header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 10px;
-            }
-
-            .mobile-card-month {
-                font-size: 15px;
-                font-weight: 800;
-                color: var(--navy);
-            }
-
-            .mobile-card-body {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                background: #f8fafc;
-                border-radius: var(--radius-sm);
-                padding: 8px 12px;
-                gap: 12px;
-            }
-
-            .mobile-card-col {
-                display: flex;
-                flex-direction: column;
-            }
-
-            .mobile-card-label {
-                font-size: 11px;
-                font-weight: 600;
-                text-transform: uppercase;
-                color: #64748b;
-                letter-spacing: 0.04em;
-            }
-
-            .mobile-card-val {
-                font-size: 15px;
-                font-weight: 800;
-                color: var(--navy);
-            }
-
-            .mobile-card-val.highlight {
-                color: var(--solar-orange-dark);
-            }
-
-            .mobile-card-val-meta {
-                font-size: 13px;
-                font-weight: 600;
-                color: #334155;
-            }
-
-            .mobile-card-action {
-                display: flex;
-                align-items: center;
-                justify-content: flex-end;
-                padding-top: 2px;
-            }
-
-            /* Payment History See More / See Less Toggle */
-            .payments-history-toggle-wrap {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding-top: 14px;
-                margin-top: 6px;
-                border-top: 1px solid #f1f5f9;
-            }
-
-            .payments-history-toggle-btn {
-                background: transparent;
-                border: 1px solid transparent;
-                color: var(--solar-orange);
-                font-family: inherit;
-                font-size: 13px;
-                font-weight: 700;
-                padding: 7px 18px;
-                border-radius: 9999px;
-                cursor: pointer;
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
-            }
-
-            .payments-history-toggle-btn:hover {
-                color: var(--solar-orange-dark);
-                background: rgba(255, 122, 0, 0.08);
-            }
-
-            .payments-history-toggle-btn:focus-visible {
-                outline: 2px solid var(--solar-orange);
-                outline-offset: 2px;
-                border-color: var(--solar-orange-light);
-            }
-
-            .payments-history-toggle-btn .toggle-chevron {
-                width: 15px;
-                height: 15px;
-                transition: transform 0.25s ease;
-                stroke: currentColor;
-            }
-
-            .payments-history-toggle-btn[aria-expanded="true"] .toggle-chevron {
-                transform: rotate(180deg);
-            }
-
-            /* Mobile Expandable Action Toggles (Hidden on Desktop) */
-            .action-panel-toggle {
-                display: none;
-            }
-
-            .desktop-panel-header {
-                display: flex;
-            }
-
-            .desktop-only-badge {
-                display: inline-flex;
-            }
-
-            .method-row-main {
-                display: flex;
-                flex-direction: column;
-                gap: 2px;
-            }
-
-            .summary-content-block {
-                display: flex;
-                flex-direction: column;
-            }
-
-            #downloadReceiptBtn {
-                white-space: nowrap;
-                height: 32px;
-                padding: 0 12px;
-                font-size: 12px;
-                font-weight: 700;
-                border-radius: 8px;
-                display: inline-flex;
-                align-items: center;
-                gap: 5px;
-            }
-
-            /* Footer Spacing */
-            .portal-footer {
-                margin-top: 0;
-                padding: 20px 36px;
-            }
-
-            /* Media Queries */
-            @media (max-width: 1024px) {
-                .payment-summaries-wrap {
-                    grid-template-columns: 1fr;
-                }
-
-                .payments-action-grid {
-                    grid-template-columns: 1fr;
-                }
-            }
-
-            @media (max-width: 640px) {
-                .content {
-                    min-height: auto !important;
-                    flex: initial !important;
-                    padding: 16px 14px calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 14px) !important;
-                }
-
-                .page-intro {
-                    margin-bottom: 14px;
-                }
-
-                .page-intro .eyebrow {
-                    display: none;
-                }
-
-                .page-intro h1 {
-                    font-size: 22px;
-                }
-
-                .page-intro p {
-                    font-size: 13px;
-                }
-
-                /* 1. Compact 2x2 Summary Grid */
-                .payment-summaries-wrap {
-                    display: grid;
-                    grid-template-columns: repeat(2, minmax(0, 1fr));
-                    grid-auto-rows: 1fr;
-                    gap: 8px;
-                    margin-bottom: 12px;
-                    align-items: stretch;
-                }
-
-                .secondary-summaries-grid {
-                    display: contents;
-                }
-
-                #cardNextPayment {
-                    order: 1;
-                    border-color: rgba(255, 122, 0, 0.4);
-                    background: #fffdfa;
-                    box-shadow: 0 1px 3px rgba(255, 122, 0, 0.06);
-                }
-
-                #cardPaymentStatus {
-                    order: 2;
-                }
-
-                #cardPaymentPlan {
-                    order: 3;
-                }
-
-                #cardPaymentsCompleted {
-                    order: 4;
-                }
-
-                .next-payment-card,
-                .secondary-summaries-grid .summary-card {
-                    padding: 10px 11px;
-                    min-height: 114px;
-                    height: 100%;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-between;
-                    border-radius: var(--radius-md);
-                    border: 1px solid #e2e8f0;
-                    background: var(--white);
-                    box-shadow: 0 1px 2px rgba(16, 26, 46, 0.02);
-                    box-sizing: border-box;
-                }
-
-                .summary-top {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    gap: 4px;
-                    margin-bottom: 4px;
-                }
-
-                .summary-label {
-                    font-size: 11.5px;
-                    font-weight: 600;
-                    color: #475569;
-                    text-transform: none;
-                    letter-spacing: normal;
-                    line-height: 1.25;
-                }
-
-                .summary-icon {
-                    width: 24px;
-                    height: 24px;
-                    border-radius: 6px;
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: #f8fafc;
-                    color: #64748b;
-                    flex-shrink: 0;
-                }
-
-                .summary-icon svg {
-                    width: 13px;
-                    height: 13px;
-                }
-
-                .summary-icon.highlight {
-                    background: #fff7ed;
-                    color: var(--solar-orange-dark);
-                    border: 1px solid #ffedd5;
-                }
-
-                .summary-content-block {
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: flex-end;
-                    flex: 1;
-                }
-
-                .summary-value {
-                    font-size: 14.5px;
-                    font-weight: 700;
-                    color: var(--navy);
-                    line-height: 1.2;
-                    word-break: break-word;
-                    margin: 2px 0 1px 0;
-                }
-
-                .next-payment-card .summary-value {
-                    color: var(--solar-orange-dark);
-                    font-size: clamp(26px, 7vw, 28px);
-                    font-weight: 800;
-                    letter-spacing: -0.02em;
-                    line-height: 1.08;
-                    margin: 3px 0 2px 0;
-                }
-
-                .summary-meta {
-                    font-size: 11px;
-                    color: #64748b;
-                    margin-top: 2px;
-                    line-height: 1.3;
-                    white-space: normal;
-                    overflow: visible;
-                    text-overflow: clip;
-                    word-break: break-word;
-                }
-
-                .next-payment-card .summary-meta.due-meta {
-                    font-size: 11.5px;
-                    font-weight: 600;
-                    color: #475569;
-                    line-height: 1.25;
-                }
-
-                /* 2. Compact Expandable Payment Actions */
-                .payments-action-grid {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 8px;
-                    margin-bottom: 12px;
-                }
-
-                .desktop-panel-header {
-                    display: none !important;
-                }
-
-                .action-panel-toggle {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    width: 100%;
-                    padding: 11px 14px;
-                    background: var(--white);
-                    border: 1px solid #e2e8f0;
-                    border-radius: var(--radius-md);
-                    cursor: pointer;
-                    font-family: inherit;
-                    text-align: left;
-                    box-shadow: 0 1px 2px rgba(16, 26, 46, 0.02);
-                    transition: background var(--transition-fast), border-color var(--transition-fast);
-                }
-
-                .action-panel-toggle:focus-visible {
-                    outline: 2px solid var(--solar-orange);
-                    outline-offset: -2px;
-                }
-
-                .action-toggle-left {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                }
-
-                .action-toggle-icon {
-                    width: 30px;
-                    height: 30px;
-                    border-radius: 7px;
-                    background: #fff7ed;
-                    color: var(--solar-orange-dark);
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex-shrink: 0;
-                }
-
-                .action-toggle-icon svg {
-                    width: 15px;
-                    height: 15px;
-                }
-
-                .action-toggle-title {
-                    font-size: 14px;
-                    font-weight: 700;
-                    color: var(--navy);
-                }
-
-                .action-toggle-chevron {
-                    width: 16px;
-                    height: 16px;
-                    color: #64748b;
-                    transition: transform 0.25s ease;
-                    stroke: currentColor;
-                }
-
-                .action-collapsible-panel {
-                    background: transparent;
-                    border: none;
-                    box-shadow: none;
-                    margin-bottom: 0;
-                }
-
-                .action-collapsible-panel .panel-body {
-                    display: none;
-                    padding: 14px;
-                    background: var(--white);
-                    border: 1px solid #e2e8f0;
-                    border-top: none;
-                    border-bottom-left-radius: var(--radius-md);
-                    border-bottom-right-radius: var(--radius-md);
-                    box-shadow: 0 2px 4px rgba(16, 26, 46, 0.03);
-                }
-
-                .action-collapsible-panel.is-open .panel-body {
-                    display: block;
-                }
-
-                .action-collapsible-panel.is-open .action-panel-toggle {
-                    border-bottom-left-radius: 0;
-                    border-bottom-right-radius: 0;
-                    background: #fffdfb;
-                    border-color: #cbd5e1;
-                }
-
-                .action-collapsible-panel.is-open .action-panel-toggle .action-toggle-chevron {
-                    transform: rotate(180deg);
-                }
-
-                /* How to Pay methods as simple labeled rows */
-                .payment-methods-grid {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 6px;
-                    margin: 10px 0 12px 0;
-                }
-
-                .payment-method-box {
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 8px 11px;
-                    background: #f8fafc;
-                    border: 1px solid #e2e8f0;
-                    border-radius: var(--radius-sm);
-                    gap: 8px;
-                }
-
-                .payment-method-box .method-tag {
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: var(--navy);
-                    margin: 0;
-                }
-
-                .payment-method-box .method-sub {
-                    font-size: 11px;
-                    color: #64748b;
-                    margin: 0;
-                }
-
-                .payment-method-box .method-detail {
-                    font-size: 12.5px;
-                    font-weight: 700;
-                    color: var(--solar-orange-dark);
-                    letter-spacing: 0.02em;
-                    white-space: nowrap;
-                }
-
-                .payment-instructions-box {
-                    padding: 10px 12px;
-                    font-size: 12px;
-                }
-
-                .due-callout {
-                    flex-direction: column;
-                    align-items: flex-start;
-                    gap: 6px;
-                    padding: 10px 12px;
-                    margin-bottom: 10px;
-                }
-
-                .due-callout #dueCalloutMeta {
-                    text-align: left;
-                }
-
-                .due-amount-large {
-                    font-size: 19px;
-                }
-
-                /* 3. Payment History Section */
-                .desktop-only-badge {
-                    display: none !important;
-                }
-
-                #paymentHistorySection .panel-header {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: flex-start;
-                    gap: 6px;
-                    padding: 14px 14px 12px;
-                }
-
-                #paymentHistorySection .panel-header>div:first-child {
-                    width: 100%;
-                }
-
-                #paymentHistorySection .panel-title {
-                    font-size: 16px;
-                    font-weight: 700;
-                    color: var(--navy);
-                    margin: 0 0 2px 0;
-                    width: 100%;
-                }
-
-                #paymentHistorySection .panel-subtitle {
-                    font-size: 12px;
-                    color: #64748b;
-                    margin: 0;
-                    line-height: 1.35;
-                    word-break: break-word;
-                }
-
-                #paymentHistorySection .panel-header-actions {
-                    width: 100%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: flex-start;
-                    margin-top: 4px;
-                }
-
-                #paymentHistorySection #downloadReceiptBtn {
-                    height: 28px;
-                    padding: 0 10px;
-                    font-size: 11.5px;
-                    font-weight: 600;
-                    border-radius: 6px;
-                    background: #f8fafc;
-                    border: 1px solid #cbd5e1;
-                    color: var(--navy);
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 5px;
-                }
-
-                #paymentHistorySection #downloadReceiptBtn:hover {
-                    background: #f1f5f9;
-                    border-color: #94a3b8;
-                }
-
-                #paymentHistorySection .panel-body {
-                    padding: 10px 12px 14px;
-                }
-
-                .payments-table-controls {
-                    gap: 8px;
-                    margin-bottom: 12px;
-                }
-
-                .payments-search-wrap {
-                    width: 100%;
-                    flex: 1 1 100%;
-                    max-width: 100%;
-                    min-width: 0;
-                }
-
-                .payments-search-input {
-                    font-size: 12.5px;
-                    height: 38px;
-                }
-
-                .payments-filter-chips {
-                    width: 100%;
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 6px;
-                    justify-content: flex-start;
-                }
-
-                .filter-chip {
-                    padding: 5px 12px;
-                    font-size: 11.5px;
-                }
-
-                /* Switch to mobile cards layout */
-                .desktop-only-table {
-                    display: none;
-                }
-
-                .mobile-only-cards {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 8px;
-                }
-
-                .payment-mobile-card {
-                    padding: 11px 12px;
-                    gap: 8px;
-                }
-
-                .mobile-card-month {
-                    font-size: 14.5px;
-                }
-
-                .mobile-card-body {
-                    padding: 7px 10px;
-                    gap: 8px;
-                }
-
-                .mobile-card-val {
-                    font-size: 14.5px;
-                }
-
-                .mobile-card-val-meta {
-                    font-size: 12.5px;
-                }
-
-                #paymentHistorySection {
-                    margin-bottom: 0;
-                }
-
-                .portal-footer {
-                    display: none !important;
-                }
-            }
-
-            /* Receipt workspace: primary form and compact supporting actions. */
-            .payments-action-grid {
-                display: grid;
-                grid-template-columns: minmax(0, 1.8fr) minmax(280px, 1fr);
-                gap: 20px;
-                align-items: start;
-            }
-
-            .payment-help-column {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-                min-width: 0;
-            }
-
-            #submitProofSection {
-                min-width: 0;
-                margin: 0;
-                background: #fff;
-                border: 1px solid #e6e2db;
-                border-radius: 16px;
-                overflow: hidden;
-            }
-
-            #submitProofSection .desktop-panel-header {
-                display: flex !important;
-                padding: 22px 24px 16px;
-            }
-
-            #submitProofBody {
-                display: block;
-                padding: 0 24px 24px;
-            }
-
-            #submitProofSection .upload-dropzone {
-                min-height: 220px;
-                box-sizing: border-box;
-            }
-
-            #howToPaySection {
-                margin: 0;
-                background: #fff;
-                border: 1px solid #e6e2db;
-                border-radius: 12px;
-                overflow: hidden;
-                box-shadow: none;
-            }
-
-            #howToPaySection .desktop-panel-header {
-                display: none !important;
-            }
-
-            #howToPayToggleBtn {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                width: 100%;
-                padding: 18px;
-                background: #fff;
-                border: 0;
-                border-radius: 0;
-                font: inherit;
-                text-align: left;
-                cursor: pointer;
-            }
-
-            #howToPayToggleBtn .action-toggle-left {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            #howToPayToggleBtn .action-toggle-icon {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 30px;
-                height: 30px;
-                background: #fff7ed;
-                border-radius: 7px;
-                color: #ff8a00;
-            }
-
-            #howToPayToggleBtn .action-toggle-icon svg {
-                width: 17px;
-                height: 17px;
-            }
-
-            #howToPayToggleBtn .action-toggle-title {
-                font-size: 14px;
-                font-weight: 700;
-                color: #292724;
-            }
-
-            #howToPayToggleBtn .action-toggle-chevron {
-                width: 16px;
-                height: 16px;
-                color: #746e65;
-                transition: transform .2s;
-            }
-
-            #howToPaySection.is-open .action-toggle-chevron {
-                transform: rotate(180deg);
-            }
-
-            #howToPayBody {
-                display: none;
-                padding: 0 18px 18px;
-                border: 0;
-                box-shadow: none;
-            }
-
-            #howToPaySection.is-open #howToPayBody {
-                display: block;
-            }
-
-            #howToPayBody .payment-methods-grid {
-                display: grid;
-                grid-template-columns: minmax(0, 1fr);
-            }
-
-            #howToPayBody .due-callout {
-                flex-wrap: wrap;
-                gap: 8px;
-                padding: 12px;
-            }
-
-            #howToPayBody #dueCalloutMeta {
-                text-align: left !important;
-            }
-
-            .payment-history-launch {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 12px;
-                padding: 18px;
-                width: 100%;
-                background: #fff;
-                color: #292724;
-                border: 1px solid #e6e2db;
-                border-radius: 12px;
-                font: inherit;
-                font-size: 14px;
-                font-weight: 700;
-                cursor: pointer;
-            }
-
-            .payment-history-launch span {
-                color: #ba6509;
-            }
-
-            .payment-history-launch:hover,
-            #howToPayToggleBtn:hover {
-                background: #fff8eb;
-            }
-
-            .payment-history-launch:focus-visible,
-            #howToPayToggleBtn:focus-visible,
-            #closePaymentHistoryBtn:focus-visible {
-                outline: 2px solid #ba6509;
-                outline-offset: -3px;
-            }
-
-
-            @media (max-width: 767px) {
-                .payments-action-grid {
-                    grid-template-columns: minmax(0, 1fr);
-                    gap: 12px;
-                }
-
-                #submitProofSection .desktop-panel-header {
-                    padding: 18px 16px 12px;
-                }
-
-                #submitProofBody {
-                    padding: 0 16px 18px;
-                }
-
-                #submitProofSection .upload-dropzone {
-                    min-height: 180px;
-                }
-            }
-
-            /* ==========================================================================
-           PAYMENT HISTORY MODAL DIALOG (Hello Solar Design System)
-           ========================================================================== */
-            dialog#paymentHistoryModal::backdrop {
-                background: rgba(16, 26, 46, 0.65);
-                backdrop-filter: blur(6px);
-                -webkit-backdrop-filter: blur(6px);
-                animation: paymentModalBackdropFadeIn 0.22s ease-out;
-            }
-
-            dialog#paymentHistoryModal {
-                position: fixed;
-                inset: 0;
-                margin: auto;
-                padding: 0;
-                box-sizing: border-box;
-                width: min(980px, calc(100vw - 32px));
-                min-width: 0;
-                max-width: calc(100vw - 32px);
-                height: fit-content;
-                max-height: min(880px, calc(100dvh - 48px));
-                overflow: hidden;
-                border: 1px solid var(--gray-200);
-                border-radius: 20px;
-                background: #ffffff;
-                color: var(--navy);
-                box-shadow: 0 25px 60px -15px rgba(16, 26, 46, 0.25), 0 0 0 1px rgba(16, 26, 46, 0.05);
-            }
-
-            dialog#paymentHistoryModal:not([open]) {
-                display: none;
-            }
-
-            dialog#paymentHistoryModal[open] {
-                display: flex;
-                flex-direction: column;
-                animation: paymentModalSlideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-            }
-
-            @keyframes paymentModalBackdropFadeIn {
-                from {
-                    opacity: 0;
-                }
-
-                to {
-                    opacity: 1;
-                }
-            }
-
-            @keyframes paymentModalSlideUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(14px) scale(0.985);
-                }
-
-                to {
-                    opacity: 1;
-                    transform: translateY(0) scale(1);
-                }
-            }
-
-            #paymentHistoryModal #paymentHistorySection {
-                display: flex;
-                flex-direction: column;
-                width: 100%;
-                min-width: 0;
-                min-height: 0;
-                max-height: inherit;
-                overflow: hidden;
-                border-radius: inherit;
-                background: #ffffff;
-                border: none;
-                box-shadow: none;
-                margin: 0;
-            }
-
-            /* Modal Header */
-            #paymentHistoryModal #paymentHistorySection>.panel-header {
-                position: relative;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                flex: 0 0 auto;
-                gap: 16px;
-                padding: 22px 64px 20px 26px;
-                margin: 0;
-                border-bottom: 1px solid var(--gray-200);
-                background: #ffffff;
-            }
-
-            #paymentHistoryModal .panel-title {
-                margin: 0 0 4px;
-                font-size: 20px;
-                font-weight: 800;
-                line-height: 1.25;
-                letter-spacing: -0.02em;
-                color: var(--navy);
-            }
-
-            #paymentHistoryModal .panel-subtitle {
-                margin: 0;
-                font-size: 13px;
-                line-height: 1.45;
-                color: var(--gray-500);
-                overflow-wrap: anywhere;
-            }
-
-            #paymentHistoryModal #closePaymentHistoryBtn {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 34px;
-                height: 34px;
-                padding: 0;
-                border: 1px solid transparent;
-                border-radius: 50%;
-                background: #f1f5f9;
-                color: var(--gray-600);
-                font-size: 18px;
-                line-height: 1;
-                cursor: pointer;
-                transition: all var(--transition-fast);
-                box-shadow: 0 1px 2px rgba(16, 26, 46, 0.04);
-            }
-
-            #paymentHistoryModal #closePaymentHistoryBtn:hover {
-                background: #fff7ed;
-                border-color: #fed7aa;
-                color: var(--solar-orange-dark);
-                transform: rotate(90deg);
-            }
-
-            #paymentHistoryModal #closePaymentHistoryBtn:focus-visible {
-                outline: 2px solid var(--solar-orange);
-                outline-offset: 2px;
-            }
-
-            #paymentHistoryModal .panel-header-actions {
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                gap: 10px;
-                margin: 0;
-            }
-
-            #paymentHistoryModal #paymentScheduleBadge {
-                font-size: 11.5px;
-                font-weight: 700;
-                padding: 5px 12px;
-                border-radius: 9999px;
-                background: #f8fafc;
-                color: var(--navy);
-                border: 1px solid var(--gray-200);
-                letter-spacing: 0.02em;
-            }
-
-            #paymentHistoryModal #downloadReceiptBtn {
-                height: 34px;
-                padding: 0 14px;
-                font-size: 12.5px;
-                font-weight: 700;
-                border-radius: 8px;
-                border: 1px solid var(--gray-200);
-                background: #ffffff;
-                color: var(--navy);
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                cursor: pointer;
-                box-shadow: 0 1px 2px rgba(16, 26, 46, 0.04);
-                transition: all var(--transition-fast);
-            }
-
-            #paymentHistoryModal #downloadReceiptBtn svg {
-                color: var(--gray-500);
-                transition: color var(--transition-fast);
-            }
-
-            #paymentHistoryModal #downloadReceiptBtn:hover {
-                background: #fff7ed;
-                border-color: #fed7aa;
-                color: var(--solar-orange-dark);
-            }
-
-            #paymentHistoryModal #downloadReceiptBtn:hover svg {
-                color: var(--solar-orange-dark);
-            }
-
-            /* Modal Body */
-            #paymentHistoryModal #paymentHistorySection>.panel-body {
-                flex: 1 1 auto;
-                min-height: 0;
-                padding: 22px 26px 26px;
-                overflow-y: auto;
-                overscroll-behavior: contain;
-            }
-
-            /* Controls: Search & Filters */
-            #paymentHistoryModal .payments-table-controls {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 14px;
-                margin-bottom: 20px;
-                flex-wrap: wrap;
-            }
-
-            #paymentHistoryModal .payments-search-wrap {
-                position: relative;
-                flex: 1 1 280px;
-                min-width: 0;
-                display: flex;
-                align-items: center;
-            }
-
-            #paymentHistoryModal .payments-search-wrap svg {
-                position: absolute;
-                left: 13px;
-                color: var(--gray-400);
-                pointer-events: none;
-                width: 15px;
-                height: 15px;
-            }
-
-            #paymentHistoryModal .payments-search-input {
-                width: 100%;
-                height: 40px;
-                padding: 0 14px 0 38px;
-                background: #f8fafc;
-                border: 1px solid var(--gray-200);
-                border-radius: 10px;
-                font-size: 13px;
-                color: var(--navy);
-                box-sizing: border-box;
-                transition: all var(--transition-fast);
-            }
-
-            #paymentHistoryModal .payments-search-input:focus {
-                outline: none;
-                background: #ffffff;
-                border-color: var(--solar-orange);
-                box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.15);
-            }
-
-            #paymentHistoryModal .payments-filter-chips {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                flex-wrap: wrap;
-            }
-
-            #paymentHistoryModal .filter-chip {
-                height: 32px;
-                padding: 0 13px;
-                border-radius: 9999px;
-                font-size: 12px;
-                font-weight: 600;
-                border: 1px solid var(--gray-200);
-                background: #f8fafc;
-                color: var(--gray-600);
-                cursor: pointer;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                transition: all var(--transition-fast);
-            }
-
-            #paymentHistoryModal .filter-chip:hover {
-                background: #f1f5f9;
-                color: var(--navy);
-                border-color: var(--gray-300);
-            }
-
-            #paymentHistoryModal .filter-chip.active {
-                background: #fff7ed;
-                border-color: #fed7aa;
-                color: var(--solar-orange-dark);
-                font-weight: 700;
-                box-shadow: 0 1px 3px rgba(234, 88, 12, 0.1);
-            }
-
-            /* Desktop Table View */
-            #paymentHistoryModal .table-responsive {
-                border: 1px solid var(--gray-200);
-                border-radius: 12px;
-                overflow-x: auto;
-                background: #ffffff;
-            }
-
-            #paymentHistoryModal .portal-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin: 0;
-            }
-
-            #paymentHistoryModal .portal-table th {
-                background: #f8fafc;
-                color: #475569;
-                font-size: 11px;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                padding: 12px 18px;
-                border-bottom: 1px solid var(--gray-200);
-                text-align: left;
-                white-space: nowrap;
-            }
-
-            #paymentHistoryModal .portal-table td {
-                padding: 13px 18px;
-                font-size: 13.5px;
-                color: var(--navy);
-                border-bottom: 1px solid #f1f5f9;
-                vertical-align: middle;
-                transition: background var(--transition-fast);
-            }
-
-            #paymentHistoryModal .portal-table tbody tr:last-child td {
-                border-bottom: none;
-            }
-
-            #paymentHistoryModal .portal-table tbody tr:hover td {
-                background: #fffbf5;
-            }
-
-            #paymentHistoryModal .download-row-receipt {
-                height: 28px;
-                padding: 0 10px;
-                font-size: 11.5px;
-                font-weight: 600;
-                border-radius: 6px;
-                border: 1px solid var(--gray-200);
-                background: #f8fafc;
-                color: var(--navy);
-                display: inline-flex;
-                align-items: center;
-                gap: 5px;
-                cursor: pointer;
-                transition: all var(--transition-fast);
-            }
-
-            #paymentHistoryModal .download-row-receipt svg {
-                color: var(--gray-500);
-                transition: color var(--transition-fast);
-            }
-
-            #paymentHistoryModal .download-row-receipt:hover {
-                background: #fff7ed;
-                border-color: #fed7aa;
-                color: var(--solar-orange-dark);
-            }
-
-            #paymentHistoryModal .download-row-receipt:hover svg {
-                color: var(--solar-orange-dark);
-            }
-
-            /* See More / See Less Toggle Wrap */
-            #paymentHistoryModal .payments-history-toggle-wrap {
-                margin-top: 16px;
-                text-align: center;
-            }
-
-            #paymentHistoryModal .payments-history-toggle-btn {
-                height: 36px;
-                padding: 0 18px;
-                border-radius: 8px;
-                border: 1px solid var(--gray-200);
-                background: #f8fafc;
-                color: var(--navy);
-                font-size: 12.5px;
-                font-weight: 600;
-                cursor: pointer;
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                transition: all var(--transition-fast);
-            }
-
-            #paymentHistoryModal .payments-history-toggle-btn:hover {
-                background: #fff7ed;
-                border-color: #fed7aa;
-                color: var(--solar-orange-dark);
-            }
-
-            /* Mobile Responsive Overrides */
-            @media (max-width: 767px) {
-                dialog#paymentHistoryModal {
-                    width: calc(100vw - 20px);
-                    max-width: calc(100vw - 20px);
-                    max-height: calc(100dvh - 24px);
-                    border-radius: 16px;
-                }
-
-                #paymentHistoryModal #paymentHistorySection>.panel-header {
-                    padding: 18px 52px 14px 16px;
-                    flex-direction: column;
-                    align-items: flex-start;
-                    gap: 12px;
-                }
-
-                #paymentHistoryModal .panel-title {
-                    font-size: 18px;
-                }
-
-                #paymentHistoryModal #closePaymentHistoryBtn {
-                    top: 14px;
-                    right: 14px;
-                    width: 32px;
-                    height: 32px;
-                    font-size: 16px;
-                }
-
-                #paymentHistoryModal .panel-header-actions {
-                    width: 100%;
-                    justify-content: flex-start;
-                }
-
-                #paymentHistoryModal #paymentHistorySection>.panel-body {
-                    padding: 16px;
-                }
-
-                #paymentHistoryModal .payments-table-controls {
-                    flex-direction: column;
-                    align-items: stretch;
-                    gap: 10px;
-                }
-
-                #paymentHistoryModal .payments-search-wrap {
-                    flex-basis: auto;
-                    width: 100%;
-                }
-
-                #paymentHistoryModal .payment-mobile-card {
-                    background: #ffffff;
-                    border: 1px solid var(--gray-200);
-                    border-radius: 12px;
-                    padding: 14px;
-                    margin-bottom: 10px;
-                    box-shadow: 0 1px 3px rgba(16, 26, 46, 0.03);
-                    transition: border-color var(--transition-fast), background var(--transition-fast);
-                }
-
-                #paymentHistoryModal .payment-mobile-card:hover {
-                    border-color: #fed7aa;
-                    background: #fffdfa;
-                }
-            }
-
-        }
-    </style>
-
-    <style>
-        /* Page layout stays below the shared dashboard theme in the cascade. */
-        @layer dashboard-legacy {
-
-            /* Receipt action: orange background matched to the supplied reference. */
-            #uploadProofBtn {
-                background: linear-gradient(110deg, #ff9900 0%, #ff7900 100%);
-                border-color: #ff8a00;
-                color: #ffffff;
-            }
-
-            #uploadProofBtn svg {
-                color: #ffffff;
-                stroke: currentColor;
-            }
-
-            #uploadProofBtn:hover:not(:disabled) {
-                background: linear-gradient(110deg, #f59000 0%, #f27100 100%);
-                border-color: #f58000;
-                color: #ffffff;
-            }
-
-        }
-    </style>
+    <link rel="stylesheet" href="css/payments-page-2.css">
+    <link rel="stylesheet" href="css/customer-polish.css">
 </head>
 
 <body>
@@ -1685,60 +44,28 @@
 
             <nav class="nav" aria-label="Portal navigation">
                 <a href="mysystem.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="4" />
-                        <path d="M12 2v2" />
-                        <path d="M12 20v2" />
-                        <path d="m4.93 4.93 1.41 1.41" />
-                        <path d="m17.66 17.66 1.41 1.41" />
-                        <path d="M2 12h2" />
-                        <path d="M20 12h2" />
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41" /></svg>
                     My System
                 </a>
-
                 <a href="energy.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
-                    </svg>
-                    Equipment Details
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" /></svg>
+                    Equipment
                 </a>
-
                 <a href="payments.html" class="nav-link active" aria-current="page">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <rect x="2" y="5" width="20" height="14" rx="2" />
-                        <path d="M2 10h20" />
-                        <path d="M6 15h4" />
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /><path d="M6 15h4" /></svg>
                     My Payments
                 </a>
-
-
+                <a href="documents.html" class="nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M8 13h8M8 17h5" /></svg>
+                    Documents
+                </a>
                 <a href="support.html" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M3 11a9 9 0 0 1 18 0" />
-                        <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
-                        <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
-                        <path d="M17 17c0 2-2 3-5 3" />
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 0 1 18 0" /><path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" /><path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" /><path d="M17 17c0 2-2 3-5 3" /></svg>
                     Support
                 </a>
             </nav>
 
             <div class="sidebar-bottom">
-                <div class="sidebar-status-card">
-                    <div class="sidebar-status-info">
-                        <span class="sidebar-status-label">Next Bill Due</span>
-                        <span class="sidebar-status-val">Sep 1, 2026</span>
-                    </div>
-                    <span class="badge badge-upcoming">₱9,067</span>
-                </div>
-
-                <div class="sidebar-divider"></div>
 
                 <button class="logout-button" id="logoutButton" type="button">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
@@ -1789,9 +116,10 @@
                 <section class="page-intro">
                     <div>
                         <h1>My <span>Payments</span></h1>
-
                     </div>
-
+                    <div class="cta-group">
+                        <div class="package-selector-slot" id="pagePackageSelector"></div>
+                    </div>
                 </section>
 
                 <!-- 1. NEXT PAYMENT & ACCOUNT SUMMARIES (2x2 GRID ON MOBILE) -->
@@ -1799,7 +127,7 @@
                     <!-- 1. Next Payment (Top-Left on Mobile) -->
                     <article class="next-payment-card" id="cardNextPayment">
                         <div class="summary-top">
-                            <span class="summary-label">Next payment</span>
+                            <span class="summary-label" id="summaryCard1Label">Next payment</span>
                             <div class="summary-icon highlight">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
                                     stroke-linejoin="round">
@@ -1820,7 +148,7 @@
                         <!-- 2. Payment Status (Top-Right on Mobile) -->
                         <article class="summary-card secondary-card" id="cardPaymentStatus">
                             <div class="summary-top">
-                                <span class="summary-label">Payment status</span>
+                                <span class="summary-label" id="summaryCard2Label">Payment status</span>
                                 <div class="summary-icon">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
                                         stroke-linejoin="round">
@@ -1838,7 +166,7 @@
                         <!-- 3. Payment Plan (Bottom-Left on Mobile) -->
                         <article class="summary-card secondary-card" id="cardPaymentPlan">
                             <div class="summary-top">
-                                <span class="summary-label">Payment plan</span>
+                                <span class="summary-label" id="summaryCard3Label">Payment plan</span>
                                 <div class="summary-icon">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
                                         stroke-linejoin="round">
@@ -1855,7 +183,7 @@
                         <!-- 4. Payments Completed (Bottom-Right on Mobile) -->
                         <article class="summary-card secondary-card" id="cardPaymentsCompleted">
                             <div class="summary-top">
-                                <span class="summary-label">Payments completed</span>
+                                <span class="summary-label" id="summaryCard4Label">Payments completed</span>
                                 <div class="summary-icon">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
                                         stroke-linejoin="round">
@@ -1923,7 +251,7 @@
                             </div>
 
                             <button type="button" class="btn btn-primary" id="uploadProofBtn"
-                                style="width: 100%; margin-top: 14px;" disabled>
+                                style="width: 100%; margin-top: 14px;">
                                 Submit Proof of Payment
                             </button>
 
@@ -1972,10 +300,11 @@
                                         <div class="due-amount-large" id="dueCalloutAmount">₱9,067</div>
                                     </div>
                                     <div id="dueCalloutMeta"
-                                        style="font-size: 12.5px; text-align: right; color: var(--navy);">
-                                        Period: <strong id="dueCalloutPeriod">Sep 2026 (Current)</strong><br>
-                                        <span style="font-size: 11px; color: var(--gray-500);" id="dueCalloutRef">Ref:
-                                            HS-88219-0926</span>
+                                        style="font-size: 12px; text-align: right; color: var(--navy); display: flex; flex-direction: column; gap: 3px; align-items: flex-end;">
+                                        <div>Type: <strong id="dueCalloutPaymentType">5-Year Installment</strong></div>
+                                        <div><span id="dueCalloutPeriodLabel">Period</span>: <strong id="dueCalloutPeriod">Sep 2026 (Current)</strong></div>
+                                        <div>Due Date: <strong id="dueCalloutDueDate">Oct 15, 2026</strong></div>
+                                        <div style="font-size: 11px; color: var(--gray-500);" id="dueCalloutRef"></div>
                                     </div>
                                 </div>
 
@@ -2001,7 +330,7 @@
                                     <ol>
                                         <li>Send payment to either verified channel above.</li>
                                         <li>Add your account reference number (<span id="howToPayRefBadge"
-                                                style="font-weight: 700; color: var(--navy);">HS-88219</span>) in the
+                                                style="font-weight: 700; color: var(--navy);"></span>) in the
                                             remarks.</li>
                                         <li>Save your transaction screenshot or deposit slip and upload it using the
                                             receipt form.</li>
@@ -2034,7 +363,7 @@
                 <div>
                     <h2 class="panel-title" id="paymentHistoryTitle">Payment History</h2>
                     <p class="panel-subtitle" id="paymentScheduleSubtitle">Monthly installment status for
-                        Greenhills Residential (#HS-88219)</p>
+                        your selected system</p>
                 </div>
                 <div class="panel-header-actions">
                     <span class="badge badge-neutral desktop-only-badge" id="paymentScheduleBadge">5-Year
@@ -2066,7 +395,8 @@
                     <div class="payments-filter-chips" id="paymentsFilterChips">
                         <button type="button" class="filter-chip active" data-filter="all">All</button>
                         <button type="button" class="filter-chip" data-filter="paid">Paid</button>
-                        <button type="button" class="filter-chip" data-filter="due">Due / Upcoming</button>
+                        <button type="button" class="filter-chip" data-filter="upcoming">Upcoming</button>
+                        <button type="button" class="filter-chip" data-filter="unpaid">Unpaid</button>
                     </div>
                 </div>
 
@@ -2108,738 +438,128 @@
         </section>
     </dialog>
 
+    <!-- SUBMIT PAYMENT PROOF MODAL -->
+    <dialog id="submitPaymentProofModal" aria-labelledby="proofModalTitle">
+        <section class="panel" id="submitProofModalSection">
+            <div class="panel-header">
+                <button type="button" id="closeProofModalBtn" aria-label="Close submit payment proof" autofocus>✕</button>
+                <div>
+                    <h2 class="panel-title" id="proofModalTitle">Submit Proof of Payment</h2>
+                    <p class="panel-subtitle" id="proofModalSubtitle">Submit payment receipt for Super Admin verification</p>
+                </div>
+            </div>
+
+            <form id="paymentProofModalForm" class="panel-body">
+                <div class="verification-notice-box">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="color: var(--solar-orange); flex-shrink: 0; margin-top: 1px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">
+                        <strong>Super Admin verification required.</strong> Your submission status will be set to <strong>Payment Under Review</strong> only. Your account is marked Paid once verified by Super Admin.
+                    </p>
+                </div>
+
+                <div class="proof-field-group">
+                    <label class="proof-field-label" for="proofChannelInput">Bank / Payment Channel <span class="required-star">*</span></label>
+                    <select id="proofChannelInput" class="proof-field-select" required>
+                        <option value="GCash">GCash (+63 917 000 1111 - Hello Solar Official)</option>
+                        <option value="Maya">Maya (+63 917 000 1111 - Hello Solar Official)</option>
+                        <option value="BDO Bank Transfer">BDO Bank Transfer (0082-1234-5678 - Hello Solar Inc.)</option>
+                        <option value="BPI Bank Transfer">BPI Bank Transfer</option>
+                        <option value="UnionBank">UnionBank</option>
+                        <option value="Over-the-Counter / Other">Over-the-Counter / Other</option>
+                    </select>
+                </div>
+
+                <div class="proof-field-row">
+                    <div class="proof-field-group">
+                        <label class="proof-field-label" for="proofAmountInput">Amount Deposited <span class="required-star">*</span></label>
+                        <input type="text" id="proofAmountInput" class="proof-field-input" placeholder="₱9,066.67" required>
+                    </div>
+                    <div class="proof-field-group">
+                        <label class="proof-field-label" for="proofDateInput">Payment / Deposit Date <span class="required-star">*</span></label>
+                        <input type="date" id="proofDateInput" class="proof-field-input" required>
+                    </div>
+                </div>
+
+                <div class="proof-field-group">
+                    <label class="proof-field-label" for="proofRefInput">Reference Number <span class="required-star">*</span></label>
+                    <input type="text" id="proofRefInput" class="proof-field-input" placeholder="e.g. HS-12345 or Transaction Ref #" required>
+                </div>
+
+                <div class="proof-field-group">
+                    <label class="proof-field-label" id="modalFileLabel">Receipt Upload <span class="required-star">*</span></label>
+                    <input type="file" id="modalProofFileInput" class="upload-file-input" accept="image/png,image/jpeg,application/pdf">
+                    <div class="upload-dropzone" id="modalProofDropzone" role="button" tabindex="0"
+                        aria-label="Click or drag file to upload payment proof receipt">
+                        <div class="upload-icon-circle">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                        </div>
+                        <div>
+                            <strong style="font-size: 13.5px; color: var(--navy);" id="modalDropzonePrompt">Click or drag receipt file here</strong>
+                            <p style="font-size: 11.5px; color: var(--gray-400); margin-top: 2px;">PNG, JPG, or PDF up to 10MB</p>
+                        </div>
+                    </div>
+
+                    <div class="selected-file-badge" id="modalSelectedFileBadge">
+                        <span>📄</span>
+                        <span id="modalSelectedFileName">receipt.png</span>
+                    </div>
+                </div>
+
+                <div class="proof-modal-actions">
+                    <button type="button" class="btn btn-outline" id="modalCancelProofBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="modalSubmitProofBtn">Submit Payment Proof</button>
+                </div>
+            </form>
+        </section>
+    </dialog>
+
     <!-- MOBILE BOTTOM NAVIGATION -->
     <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
         <div class="mobile-bottom-nav-inner">
             <a href="mysystem.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="4" />
-                    <path
-                        d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41" />
-                </svg>
-                <span>My System</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41" /></svg>
+                <span>System</span>
             </a>
             <a href="energy.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                    stroke-linejoin="round">
-                    <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" />
-                </svg>
-                <span>Equipment Details</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" /></svg>
+                <span>Equipment</span>
             </a>
             <a href="payments.html" class="mobile-nav-item active" aria-current="page">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                    stroke-linejoin="round">
-                    <rect x="2" y="5" width="20" height="14" rx="2" />
-                    <path d="M2 10h20" />
-                    <path d="M6 15h4" />
-                </svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /><path d="M6 15h4" /></svg>
                 <span>Payments</span>
             </a>
+            <a href="documents.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M8 13h8M8 17h5" /></svg>
+                <span>Documents</span>
+            </a>
             <a href="support.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                    stroke-linejoin="round">
-                    <path d="M3 11a9 9 0 0 1 18 0" />
-                    <path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" />
-                    <path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" />
-                    <path d="M17 17c0 2-2 3-5 3" />
-                </svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 0 1 18 0" /><path d="M3 11v4a2 2 0 0 0 2 2h2v-6H5a2 2 0 0 0-2 2" /><path d="M21 11v4a2 2 0 0 1-2 2h-2v-6h2a2 2 0 0 1 2 2" /><path d="M17 17c0 2-2 3-5 3" /></svg>
                 <span>Support</span>
             </a>
         </div>
     </nav>
 
     <!-- Shared Data Loader -->
-    <script src="assets/js/data-loader.js"></script>
+    <script src="js/data-loader.js"></script>
 
     <!-- Core Portal JavaScript -->
-    <script src="assets/js/portal.js"></script>
+    <script src="js/portal.js"></script>
 
-    <script>
-        (function () {
-            "use strict";
+    <script src="js/payments-page-2.js"></script>
+    <script src="js/notifications.js"></script>
 
-            const proofFileInput = document.getElementById("proofFileInput");
-            const uploadDropzone = document.getElementById("uploadDropzone");
-            const selectedFileBadge = document.getElementById("selectedFileBadge");
-            const selectedFileName = document.getElementById("selectedFileName");
-            const uploadProofBtn = document.getElementById("uploadProofBtn");
-            const downloadReceiptBtn = document.getElementById("downloadReceiptBtn");
-
-            // Summary card elements
-            const paymentNextAmount = document.getElementById("paymentNextAmount");
-            const paymentNextDueMeta = document.getElementById("paymentNextDueMeta");
-            const paymentPlanTerm = document.getElementById("paymentPlanTerm");
-            const paymentPlanMeta = document.getElementById("paymentPlanMeta");
-            const paymentPaidCount = document.getElementById("paymentPaidCount");
-            const paymentTotalPaidMeta = document.getElementById("paymentTotalPaidMeta");
-            const paymentStandingVal = document.getElementById("paymentStandingVal");
-            const paymentStandingMeta = document.getElementById("paymentStandingMeta");
-
-            // Schedule table and card elements
-            const paymentScheduleSubtitle = document.getElementById("paymentScheduleSubtitle");
-            const paymentScheduleBadge = document.getElementById("paymentScheduleBadge");
-            const paymentScheduleTableBody = document.getElementById("paymentScheduleTableBody");
-            const paymentScheduleCards = document.getElementById("paymentScheduleCards");
-            const paymentsSearchInput = document.getElementById("paymentsSearchInput");
-            const paymentsFilterChips = document.getElementById("paymentsFilterChips");
-
-            // Due callout elements
-            const dueCalloutBox = document.getElementById("dueCalloutBox");
-            const dueCalloutTitle = document.getElementById("dueCalloutTitle");
-            const dueCalloutAmount = document.getElementById("dueCalloutAmount");
-            const dueCalloutPeriod = document.getElementById("dueCalloutPeriod");
-            const dueCalloutRef = document.getElementById("dueCalloutRef");
-            const howToPayRefBadge = document.getElementById("howToPayRefBadge");
-
-            // Mobile expandable action panels
-            const howToPayToggleBtn = document.getElementById("howToPayToggleBtn");
-            const howToPaySection = document.getElementById("howToPaySection");
-            const uploadReceiptToggleBtn = document.getElementById("uploadReceiptToggleBtn");
-            const submitProofSection = document.getElementById("submitProofSection");
-
-            // Payment History toggle elements
-            const paymentsHistoryToggleWrap = document.getElementById("paymentsHistoryToggleWrap");
-            const paymentsHistoryToggleBtn = document.getElementById("paymentsHistoryToggleBtn");
-            const paymentsHistoryToggleText = document.getElementById("paymentsHistoryToggleText");
-            const COLLAPSED_RECORD_LIMIT = 3;
-            let isHistoryExpanded = false;
-
-            let currentPackage = null;
-            let renderToken = 0;
-            let selectedFile = null;
-            let activeFilter = "all";
-            let activeSearchQuery = "";
-            const packageFileDrafts = {};
-            const submittedProofs = {};
-
-            // ----------------------------------------------------------------------
-            // 1. UNFINISHED INPUT / DIRTY CHECK PROTECTION
-            // ----------------------------------------------------------------------
-            function setupDirtyCheck() {
-                if (window.HelloSolar && window.HelloSolar.registerDirtyCheck) {
-                    window.HelloSolar.registerDirtyCheck(() => {
-                        if (selectedFile) {
-                            return `payment proof file "${selectedFile.name}" is selected but not submitted`;
-                        }
-                        return null;
-                    });
-                }
-            }
-
-            function clearSelectedFile(preserveInDraft = true) {
-                if (preserveInDraft && currentPackage && selectedFile) {
-                    packageFileDrafts[currentPackage.id] = selectedFile;
-                }
-                selectedFile = null;
-                if (proofFileInput) proofFileInput.value = "";
-                if (selectedFileName) selectedFileName.textContent = "";
-                if (selectedFileBadge) selectedFileBadge.classList.remove("visible");
-                if (uploadProofBtn) {
-                    uploadProofBtn.disabled = true;
-                    uploadProofBtn.textContent = "Submit Proof of Payment";
-                }
-            }
-
-            function restoreSelectedFile(file) {
-                if (!file) return;
-                selectedFile = file;
-                if (selectedFileName) {
-                    selectedFileName.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-                }
-                if (selectedFileBadge) selectedFileBadge.classList.add("visible");
-                if (uploadProofBtn) uploadProofBtn.disabled = false;
-            }
-
-            // File selection event handlers
-            if (uploadDropzone && proofFileInput) {
-                uploadDropzone.addEventListener("click", () => proofFileInput.click());
-                uploadDropzone.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        proofFileInput.click();
-                    }
-                });
-
-                uploadDropzone.addEventListener("dragover", (e) => {
-                    e.preventDefault();
-                    uploadDropzone.classList.add("dragover");
-                });
-
-                uploadDropzone.addEventListener("dragleave", () => {
-                    uploadDropzone.classList.remove("dragover");
-                });
-
-                uploadDropzone.addEventListener("drop", (e) => {
-                    e.preventDefault();
-                    uploadDropzone.classList.remove("dragover");
-                    if (e.dataTransfer.files.length > 0) {
-                        handleFileSelected(e.dataTransfer.files[0]);
-                    }
-                });
-
-                proofFileInput.addEventListener("change", () => {
-                    if (proofFileInput.files.length > 0) {
-                        handleFileSelected(proofFileInput.files[0]);
-                    }
-                });
-            }
-
-            function handleFileSelected(file) {
-                selectedFile = file;
-                if (currentPackage) {
-                    packageFileDrafts[currentPackage.id] = file;
-                }
-                restoreSelectedFile(file);
-            }
-
-            if (uploadProofBtn) {
-                uploadProofBtn.addEventListener("click", () => {
-                    if (!selectedFile || !currentPackage) return;
-                    uploadProofBtn.disabled = true;
-                    uploadProofBtn.textContent = "Processing submission...";
-
-                    setTimeout(() => {
-                        const pkgName = currentPackage.name;
-                        const pkgAcc = currentPackage.accountNo;
-                        const fileName = selectedFile.name;
-
-                        // Save proof submission status for this package
-                        submittedProofs[currentPackage.id] = {
-                            fileName: fileName,
-                            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                            status: "Payment Submitted (Pending Verification)"
-                        };
-
-                        // Clear draft for this package
-                        delete packageFileDrafts[currentPackage.id];
-                        selectedFile = null;
-                        if (proofFileInput) proofFileInput.value = "";
-                        if (selectedFileBadge) selectedFileBadge.classList.remove("visible");
-
-                        uploadProofBtn.textContent = "Proof Submitted (Pending Review) ✓";
-
-                        if (window.HelloSolar && window.HelloSolar.toast) {
-                            window.HelloSolar.toast(
-                                "Payment Submitted (Pending Verification)",
-                                `Receipt (${fileName}) for ${pkgName} (#${pkgAcc}) uploaded. Hello Solar finance team verifies within 24 hours.`
-                            );
-                        }
-
-                        // Re-render table and cards with updated submission status
-                        renderPaymentsPage(currentPackage);
-
-                        setTimeout(() => {
-                            uploadProofBtn.disabled = true;
-                            uploadProofBtn.textContent = "Submit Proof of Payment";
-                        }, 3000);
-                    }, 800);
-                });
-            }
-
-            // ----------------------------------------------------------------------
-            // 2. RENDER PAYMENTS FOR ACTIVE PACKAGE
-            // ----------------------------------------------------------------------
-            function renderTableRows(schedule, pkg) {
-                if (paymentScheduleTableBody) paymentScheduleTableBody.innerHTML = "";
-                if (paymentScheduleCards) paymentScheduleCards.innerHTML = "";
-
-                if (!Array.isArray(schedule) || schedule.length === 0) {
-                    if (paymentsHistoryToggleWrap) paymentsHistoryToggleWrap.style.display = "none";
-                    if (paymentScheduleTableBody) {
-                        paymentScheduleTableBody.innerHTML = `
-                            <tr>
-                                <td colspan="5" style="text-align: center; padding: 24px; color: var(--gray-500);">
-                                    No payment records found.
-                                </td>
-                            </tr>
-                        `;
-                    }
-                    if (paymentScheduleCards) {
-                        paymentScheduleCards.innerHTML = `
-                            <div style="text-align: center; padding: 24px; color: var(--gray-500); background: #f8fafc; border-radius: var(--radius-md); border: 1px dashed #cbd5e1;">
-                                No payment records found.
-                            </div>
-                        `;
-                    }
-                    return;
-                }
-
-                // Check if user submitted proof for this package
-                const pendingProof = submittedProofs[pkg.id];
-
-                // Filter rows (applied to complete dataset before limiting visible records)
-                const filtered = schedule.filter(row => {
-                    // Status filter
-                    const rowStatusLower = (row.status || "").toLowerCase();
-                    if (activeFilter === "paid" && !rowStatusLower.includes("paid")) return false;
-                    if (activeFilter === "due" && !rowStatusLower.includes("due") && !rowStatusLower.includes("upcoming") && !rowStatusLower.includes("pending")) return false;
-
-                    // Search filter
-                    if (activeSearchQuery) {
-                        const q = activeSearchQuery.toLowerCase();
-                        const periodMatch = (row.period || "").toLowerCase().includes(q);
-                        const dueMatch = (row.due || "").toLowerCase().includes(q);
-                        const statusMatch = (row.status || "").toLowerCase().includes(q);
-                        const receiptMatch = (row.receiptId || "").toLowerCase().includes(q);
-                        const amountMatch = (row.amount || "").toLowerCase().includes(q);
-                        if (!periodMatch && !dueMatch && !statusMatch && !receiptMatch && !amountMatch) return false;
-                    }
-
-                    return true;
-                });
-
-                if (filtered.length === 0) {
-                    if (paymentsHistoryToggleWrap) paymentsHistoryToggleWrap.style.display = "none";
-                    if (paymentScheduleTableBody) {
-                        paymentScheduleTableBody.innerHTML = `
-                            <tr>
-                                <td colspan="5" style="text-align: center; padding: 32px 16px; color: var(--gray-500);">
-                                    <strong>No records match your filter</strong>
-                                    <p style="font-size: 12px; margin-top: 4px;">Try searching for another period or resetting the filter chips.</p>
-                                </td>
-                            </tr>
-                        `;
-                    }
-                    if (paymentScheduleCards) {
-                        paymentScheduleCards.innerHTML = `
-                            <div style="text-align: center; padding: 28px 16px; color: var(--gray-500); background: #f8fafc; border-radius: var(--radius-md); border: 1px dashed #cbd5e1;">
-                                <strong style="color: var(--navy); display: block; margin-bottom: 4px;">No records match your filter</strong>
-                                <span style="font-size: 12px;">Try searching for another period or resetting the filter chips.</span>
-                            </div>
-                        `;
-                    }
-                    return;
-                }
-
-                // Manage toggle visibility and button label
-                const needsToggle = filtered.length > COLLAPSED_RECORD_LIMIT;
-                if (paymentsHistoryToggleWrap) {
-                    if (needsToggle) {
-                        paymentsHistoryToggleWrap.style.display = "flex";
-                        if (paymentsHistoryToggleBtn) {
-                            paymentsHistoryToggleBtn.setAttribute("aria-expanded", isHistoryExpanded ? "true" : "false");
-                        }
-                        if (paymentsHistoryToggleText) {
-                            paymentsHistoryToggleText.textContent = isHistoryExpanded ? "See less" : "See more";
-                        }
-                    } else {
-                        paymentsHistoryToggleWrap.style.display = "none";
-                    }
-                }
-
-                // Limit visible records to 3 when collapsed, preserving existing sort order
-                const visibleRecords = (needsToggle && !isHistoryExpanded)
-                    ? filtered.slice(0, COLLAPSED_RECORD_LIMIT)
-                    : filtered;
-
-                visibleRecords.forEach(row => {
-                    let displayStatus = row.status;
-                    let displayBadge = row.badgeClass || 'badge-neutral';
-                    let isHighlighted = false;
-
-                    if (pendingProof && (row.status === "Due Soon" || row.status === "Due")) {
-                        displayStatus = "Payment Submitted (Pending Verification)";
-                        displayBadge = "badge-warning";
-                        isHighlighted = true;
-                    }
-
-                    // 1. Desktop Table Row
-                    if (paymentScheduleTableBody) {
-                        const tr = document.createElement("tr");
-                        if (isHighlighted) {
-                            tr.style.background = "#fffdf5";
-                        } else if (row.status === "Due Soon") {
-                            tr.style.background = "#fffbf2";
-                        }
-
-                        const receiptCell = row.receiptId ? `
-                            <button type="button" class="btn btn-outline btn-xs download-row-receipt" data-receipt="${row.receiptId}" data-period="${row.period}" title="Download receipt for ${row.period}">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="7 10 12 15 17 10"></polyline>
-                                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                                </svg>
-                                <span>${row.receiptId}</span>
-                            </button>
-                        ` : (pendingProof && (row.status === "Due Soon" || row.status === "Due")
-                            ? `<span style="color: var(--solar-orange-dark); font-size: 11.5px; font-weight: 700;">Uploaded (${pendingProof.fileName})</span>`
-                            : `<span style="color: var(--gray-400); font-size: 12px;">—</span>`);
-
-                        tr.innerHTML = `
-                            <td><strong>${row.period}</strong></td>
-                            <td>${row.due}</td>
-                            <td><span class="badge ${displayBadge}">${displayStatus}</span></td>
-                            <td ${isHighlighted || row.status === 'Due Soon' ? 'style="color: var(--solar-orange-dark); font-weight: 800;"' : ''}>${row.amount}</td>
-                            <td>${receiptCell}</td>
-                        `;
-                        paymentScheduleTableBody.appendChild(tr);
-                    }
-
-                    // 2. Mobile Stacked Card
-                    if (paymentScheduleCards) {
-                        const card = document.createElement("article");
-                        card.className = "payment-mobile-card";
-                        if (isHighlighted) {
-                            card.style.borderColor = "var(--solar-orange-light)";
-                            card.style.background = "#fffdf5";
-                        } else if (row.status === "Due Soon") {
-                            card.style.borderColor = "rgba(255, 122, 0, 0.35)";
-                        }
-
-                        let cardActionHtml = "";
-                        if (row.receiptId) {
-                            cardActionHtml = `
-                                <div class="mobile-card-action">
-                                    <button type="button" class="btn btn-outline btn-sm download-row-receipt" data-receipt="${row.receiptId}" data-period="${row.period}" style="width: 100%; justify-content: center; font-size: 12px; gap: 6px; padding: 7px 12px;">
-                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                            <polyline points="7 10 12 15 17 10"></polyline>
-                                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                                        </svg>
-                                        <span>Download Receipt</span>
-                                    </button>
-                                </div>
-                            `;
-                        } else if (pendingProof && (row.status === "Due Soon" || row.status === "Due")) {
-                            cardActionHtml = `
-                                <div style="font-size: 11.5px; color: var(--solar-orange-dark); font-weight: 700; background: #fff8eb; padding: 6px 10px; border-radius: var(--radius-sm); text-align: center;">
-                                    Receipt Uploaded (${pendingProof.fileName})
-                                </div>
-                            `;
-                        }
-
-                        card.innerHTML = `
-                            <div class="mobile-card-header">
-                                <span class="mobile-card-month">${row.period}</span>
-                                <span class="badge ${displayBadge}">${displayStatus}</span>
-                            </div>
-                            <div class="mobile-card-body">
-                                <div class="mobile-card-col">
-                                    <span class="mobile-card-label">Amount</span>
-                                    <span class="mobile-card-val ${isHighlighted || row.status === 'Due Soon' ? 'highlight' : ''}">${row.amount}</span>
-                                </div>
-                                <div class="mobile-card-col" style="text-align: right;">
-                                    <span class="mobile-card-label">Due Date</span>
-                                    <span class="mobile-card-val-meta">${row.due}</span>
-                                </div>
-                            </div>
-                            ${cardActionHtml}
-                        `;
-                        paymentScheduleCards.appendChild(card);
-                    }
-                });
-
-                // Wire row download handlers for both table and mobile cards
-                document.querySelectorAll(".download-row-receipt").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        const rec = btn.dataset.receipt;
-                        const per = btn.dataset.period;
-                        if (window.HelloSolar && window.HelloSolar.toast) {
-                            window.HelloSolar.toast(
-                                "Receipt Downloaded",
-                                `Receipt #${rec} for ${pkg.name} (${per}) downloaded.`
-                            );
-                        }
-                    });
-                });
-            }
-
-            function renderPaymentsPage(pkg) {
-                if (!pkg) return;
-                renderToken++;
-                const thisToken = renderToken;
-
-                currentPackage = pkg;
-                isHistoryExpanded = false; // Reset to collapsed on account/package change
-
-                // Restore or clear draft input for this system
-                if (packageFileDrafts[pkg.id]) {
-                    restoreSelectedFile(packageFileDrafts[pkg.id]);
-                } else {
-                    clearSelectedFile(false);
-                }
-
-                // Update account reference badge in instructions
-                if (howToPayRefBadge) {
-                    howToPayRefBadge.textContent = pkg.accountNo || "HS-88219";
-                }
-
-                const p = pkg.payments;
-
-                if (p && p.hasBills) {
-                    const pendingProof = submittedProofs[pkg.id];
-
-                    // 1. Summary Cards
-                    if (paymentNextAmount) {
-                        paymentNextAmount.textContent = pendingProof ? "Under Verification" : (p.nextPaymentAmount || "—");
-                    }
-                    if (paymentNextDueMeta) {
-                        paymentNextDueMeta.textContent = pendingProof
-                            ? `Receipt uploaded at ${pendingProof.timestamp}`
-                            : (p.nextDueDate ? `Due on ${p.nextDueDate}` : "No payment due");
-                    }
-                    if (paymentPlanTerm) paymentPlanTerm.textContent = p.term || "5 Years";
-                    if (paymentPlanMeta) paymentPlanMeta.textContent = "Fixed monthly payments";
-                    if (paymentPaidCount) paymentPaidCount.textContent = p.paidInstallments || "—";
-                    if (paymentTotalPaidMeta) paymentTotalPaidMeta.textContent = `${p.totalPaid || "₱0"} total paid`;
-                    if (paymentStandingVal) {
-                        paymentStandingVal.textContent = pendingProof ? "Verification Pending" : (p.standing || "Good");
-                    }
-                    if (paymentStandingMeta) {
-                        if (pendingProof) {
-                            paymentStandingMeta.innerHTML = `<span class="status-dot warning"></span>Proof under review`;
-                        } else {
-                            const dotClass = (p.standing === "Due Soon") ? "status-dot warning" : "status-dot";
-                            paymentStandingMeta.innerHTML = `<span class="${dotClass}"></span>${p.standingMeta || "Account up to date"}`;
-                        }
-                    }
-
-                    // 2. Schedule Panel
-                    if (paymentScheduleSubtitle) {
-                        paymentScheduleSubtitle.textContent = `Monthly installment status for ${pkg.name} (#${pkg.accountNo})`;
-                    }
-                    if (paymentScheduleBadge) {
-                        paymentScheduleBadge.textContent = p.termBadge || "Standard Term";
-                    }
-
-                    // 3. Populate Table & Card Rows
-                    renderTableRows(p.schedule, pkg);
-
-                    // 4. Due Callout Box
-                    if (dueCalloutBox) {
-                        dueCalloutBox.style.background = "#fff5e5";
-                        dueCalloutBox.style.borderLeftColor = "var(--solar-orange)";
-                    }
-                    if (dueCalloutTitle) dueCalloutTitle.textContent = pendingProof ? "Verification Status" : "Amount Due";
-                    if (dueCalloutAmount) dueCalloutAmount.textContent = pendingProof ? "Pending Approval" : (p.nextPaymentAmount || "₱0");
-                    if (dueCalloutPeriod) dueCalloutPeriod.textContent = p.currentBillPeriod || p.nextDueDate || "Current";
-                    if (dueCalloutRef) dueCalloutRef.textContent = `Ref: ${p.currentBillRef || pkg.accountNo}`;
-
-                } else {
-                    // MISSING / PENDING BILLING STATE (e.g. pkg-biz-6k0)
-                    // Explicitly distinguish missing data from zero
-                    if (paymentNextAmount) paymentNextAmount.textContent = "Pending Setup";
-                    if (paymentNextDueMeta) paymentNextDueMeta.textContent = "No billing schedule generated yet";
-                    if (paymentPlanTerm) paymentPlanTerm.textContent = "Pending Assessment";
-                    if (paymentPlanMeta) paymentPlanMeta.textContent = "Awaiting electrical survey sign-off";
-                    if (paymentPaidCount) paymentPaidCount.textContent = "0 of 0";
-                    if (paymentTotalPaidMeta) paymentTotalPaidMeta.textContent = "₱0 total billed";
-                    if (paymentStandingVal) paymentStandingVal.textContent = "Pending Billing";
-                    if (paymentStandingMeta) {
-                        paymentStandingMeta.innerHTML = `<span class="status-dot" style="background:#94a3b8;"></span>No bills issued yet`;
-                    }
-
-                    if (paymentScheduleSubtitle) {
-                        paymentScheduleSubtitle.textContent = `No billing records found for ${pkg.name} (#${pkg.accountNo})`;
-                    }
-                    if (paymentScheduleBadge) {
-                        paymentScheduleBadge.textContent = "Pending Assessment";
-                    }
-
-                    if (paymentScheduleTableBody) {
-                        paymentScheduleTableBody.innerHTML = `
-                            <tr>
-                                <td colspan="5" style="text-align: center; padding: 42px 20px; color: var(--gray-500);">
-                                    <div style="font-size: 32px; margin-bottom: 10px;">📋</div>
-                                    <strong style="font-size: 15px; color: var(--navy); display: block; margin-bottom: 6px;">No Billing Records Yet</strong>
-                                    <p style="font-size: 13px; max-width: 460px; margin: 0 auto; line-height: 1.5; color: var(--gray-500);">
-                                        This newly linked solar installation (#${pkg.accountNo}) has not reached billing generation yet. Once engineering site survey and net-metering stages are commissioned, your payment schedule will appear here.
-                                    </p>
-                                </td>
-                            </tr>
-                        `;
-                    }
-
-                    if (paymentScheduleCards) {
-                        paymentScheduleCards.innerHTML = `
-                            <div style="text-align: center; padding: 36px 16px; color: var(--gray-500); background: #f8fafc; border-radius: var(--radius-md); border: 1px dashed #cbd5e1;">
-                                <div style="font-size: 28px; margin-bottom: 8px;">📋</div>
-                                <strong style="font-size: 14px; color: var(--navy); display: block; margin-bottom: 4px;">No Billing Records Yet</strong>
-                                <p style="font-size: 12px; margin: 0; line-height: 1.45; color: var(--gray-500);">
-                                    This newly linked solar installation (#${pkg.accountNo}) has not reached billing generation yet.
-                                </p>
-                            </div>
-                        `;
-                    }
-
-                    if (paymentsHistoryToggleWrap) {
-                        paymentsHistoryToggleWrap.style.display = "none";
-                    }
-
-                    // Due Callout in pending mode
-                    if (dueCalloutBox) {
-                        dueCalloutBox.style.background = "var(--gray-50)";
-                        dueCalloutBox.style.borderLeftColor = "var(--gray-300)";
-                    }
-                    if (dueCalloutTitle) dueCalloutTitle.textContent = "Account Status";
-                    if (dueCalloutAmount) dueCalloutAmount.textContent = "No Bill Due";
-                    if (dueCalloutPeriod) dueCalloutPeriod.textContent = "Pending Commissioning";
-                    if (dueCalloutRef) dueCalloutRef.textContent = `Account: ${pkg.accountNo}`;
-                }
-            }
-
-            // Filter chips & search input event listeners
-            if (paymentsFilterChips) {
-                paymentsFilterChips.querySelectorAll(".filter-chip").forEach(chip => {
-                    chip.addEventListener("click", () => {
-                        paymentsFilterChips.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
-                        chip.classList.add("active");
-                        activeFilter = chip.dataset.filter || "all";
-                        isHistoryExpanded = false; // Reset to collapsed when filter changes
-                        if (currentPackage && currentPackage.payments && currentPackage.payments.schedule) {
-                            renderTableRows(currentPackage.payments.schedule, currentPackage);
-                        }
-                    });
-                });
-            }
-
-            if (paymentsSearchInput) {
-                paymentsSearchInput.addEventListener("input", (e) => {
-                    activeSearchQuery = (e.target.value || "").trim();
-                    isHistoryExpanded = false; // Reset to collapsed when search query changes
-                    if (currentPackage && currentPackage.payments && currentPackage.payments.schedule) {
-                        renderTableRows(currentPackage.payments.schedule, currentPackage);
-                    }
-                });
-            }
-
-            // See More / See Less toggle handler
-            if (paymentsHistoryToggleBtn) {
-                paymentsHistoryToggleBtn.addEventListener("click", () => {
-                    isHistoryExpanded = !isHistoryExpanded;
-                    if (currentPackage && currentPackage.payments && currentPackage.payments.schedule) {
-                        renderTableRows(currentPackage.payments.schedule, currentPackage);
-                    }
-                    // When collapsing back to 3 records, keep history section comfortably in view
-                    if (!isHistoryExpanded) {
-                        const historySection = document.getElementById("paymentHistorySection");
-                        if (historySection) {
-                            const rect = historySection.getBoundingClientRect();
-                            if (rect.top < 80) {
-                                historySection.scrollIntoView({ behavior: "smooth", block: "start" });
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Mobile expandable action panels toggle listeners
-            if (howToPayToggleBtn && howToPaySection) {
-                howToPayToggleBtn.addEventListener("click", () => {
-                    const isOpen = howToPaySection.classList.toggle("is-open");
-                    howToPayToggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-                });
-            }
-
-            if (uploadReceiptToggleBtn && submitProofSection) {
-                uploadReceiptToggleBtn.addEventListener("click", () => {
-                    const isOpen = submitProofSection.classList.toggle("is-open");
-                    uploadReceiptToggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-                });
-            }
-
-            // ----------------------------------------------------------------------
-            // 3. CTA HANDLERS TIED TO ACTIVE PACKAGE
-            // ----------------------------------------------------------------------
-            if (downloadReceiptBtn) {
-                downloadReceiptBtn.addEventListener("click", () => {
-                    const pkg = currentPackage || (window.HelloSolar && window.HelloSolar.getActivePackage());
-                    if (!pkg) return;
-
-                    if (pkg.payments && pkg.payments.hasBills) {
-                        if (window.HelloSolar && window.HelloSolar.toast) {
-                            window.HelloSolar.toast(
-                                "Statement Downloaded",
-                                `Official billing statement generated for ${pkg.name} (#${pkg.accountNo}).`
-                            );
-                        } else {
-                            alert(`Downloading official statement for ${pkg.name} (${pkg.accountNo})...`);
-                        }
-                    } else {
-                        if (window.HelloSolar && window.HelloSolar.toast) {
-                            window.HelloSolar.toast(
-                                "No Statement Available",
-                                `No issued billing statement exists yet for ${pkg.name} (#${pkg.accountNo}).`
-                            );
-                        } else {
-                            alert(`No statement available yet for ${pkg.name}.`);
-                        }
-                    }
-                });
-            }
-
-            // ----------------------------------------------------------------------
-            // 4. INITIALIZE PAGE & LISTENERS
-            // ----------------------------------------------------------------------
-            setupDirtyCheck();
-
-            // Initial render
-            const initialPkg = (window.HelloSolar && window.HelloSolar.getActivePackage)
-                ? window.HelloSolar.getActivePackage()
-                : null;
-            if (initialPkg) renderPaymentsPage(initialPkg);
-
-            // Listen for package changes triggered from elsewhere
-            window.addEventListener("helloSolarPackageChanged", (e) => {
-                if (e.detail && e.detail.package) {
-                    renderPaymentsPage(e.detail.package);
-                }
-            });
-
-            // Listen for dataset async load completion
-            window.addEventListener("helloSolarDataLoaded", () => {
-                const active = window.HelloSolar ? window.HelloSolar.getActivePackage() : null;
-                if (active) {
-                    renderPaymentsPage(active);
-                }
-            });
-        })();
-    </script>
-    <script src="assets/js/notifications.js"></script>
-
-    <script>
-        (() => {
-            const modal = document.getElementById('paymentHistoryModal');
-            const opener = document.getElementById('openPaymentHistoryBtn');
-            const close = document.getElementById('closePaymentHistoryBtn');
-            let previousOverflow = '';
-            let previousPaddingRight = '';
-
-            if (opener && modal) {
-                opener.addEventListener('click', () => {
-                    if (modal.open) return;
-                    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-                    previousOverflow = document.body.style.overflow;
-                    previousPaddingRight = document.body.style.paddingRight;
-                    if (scrollbarWidth > 0) {
-                        document.body.style.paddingRight = `${scrollbarWidth}px`;
-                    }
-                    modal.showModal();
-                    document.body.style.overflow = 'hidden';
-                });
-            }
-
-            if (close && modal) {
-                close.addEventListener('click', () => modal.close());
-            }
-
-            if (modal) {
-                modal.addEventListener('click', (event) => {
-                    const rect = modal.getBoundingClientRect();
-                    if (event.target === modal && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) {
-                        modal.close();
-                    }
-                });
-                modal.addEventListener('close', () => {
-                    document.body.style.overflow = previousOverflow;
-                    document.body.style.paddingRight = previousPaddingRight;
-                    if (opener) opener.focus();
-                });
-            }
-        })();
-    </script>
+    <script src="js/payments-page-3.js"></script>
 </body>
 
 </html>

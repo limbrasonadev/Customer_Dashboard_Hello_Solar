@@ -71,18 +71,32 @@
         return /\d{5}/.test(number) ? `tel:${number}` : "";
     }
     function renderContact(pkg) {
-        const support = (pkg && pkg.support) || {};
-        const installer = (pkg && pkg.install && pkg.install.assignedTeam) || {};
-        const supportName = support.leadTechnician || "";
-        const samePerson = Boolean(supportName && installer.name && supportName.trim().toLowerCase() === installer.name.trim().toLowerCase());
-        const name = supportName || installer.name || "Hello Solar Support";
-        const role = samePerson ? "Lead Solar Specialist" : supportName ? (support.leadRole || "Support Specialist") : (installer.role || "Solar Specialist");
-        const phone = supportName ? (support.leadPhone || (samePerson ? installer.phone : "")) : installer.phone;
+        const hasInstaller = Boolean(pkg && pkg.assignedInstaller && pkg.assignedInstaller.name);
+
+        let name = "";
+        let role = "";
+        let phone = "";
+        let availability = "";
+
+        if (hasInstaller) {
+            // If an installer is assigned, show the assigned installer as the primary support contact
+            name = pkg.assignedInstaller.name;
+            role = `${pkg.assignedInstaller.role || "Certified Solar Master Installer"} (Assigned Installer)`;
+            phone = pkg.assignedInstaller.phone || "+63 917 555 0101";
+            availability = pkg.assignedInstaller.note || "Primary on-site installer and warranty technician. Mon–Sat, 8am–5pm.";
+        } else {
+            // If no installer is assigned yet, route support to Hello Solar / Super Admin
+            name = "Hello Solar Super Admin / Central Support";
+            role = "Super Admin & Central Dispatch (No installer assigned yet)";
+            phone = "+63 2 8888 0100";
+            availability = "Your solar application is in pre-installation processing. Direct support is routed to Super Admin.";
+        }
+
         const href = telephone(phone) || "mailto:support@hellosolarph.com";
 
         setText("routingLeadName", name);
         setText("routingLeadRole", role);
-        setText("sidebarContactRole", "Support contact");
+        setText("sidebarContactRole", hasInstaller ? "Assigned Installer" : "Super Admin Support");
         setText("sidebarContactName", name);
 
         if ($("routingLeadPhoneLink")) {
@@ -94,27 +108,17 @@
             $("supportHotlineBtn").setAttribute("aria-label", telephone(phone) ? `Call ${name}` : "Email Hello Solar Support");
         }
         setText("routingLeadPhone", telephone(phone) ? `Call ${phone}` : "Email support");
-        setText("supportHotlineText", telephone(phone) ? "Call your contact" : "Email support");
+        setText("supportHotlineText", telephone(phone) ? `Call ${phone}` : "Email support");
 
-        const availability = support.availability || ((samePerson || !supportName) && installer.availability) || "";
         setText("contactAvailability", availability);
-        if ($("contactAvailability")) $("contactAvailability").hidden = !availability;
+        if ($("contactAvailability")) $("contactAvailability").hidden = false;
 
-        const distinctInstaller = Boolean(supportName && installer.name && !samePerson);
         if ($("installerContact")) {
-            $("installerContact").hidden = !distinctInstaller;
-            setText("installerContactName", distinctInstaller ? installer.name : "");
-            setText("installerContactRole", distinctInstaller ? (installer.role || "Installer") : "");
-            const installerHref = telephone(installer.phone);
-            if ($("installerContactPhone")) {
-                $("installerContactPhone").hidden = !distinctInstaller || !installerHref;
-                $("installerContactPhone").href = installerHref || "#";
-                setText("installerContactPhone", installerHref ? `Call ${installer.phone}` : "");
-            }
+            $("installerContact").hidden = true;
         }
 
-        setText("responseTarget", support.responseTarget || "Within 24 hours");
-        setText("supportHours", support.supportHours || "Mon–Sat, 8am–6pm");
+        setText("responseTarget", hasInstaller ? "Within 12 hours (Direct Field Lead)" : "Within 2 hours (Super Admin Priority)");
+        setText("supportHours", hasInstaller ? "Mon–Sat, 8am–5pm" : "Mon–Sun, 24/7 Priority Desk");
     }
 
     function status(ticket) { return ticket.status || "Submitted"; }
@@ -140,6 +144,27 @@
         return el;
     }
 
+    // This customer's tickets for the selected system, from the shared support queue
+    function sharedTickets() {
+        const customer = portal ? portal.getCustomer() : {};
+        if (!window.HSShared || !customer.accountId || !currentPackage) return [];
+        return window.HSShared.supportTicketsFor("Customer", customer.accountId)
+            .filter(t => t.relatedId === currentPackage.appId)
+            .map(t => ({
+                id: t.id,
+                subject: t.subject || t.concern,
+                description: t.notes,
+                category: t.topic || "General",
+                priority: t.priority,
+                createdAt: t.createdAt,
+                status: t.status,
+                resolutionNote: t.resolutionNote || "",
+                technician: t.assignedTo || "Hello Solar Support",
+                packageId: currentPackage.id,
+                accountNo: currentPackage.accountNo
+            }));
+    }
+
     function refreshHistory() {
         let local = [];
         if ($("historyStorageWarning")) $("historyStorageWarning").hidden = true;
@@ -151,8 +176,9 @@
                 $("historyStorageWarning").hidden = false;
             }
         }
-        const records = currentPackage && currentPackage.support && currentPackage.support.tickets;
-        currentTickets = [...local, ...(Array.isArray(records) ? records.filter(t => t && typeof t === "object") : [])];
+        // Shared support queue (Super Admin → Support) is the record; requests saved only on this device before
+        // the shared queue existed are still listed.
+        currentTickets = [...sharedTickets(), ...local];
         renderHistory();
     }
 
@@ -318,23 +344,24 @@
             setText("submitBtnText", "Submitting…");
 
             try {
-                const saved = readLocal("requests");
-                const now = new Date();
-                const randomId = Math.floor(1000 + Math.random() * 9000);
-                const ticket = {
-                    id: `HS-SR-${randomId}`,
-                    subject: (fields.subject && fields.subject.value.trim()) || (fields.description && fields.description.value.trim().slice(0, 80)) || "Service Request",
-                    description: fields.description ? fields.description.value.trim() : "",
-                    category: (fields.category && fields.category.selectedIndex >= 0 && fields.category.options[fields.category.selectedIndex].text) || "General",
-                    priority: (fields.priority && fields.priority.value === "urgent") ? "Urgent" : "Normal",
-                    createdAt: now.toISOString(),
-                    date: now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-                    status: "Submitted",
-                    technician: ($("routingLeadName") && $("routingLeadName").textContent) || "Assigned Support Specialist",
-                    packageId: currentPackage.id,
-                    accountNo: currentPackage.accountNo
-                };
-                writeLocal("requests", [ticket, ...saved]);
+                const customer = portal ? portal.getCustomer() : {};
+                const subject = (fields.subject && fields.subject.value.trim()) || (fields.description && fields.description.value.trim().slice(0, 80)) || "Service Request";
+                const category = (fields.category && fields.category.selectedIndex >= 0 && fields.category.options[fields.category.selectedIndex].text) || "General";
+                const result = window.HSShared
+                    ? window.HSShared.createSupportTicket({
+                        accountType: "Customer",
+                        accountId: customer.accountId,
+                        accountName: customer.name,
+                        relatedId: currentPackage.appId,
+                        hsId: currentPackage.hsId,
+                        subject,
+                        category,
+                        priority: (fields.priority && fields.priority.value === "urgent") ? "High" : "Medium",
+                        description: fields.description ? fields.description.value.trim() : ""
+                    })
+                    : { ok: false };
+                if (!result.ok) throw new Error(result.error || "Support queue unavailable");
+                const ticket = result.ticket;
                 form.reset();
                 drafts.delete(currentPackage.id);
                 savedDrafts.delete(currentPackage.id);

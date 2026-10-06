@@ -188,13 +188,40 @@ ol {
 }
 
 .nav-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    align-self: flex-start;
+    padding: 5px 13px 5px 11px;
+    margin-left: 4px;
+    margin-bottom: 16px;
+    background: #FFF4D6;
+    border: 1px solid #FFE29F;
+    border-radius: 9999px;
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--gray-400);
-    padding: 0 10px;
-    margin-bottom: 12px;
+    letter-spacing: 0.06em;
+    color: var(--navy, #101a2e);
+    line-height: 1;
+    white-space: nowrap;
+    user-select: none;
+    box-shadow: 0 1px 2px rgba(255, 138, 0, 0.04);
+}
+
+.nav-label::before,
+.nav-label-dot {
+    content: "";
+    display: inline-block;
+    width: 7.5px;
+    height: 7.5px;
+    border-radius: 50%;
+    background-color: var(--solar-orange, #ff8a00);
+    flex-shrink: 0;
+}
+
+.nav-label:has(.nav-label-dot)::before {
+    display: none;
 }
 
 .nav {
@@ -3814,10 +3841,13 @@ ol {
     justify-content: space-between;
     gap: 12px;
     margin-bottom: 14px;
+    min-width: 0;
 }
 
 .system-card-title-wrap {
-    flex: 1;
+    flex: 1 1 0%;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .system-card-model {
@@ -3826,6 +3856,11 @@ ol {
     color: var(--navy);
     line-height: 1.25;
     margin: 0 0 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .system-card-capacity-pill {
@@ -4017,147 +4052,190 @@ body.detail-view-open .content,
     padding-top: 24px;
 }
 
-/* Compact Desktop Row: Back Button & Model Info on left, Payment & Savings on right */
-@media (min-width: 769px) {
-    .system-detail-view.active {
-        display: grid !important;
-        grid-template-columns: minmax(0, 1fr) auto;
-        align-items: center;
-        row-gap: 22px;
-        /* 20–24px spacing above Live Telemetry */
-    }
+/* Compact Desktop System Detail Layout: Header row, Telemetry, and Lower Project Status */
+.system-detail-view.active {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100%;
+}
 
-    /* Left Group: Back button and model information together on the left */
-    .system-detail-topbar {
-        grid-column: 1;
-        grid-row: 1;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 14px;
-        margin: 0;
-        padding: 0;
-        border: none;
-    }
+.system-detail-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    margin-bottom: 22px;
+}
 
-    .btn-back-systems {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        min-width: 40px;
-        min-height: 40px;
-        padding: 0;
-        background: var(--white);
-        border: 1px solid var(--gray-300);
-        border-radius: 50%;
-        color: var(--navy);
-        cursor: pointer;
-        flex-shrink: 0;
-        transition: all 0.15s ease;
-    }
-
-    .btn-back-systems:hover {
-        background: #fff7ed;
-        border-color: var(--solar-orange);
-        color: var(--solar-orange-dark);
-    }
-
-    .btn-back-systems svg {
-        width: 17px;
-        height: 17px;
-        transition: transform 0.15s ease;
-    }
-
-    .btn-back-systems:hover svg {
-        transform: translateX(-3px);
-    }
-
-    .system-detail-title-block {
-        display: flex;
+@media (max-width: 860px) {
+    .system-detail-header-row {
         flex-direction: column;
         align-items: flex-start;
-        text-align: left;
-        gap: 3px;
-        margin-left: 0;
-        min-width: 0;
+        gap: 14px;
     }
+}
 
-    .system-detail-title-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
+/* Left Group: Back button and model information together on the left */
+.system-detail-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    min-width: 0;
+    flex: 0 1 auto;
+}
 
-    .system-detail-title {
-        font-size: 19px;
-        font-weight: 800;
-        color: var(--navy);
-        line-height: 1.25;
-        margin: 0;
-        letter-spacing: -0.01em;
-    }
+.btn-back-systems {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: 50%;
+    color: var(--navy);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
 
-    .system-detail-account-meta {
-        font-size: 12.5px;
-        font-weight: 500;
-        color: var(--gray-500);
-        line-height: 1.3;
-        margin: 0;
-    }
+.btn-back-systems:hover {
+    background: #fff7ed;
+    border-color: var(--solar-orange);
+    color: var(--solar-orange-dark);
+}
 
-    .system-detail-title-block .system-card-capacity-pill {
-        display: inline-flex;
-        align-items: center;
-        color: #FF8A00;
-        font-size: 11.5px;
-        font-weight: 700;
-        flex-shrink: 0;
-    }
+.btn-back-systems svg {
+    width: 17px;
+    height: 17px;
+    transition: transform 0.15s ease;
+}
 
-    /* Content container unrolled on desktop so children join the parent grid */
-    .system-detail-content {
-        display: contents;
-    }
+.btn-back-systems:hover svg {
+    transform: translateX(-3px);
+}
 
-    /* Right Group: Payment Status and Estimated Savings side by side with equal dimensions */
-    .detail-summary-row {
-        grid-column: 2;
-        grid-row: 1;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 12px;
-        margin: 0;
-        padding: 0;
-    }
+.system-detail-title-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 4px;
+    margin-left: 0;
+    min-width: 0;
+}
 
-    .detail-summary-btn {
-        width: 215px;
-        min-height: 48px;
-        box-sizing: border-box;
-    }
+.system-detail-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+    min-width: 0;
+    max-width: 100%;
+}
 
-    /* Row 2: Live Telemetry spanning full available width (20-24px below header row) */
-    .detail-telemetry-row {
-        grid-column: 1 / -1;
-        grid-row: 2;
-        margin: 0;
-    }
+.system-detail-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.25;
+    margin: 0;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
 
-    /* Row 3: Support CTA directly below telemetry */
-    .system-support-cta-wrap {
-        grid-column: 1 / -1;
-        grid-row: 3;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        margin-top: 20px;
-        margin-bottom: 24px;
-    }
+.system-detail-account-meta {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-500);
+    line-height: 1.35;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    white-space: nowrap;
+}
+
+.system-detail-account-meta .meta-item {
+    white-space: nowrap;
+}
+
+.system-detail-account-meta .meta-sep {
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+.system-detail-title-block .system-card-capacity-pill {
+    display: inline-flex;
+    align-items: center;
+    color: #FF8A00;
+    background: #fff7ed;
+    border: 1px solid #ffedd5;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* Content container */
+.system-detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+/* Right Group: System Status and Payment Status side by side */
+.detail-summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.detail-summary-btn {
+    width: auto;
+    min-width: 210px;
+    min-height: 48px;
+    box-sizing: border-box;
+}
+
+/* Row 2: Live Telemetry centered in content area */
+.detail-telemetry-row {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 14px auto 0;
+    box-sizing: border-box;
+}
+
+/* Row 3: Support CTA directly below telemetry */
+.system-support-cta-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 /* Compact Summary Action Buttons — Visual match to .btn-primary */

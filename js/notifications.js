@@ -10,15 +10,19 @@
     const CHANNEL_NAME = "hello_solar_notifications_bus";
 
     // Detect active portal role from directory path or window context
-    function detectPortalRole() {
-        const path = window.location.pathname.toLowerCase();
-        if (path.includes("hello_solar_installer")) return "installer";
-        if (path.includes("hello_solar_merchant")) return "merchant";
-        if (path.includes("hello_solar_financer")) return "financer";
-        return "customer"; // Default in Hello Solar Customer portal
-    }
+    const CURRENT_ROLE = "customer"; // explicit: never inferred from the URL path
 
-    const CURRENT_ROLE = detectPortalRole();
+    // Notifications are addressed by role and, when known, by account ID (shared session of this portal).
+    // Portal demo notifications belong to the portal's demo account in the shared registry.
+    const DEMO_RECIPIENT = { customer: "CUS-1010", financer: "FIN-005", installer: "INS-006", merchant: "MER-026" };
+    function currentAccountId() {
+        const session = window.HSShared ? window.HSShared.session.get(CURRENT_ROLE) : null;
+        return session ? session.accountId : null;
+    }
+    function isVisible(n, role) {
+        if (!(n.recipientRole === role || n.recipientRole === "*")) return false;
+        return !n.recipientId || n.recipientId === "*" || n.recipientId === currentAccountId();
+    }
 
     // Default seed dataset
     const DEFAULT_SEED = [
@@ -28,7 +32,7 @@
             recipientId: "*",
             eventType: "application_submitted",
             sourceEventId: "evt-app-4091-sub",
-            recordId: "HS-APP-4091",
+            recordId: "APP-4091",
             title: "New Financing Application Received",
             message: "Ricardo Gomez applied for ₱285,000 hybrid solar loan via SunPower Manila.",
             timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
@@ -42,7 +46,7 @@
             recipientId: "*",
             eventType: "document_uploaded",
             sourceEventId: "evt-doc-4088-meralco",
-            recordId: "HS-APP-4088",
+            recordId: "APP-4088",
             title: "Utility Offset Proof Uploaded",
             message: "3-Month Meralco electric bill uploaded for Maria Elena Cruz (Quezon City).",
             timestamp: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
@@ -56,7 +60,7 @@
             recipientId: "*",
             eventType: "application_approved",
             sourceEventId: "evt-app-4085-approved",
-            recordId: "HS-APP-4085",
+            recordId: "APP-4085",
             title: "Promissory Note Signed",
             message: "David Tan (Cebu City) signed promissory note for ₱780,000 commercial solar facility.",
             timestamp: new Date(Date.now() - 120 * 60 * 1000).toISOString(),
@@ -129,12 +133,32 @@
     // --------------------------------------------------------------------------
     // STORAGE & PERSISTENCE
     // --------------------------------------------------------------------------
+    DEFAULT_SEED.forEach(n => {
+        if (!n.recipientId || n.recipientId === "*") n.recipientId = DEMO_RECIPIENT[n.recipientRole] || n.recipientId;
+    });
+
+    // Demo notifications only in local demo mode; api mode lists come from the backend (bootstrap / commands)
+    const DEMO_NOTIFICATIONS = !(window.HS_CONFIG && (window.HS_CONFIG.isApi || window.HS_CONFIG.demoData === false));
+
     function loadStoredNotifications() {
         try {
-            const raw = localStorage.getItem(STORAGE_KEY);
+            const raw = window.HSStore ? window.HSStore.getItem(STORAGE_KEY) : localStorage.getItem(STORAGE_KEY);
             if (raw) {
                 const parsed = JSON.parse(raw);
                 if (Array.isArray(parsed) && parsed.length > 0) {
+                    // Add this portal's seed items once; address previously stored seed items to their demo account
+                    let updated = false;
+                    (DEMO_NOTIFICATIONS ? DEFAULT_SEED : []).forEach(seed => {
+                        const existing = parsed.find(item => item.id === seed.id);
+                        if (!existing) {
+                            parsed.unshift(seed);
+                            updated = true;
+                        } else if ((!existing.recipientId || existing.recipientId === "*") && seed.recipientId) {
+                            existing.recipientId = seed.recipientId;
+                            updated = true;
+                        }
+                    });
+                    if (updated) saveNotifications(parsed);
                     return parsed;
                 }
             }
@@ -142,13 +166,16 @@
             console.warn("Error loading notifications from storage:", e);
         }
         // Initialize with default seed
-        saveNotifications(DEFAULT_SEED);
-        return DEFAULT_SEED;
+        const initial = DEMO_NOTIFICATIONS ? DEFAULT_SEED : [];
+        saveNotifications(initial);
+        return initial;
     }
 
-    function saveNotifications(list) {
+    // cmd: backend command for user actions (mark read); seeding and local dispatch send none
+    function saveNotifications(list, cmd) {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+            if (window.HSShared && window.HSShared.writeNotifications) window.HSShared.writeNotifications(list, cmd);
+            else localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
         } catch (e) {
             console.warn("Error saving notifications to storage:", e);
         }
@@ -183,7 +210,7 @@
     const NotificationService = {
         getRoleNotifications(role = CURRENT_ROLE) {
             const all = loadStoredNotifications();
-            return all.filter((n) => n.recipientRole === role || n.recipientRole === "*");
+            return all.filter((n) => isVisible(n, role));
         },
 
         getUnreadCount(role = CURRENT_ROLE) {
@@ -205,7 +232,7 @@
             });
 
             if (changed) {
-                saveNotifications(all);
+                saveNotifications(all, { name: "notification.markRead", payload: { ids } });
                 broadcastEvent("NOTIFICATIONS_READ", { ids, role: CURRENT_ROLE });
             }
         },
@@ -216,14 +243,14 @@
             let changed = false;
 
             all.forEach((n) => {
-                if ((n.recipientRole === role || n.recipientRole === "*") && !n.readAt) {
+                if ((isVisible(n, role)) && !n.readAt) {
                     n.readAt = now;
                     changed = true;
                 }
             });
 
             if (changed) {
-                saveNotifications(all);
+                saveNotifications(all, { name: "notification.markRead", payload: { all: true, role } });
                 broadcastEvent("NOTIFICATIONS_ALL_READ", { role });
             }
         },
@@ -239,7 +266,7 @@
             const newNotif = {
                 id: event.id || `notif-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
                 recipientRole: event.recipientRole || CURRENT_ROLE,
-                recipientId: event.recipientId || "*",
+                recipientId: event.recipientId || (((event.recipientRole || CURRENT_ROLE) === CURRENT_ROLE && currentAccountId()) || "*"),
                 eventType: event.eventType || "system",
                 sourceEventId: event.sourceEventId || `evt-${Date.now()}`,
                 recordId: event.recordId || "",
@@ -258,7 +285,7 @@
             broadcastEvent("NEW_NOTIFICATION", { notification: newNotif });
 
             // If this portal is the target recipient, trigger UI pulse & toast
-            if (newNotif.recipientRole === CURRENT_ROLE || newNotif.recipientRole === "*") {
+            if (isVisible(newNotif, CURRENT_ROLE)) {
                 showLiveToast(newNotif);
                 updateBadge();
             }
@@ -361,8 +388,50 @@
     // --------------------------------------------------------------------------
     let currentFilter = "all"; // 'all' or 'unread'
 
+    // Delayed Payment Reminders (customer, installment only). Computed live from
+    // HelloSolar.getDelayedPaymentReminder() on every render — never stored — so they stay pinned while a bill
+    // is past due, switch to "Payment Under Review" on receipt submission, return to overdue on rejection, and
+    // disappear once verified/paid.
+    function getPaymentReminderItems() {
+        if (CURRENT_ROLE !== "customer") return [];
+        const H = window.HelloSolar;
+        if (!H || typeof H.getDelayedPaymentReminder !== "function" || typeof H.getLinkedPackages !== "function") return [];
+        const fmtDate = (iso) => {
+            const dt = iso ? new Date(iso + "T00:00:00") : null;
+            return dt && !isNaN(dt) ? dt.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "—";
+        };
+        return H.getLinkedPackages()
+            .map((pkg) => H.getDelayedPaymentReminder(pkg))
+            .filter(Boolean)
+            .map((r) => {
+                const isReview = r.state === "under_review";
+                return {
+                    id: `payment-reminder-${r.packageId}`,
+                    isPaymentReminder: true,
+                    reminderState: r.state,
+                    eventType: isReview ? "payment_review" : "payment_overdue",
+                    title: isReview ? "Payment Under Review" : "Payment Overdue",
+                    message: isReview
+                        ? "Your receipt has been submitted and is awaiting verification by Hello Solar."
+                        : "Your installment payment is past due. Please settle the overdue amount.",
+                    details: [
+                        ["Overdue Amount", r.formattedOverdueAmount],
+                        ["Billing Period", r.missedPeriods.join(", ") || "—"],
+                        ["Due Date", fmtDate(r.dueDate)]
+                    ],
+                    packageId: r.packageId,
+                    packageName: r.packageName,
+                    // Overdue reminders stay unread (badge) until resolved; under review is informational
+                    readAt: isReview ? "reminder" : null,
+                    targetUrl: isReview ? "payments.html" : "payments.html?action=upload-receipt",
+                    actionLabel: isReview ? "View Payment" : "Upload Receipt / Pay Now"
+                };
+            });
+    }
+
     function updateBadge() {
-        const count = NotificationService.getUnreadCount(CURRENT_ROLE);
+        const count = NotificationService.getUnreadCount(CURRENT_ROLE)
+            + getPaymentReminderItems().filter((r) => !r.readAt).length;
         const badge = document.getElementById("notificationBadge");
         const bellBtn = document.getElementById("notificationBellBtn");
 
@@ -397,7 +466,8 @@
         if (!listEl) return;
 
         const notifs = NotificationService.getRoleNotifications(CURRENT_ROLE);
-        const filtered = currentFilter === "unread" ? notifs.filter((n) => !n.readAt) : notifs;
+        const reminders = getPaymentReminderItems();
+        const filtered = [...reminders, ...notifs].filter((n) => currentFilter !== "unread" || !n.readAt);
 
         if (filtered.length === 0) {
             listEl.innerHTML = `
@@ -420,8 +490,38 @@
                 const iconSvg = getEventIconSvg(item.eventType);
                 const packageTag = item.packageName ? `<span class="notification-package-tag">${escapeHtml(item.packageName)}</span>` : "";
 
+                if (item.isPaymentReminder) {
+                    const isReview = item.reminderState === "under_review";
+                    return `
+                    <div class="notification-item notification-reminder ${isReview ? "is-review" : "is-overdue unread"}"
+                         tabindex="0"
+                         role="button"
+                         data-id="${item.id}"
+                         data-target="${item.targetUrl}"
+                         data-pkg="${escapeHtml(item.packageId || "")}"
+                         aria-label="${escapeHtml(item.title)}: ${escapeHtml(item.packageName || "")}">
+                        <div class="notification-item-icon ${isReview ? "type-schedule" : "type-alert"}">
+                            ${getEventIconSvg(item.eventType)}
+                        </div>
+                        <div class="notification-item-body">
+                            <div class="notification-item-title">${escapeHtml(item.title)}</div>
+                            <div class="notification-item-message">${escapeHtml(item.message)}</div>
+                            <dl class="notification-reminder-details">
+                                ${item.details.map(([k, v]) => `<div><dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd></div>`).join("")}
+                            </dl>
+                            <div class="notification-item-meta">
+                                <span class="notification-reminder-pin">${isReview ? "Pending verification" : "Action required"}</span>
+                                ${packageTag}
+                                <span class="notification-action-tag">${escapeHtml(item.actionLabel)} →</span>
+                            </div>
+                        </div>
+                        ${isReview ? "" : '<span class="notification-unread-dot" aria-hidden="true"></span>'}
+                    </div>
+                `;
+                }
+
                 return `
-                    <div class="notification-item ${isUnread ? "unread" : ""}" 
+                    <div class="notification-item ${isUnread ? "unread" : ""}"
                          tabindex="0" 
                          role="button" 
                          data-id="${item.id}" 
@@ -472,6 +572,14 @@
             if (targetUrl && targetUrl !== "#") {
                 window.location.href = targetUrl;
             }
+        }
+
+        // Already on the target package: requestPackageSwitch is a no-op there, so navigate directly
+        const activeId = window.HelloSolar && typeof window.HelloSolar.getActivePackageId === "function"
+            ? window.HelloSolar.getActivePackageId() : null;
+        if (packageId && activeId && packageId === activeId) {
+            proceedNavigation();
+            return;
         }
 
         // Customer package-switching context integration with draft protection
@@ -736,7 +844,7 @@
                     recipientRole: "financer",
                     eventType: "application_approved",
                     sourceEventId: `sim-app-${Date.now()}`,
-                    recordId: "HS-APP-4091",
+                    recordId: "APP-4091",
                     title: "Application Approved & Disbursal Queued",
                     message: `Credit Committee approved term sheet for Ricardo Gomez (₱285,000).`,
                     targetUrl: "approved.html",
@@ -818,7 +926,7 @@
             const { type, payload } = e.data || {};
             if (type === "NEW_NOTIFICATION") {
                 const notif = payload.notification;
-                if (notif && (notif.recipientRole === CURRENT_ROLE || notif.recipientRole === "*")) {
+                if (notif && isVisible(notif, CURRENT_ROLE)) {
                     showLiveToast(notif);
                     updateBadge();
                     renderNotificationList();
@@ -836,6 +944,15 @@
             }
         });
     }
+
+    // Payment reminders depend on customer package data: refresh when it loads or a package's status changes
+    // (receipt submitted / verified / rejected).
+    ["helloSolarDataLoaded", "helloSolarPackageChanged"].forEach((evt) => {
+        window.addEventListener(evt, () => {
+            updateBadge();
+            renderNotificationList();
+        });
+    });
 
     // Public API on window
     window.HelloSolarNotifications = NotificationService;

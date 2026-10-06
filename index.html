@@ -7,14 +7,10 @@
     <title>Hello Solar Customer Portal</title>
     <!-- Favicon / Tab Icon -->
     <link rel="icon" type="image/png" href="assets/images/logofortab.png">
-    <script>
-        // Automatic routing based on authentication state
-        if (localStorage.getItem("hello_solar_logged_in") === "true") {
-            window.location.replace("mysystem.html");
-        } else {
-            window.location.replace("login.html");
-        }
-    </script>
+    <script src="../shared/hello-solar-config.js"></script>
+    <script src="../hello_solar_super_admin/data.js"></script>
+    <script src="../shared/hello-solar-shared.js"></script>
+    <script src="js/index-page.js"></script>
 </head>
 
 <body

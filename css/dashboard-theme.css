@@ -397,6 +397,40 @@ svg[stroke]:not(.power-flow-svg) {
     background: var(--selected); color: var(--ink); border-color: var(--icon);
 }
 .sidebar, .topbar, .mobile-bottom-nav { background: var(--surface); border-color: var(--border); }
+.nav-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    align-self: flex-start;
+    padding: 5px 13px 5px 11px;
+    margin-left: 4px;
+    margin-bottom: 16px;
+    background: #FFF4D6;
+    border: 1px solid #FFE29F;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--navy, #101a2e);
+    line-height: 1;
+    white-space: nowrap;
+    user-select: none;
+    box-shadow: 0 1px 2px rgba(255, 138, 0, 0.04);
+}
+.nav-label::before,
+.nav-label-dot {
+    content: "";
+    display: inline-block;
+    width: 7.5px;
+    height: 7.5px;
+    border-radius: 50%;
+    background-color: var(--solar-orange, #ff8a00);
+    flex-shrink: 0;
+}
+.nav-label:has(.nav-label-dot)::before {
+    display: none;
+}
 .mobile-bottom-nav { box-shadow: 0 -2px 12px rgb(28 25 23 / 5%); }
 .nav-link:hover, .mobile-nav-item:hover { background: var(--page-bg); color: var(--ink); }
 .nav-link.active:hover, .mobile-nav-item.active:hover { background: var(--selected); }
@@ -580,4 +614,46 @@ input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
         line-height: 1.2;
         text-wrap: balance;
     }
+}
+
+/* Delayed Payment Reminder — pinned notification (computed from payment schedule; not dismissible) */
+.notification-item.notification-reminder.is-overdue {
+    background: #FEF2F2;
+    border-left: 3px solid #DC2626;
+}
+
+.notification-item.notification-reminder.is-review {
+    background: #FFFBEB;
+    border-left: 3px solid #F59E0B;
+}
+
+.notification-reminder-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 8px 0 6px;
+}
+
+.notification-reminder-details dt {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--muted, #57534E);
+}
+
+.notification-reminder-details dd {
+    margin: 1px 0 0;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ink, #1C1917);
+}
+
+.notification-reminder-pin {
+    font-weight: 700;
+    color: #B91C1C;
+}
+
+.notification-reminder.is-review .notification-reminder-pin {
+    color: #92400E;
 }

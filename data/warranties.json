@@ -114,11 +114,7 @@
     "systemId": "pkg-biz-6k0",
     "accountNo": "HS-10492",
     "inverterSerial": "HW-SUN2000-6K-2026-1049",
-    "assignedInstaller": {
-      "name": "Hello Solar Dispatch Team",
-      "role": "Project Engineering Coordinator",
-      "phone": "+63 2 8888 0100"
-    },
+    "assignedInstaller": null,
     "warranties": {
       "panels": {
         "termText": "25-Year Commercial Performance",

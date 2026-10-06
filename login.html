@@ -18,265 +18,9 @@
     <link rel="icon" type="image/png" href="assets/images/logofortab.png">
 
     <!-- Design System CSS -->
-    <link rel="stylesheet" href="assets/css/portal.css">
+    <link rel="stylesheet" href="css/portal.css">
 
-    <style>
-        .auth-page {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 32px 20px;
-            background: radial-gradient(circle at 10% 10%, rgba(255, 179, 0, 0.1) 0%, transparent 40%),
-                radial-gradient(circle at 90% 90%, rgba(255, 138, 0, 0.08) 0%, transparent 45%),
-                linear-gradient(135deg, #ffffff 0%, #fffdfa 50%, #fff9ef 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .auth-card {
-            width: 100%;
-            max-width: 440px;
-            background: var(--white);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-xl);
-            padding: 40px 36px;
-            box-shadow: 0 20px 60px rgba(16, 26, 46, 0.08);
-            position: relative;
-            z-index: 2;
-        }
-
-        .auth-logo {
-            display: inline-flex;
-            align-items: center;
-            margin-bottom: 28px;
-        }
-
-        .auth-logo img {
-            height: 38px;
-            width: auto;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        .auth-header {
-            margin-bottom: 24px;
-        }
-
-        .eyebrow,
-        .auth-header .eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-size: 11px;
-            font-style: normal;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--solar-orange-dark, #f47718);
-            background: rgba(255, 138, 0, 0.08);
-            padding: 4px 10px;
-            border-radius: 999px;
-            margin-bottom: 10px;
-        }
-
-        .auth-header h1 {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--navy);
-            letter-spacing: -0.02em;
-            line-height: 1.2;
-            margin-top: 4px;
-        }
-
-        .auth-header h1 span {
-            color: var(--solar-orange);
-        }
-
-        .auth-header p {
-            font-size: 14px;
-            color: var(--gray-500);
-            margin-top: 6px;
-        }
-
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .input-icon-wrap {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .input-icon-wrap>svg {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 18px;
-            height: 18px;
-            color: var(--gray-400);
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .input-icon-wrap .form-input {
-            width: 100%;
-            padding-left: 42px;
-            padding-right: 44px;
-            height: 48px;
-        }
-
-        .password-toggle-btn {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--gray-400);
-            padding: 6px;
-            border-radius: var(--radius-xs);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 2;
-            transition: color 0.15s ease;
-        }
-
-        .password-toggle-btn svg {
-            position: static;
-            transform: none;
-            width: 20px;
-            height: 20px;
-            color: currentColor;
-            pointer-events: none;
-        }
-
-        .password-toggle-btn:hover {
-            color: var(--navy);
-        }
-
-        .password-toggle-btn:focus-visible {
-            outline: 2px solid var(--solar-orange);
-            outline-offset: 1px;
-        }
-
-        .auth-options {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 13px;
-        }
-
-        .auth-options a {
-            color: var(--solar-orange-dark);
-            font-weight: 600;
-        }
-
-        .auth-options a:hover {
-            text-decoration: underline;
-        }
-
-        .auth-btn {
-            width: 100%;
-            height: 48px;
-            font-size: 15px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .quick-demo-btn {
-            width: 100%;
-            margin-top: 10px;
-            height: 42px;
-            font-size: 13.5px;
-            font-weight: 600;
-        }
-
-        .auth-footer {
-            margin-top: 24px;
-            text-align: center;
-            font-size: 13.5px;
-            color: var(--gray-500);
-        }
-
-        .auth-footer a {
-            color: var(--solar-orange-dark);
-            font-weight: 700;
-        }
-
-        .demo-credentials-box {
-            margin-top: 20px;
-            padding: 12px 14px;
-            background: var(--gray-50);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-sm);
-            font-size: 12px;
-            color: var(--gray-600);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .demo-credentials-box strong {
-            color: var(--navy);
-        }
-
-        .error-msg {
-            display: none;
-            background: #fef2f2;
-            color: #dc2626;
-            border: 1px solid #fecaca;
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            font-weight: 600;
-            line-height: 1.4;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .error-msg.visible {
-            display: flex;
-        }
-
-        @media (max-width: 480px) {
-            .auth-card {
-                padding: 28px 20px;
-                border-radius: var(--radius-lg);
-            }
-
-            .auth-header h1 {
-                font-size: 24px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .auth-page {
-                padding: 16px 10px;
-            }
-
-            .auth-card {
-                padding: 22px 14px;
-            }
-
-            .auth-header h1 {
-                font-size: 22px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/login-page.css">
 </head>
 
 <body>
@@ -303,7 +47,7 @@
                     Customer Portal
                 </span>
                 <h1 id="loginHeading">Welcome <span>back.</span></h1>
-                <p>Log in to access your system dashboard, live production, and billing details.</p>
+
             </header>
 
             <form class="auth-form" id="loginForm" novalidate>
@@ -366,16 +110,7 @@
                         <path d="m12 5 7 7-7 7"></path>
                     </svg>
                 </button>
-
-                <button type="button" class="btn btn-outline quick-demo-btn" id="quickDemoBtn">
-                    One-Click Demo Customer Access
-                </button>
             </form>
-
-            <div class="demo-credentials-box">
-                <div><strong>Demo Mode:</strong> Pre-filled with demo account.</div>
-                <div>Account: <code>customer@hellosolar.ph</code> · Password: <code>password123</code></div>
-            </div>
 
             <p class="auth-footer">
                 Don't have an account yet?
@@ -385,127 +120,18 @@
     </main>
 
     <!-- Customer Authentication Logic & Registry -->
-    <script src="assets/js/auth.js"></script>
+    <script src="../shared/hello-solar-config.js"></script>
+    <script src="../hello_solar_super_admin/data.js"></script>
+    <script src="../shared/hello-solar-shared.js"></script>
+    <script src="js/auth.js"></script>
 
     <!-- Shared Data Loader -->
-    <script src="assets/js/data-loader.js"></script>
+    <script src="js/data-loader.js"></script>
 
     <!-- Core Portal JavaScript -->
-    <script src="assets/js/portal.js"></script>
+    <script src="js/portal.js"></script>
 
-    <script>
-        const loginForm = document.getElementById("loginForm");
-        const loginBtn = document.getElementById("loginBtn");
-        const loginBtnText = document.getElementById("loginBtnText");
-        const quickDemoBtn = document.getElementById("quickDemoBtn");
-        const passwordInput = document.getElementById("password");
-        const passwordToggle = document.getElementById("passwordToggle");
-        const usernameInput = document.getElementById("username");
-        const forgotPasswordLink = document.getElementById("forgotPasswordLink");
-        const loginErrorMsg = document.getElementById("loginErrorMsg");
-        const loginErrorText = document.getElementById("loginErrorText");
-
-        function showError(msg) {
-            if (loginErrorMsg && loginErrorText) {
-                loginErrorText.textContent = msg;
-                loginErrorMsg.classList.add("visible");
-            }
-        }
-
-        function hideError() {
-            if (loginErrorMsg) {
-                loginErrorMsg.classList.remove("visible");
-            }
-        }
-
-        // Toggle password visibility
-        passwordToggle.addEventListener("click", (e) => {
-            e.preventDefault();
-            const isPassword = passwordInput.type === "password";
-            passwordInput.type = isPassword ? "text" : "password";
-            passwordToggle.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
-            passwordToggle.setAttribute("aria-pressed", isPassword ? "true" : "false");
-
-            const eyeIcon = document.getElementById("eyeIcon");
-            if (eyeIcon) {
-                if (isPassword) {
-                    eyeIcon.innerHTML = `
-                        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
-                        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
-                        <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/>
-                        <line x1="2" y1="2" x2="22" y2="22"/>
-                    `;
-                } else {
-                    eyeIcon.innerHTML = `
-                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-                        <circle cx="12" cy="12" r="3"/>
-                    `;
-                }
-            }
-        });
-
-        forgotPasswordLink.addEventListener("click", (e) => {
-            e.preventDefault();
-            if (window.HelloSolar && window.HelloSolar.toast) {
-                window.HelloSolar.toast("Password Reset Demo", "A reset simulation link has been sent to your registered email address.");
-            } else {
-                alert("Please contact Hello Solar Support at support@hellosolar.ph to reset your customer credentials.");
-            }
-        });
-
-        function performLogin(identifier = null, password = null) {
-            hideError();
-
-            const id = (identifier || usernameInput.value).trim();
-            const pass = password !== null ? password : passwordInput.value;
-
-            if (!id) {
-                showError("Please enter your email or account ID.");
-                usernameInput.focus();
-                return;
-            }
-
-            if (!pass) {
-                showError("Please enter your password.");
-                passwordInput.focus();
-                return;
-            }
-
-            loginBtn.disabled = true;
-            loginBtnText.textContent = "Verifying...";
-
-            setTimeout(() => {
-                // Check credentials against HelloSolarAuth
-                const matchedUser = window.HelloSolarAuth ? window.HelloSolarAuth.authenticate(id, pass) : null;
-
-                if (matchedUser) {
-                    window.HelloSolarAuth.setSession(matchedUser);
-                    loginBtnText.textContent = "Access Granted ✓";
-                    loginBtn.style.background = "#16a34a";
-
-                    setTimeout(() => {
-                        window.location.href = "mysystem.html";
-                    }, 350);
-                } else {
-                    loginBtn.disabled = false;
-                    loginBtnText.textContent = "Log In";
-                    showError("Invalid email/account ID or password. Please try again.");
-                    passwordInput.focus();
-                }
-            }, 500);
-        }
-
-        loginForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            performLogin();
-        });
-
-        quickDemoBtn.addEventListener("click", () => {
-            usernameInput.value = "customer@hellosolar.ph";
-            passwordInput.value = "password123";
-            performLogin("customer@hellosolar.ph", "password123");
-        });
-    </script>
+    <script src="js/login-page.js"></script>
 </body>
 
 </html>

@@ -7,30 +7,17 @@
     "use strict";
 
     // --------------------------------------------------------------------------
-    // 1. DEFAULT DEMO CUSTOMER STATE
+    // 1. CUSTOMER PROFILE SHAPE (identity comes from the shared registry — no demo defaults)
     // --------------------------------------------------------------------------
-    const DEFAULT_CUSTOMER = {
-        name: "Juan Dela Cruz",
-        email: "juan.delacruz@hellosolar.ph",
-        phone: "+63 917 555 0199",
-        accountNo: "HS-88219",
-        status: "Online",
-        systemSize: "4.82 kW",
-        installationDate: "March 15, 2025",
-        panelsCount: 12,
-        panelsModel: "Trina Solar Vertex S+ 420W",
-        inverterModel: "Solis 5kW Hybrid Inverter",
-        batteryCapacity: "10 kWh Lithium-ion Reserve",
-        address: "142 Solar Crest Way, Quezon City, Metro Manila",
-        inverterSerial: "SOLIS-5K-202503-8891",
-        plan: "5-Year Amortization",
-        nextDue: "Sep 1, 2026",
-        nextAmount: "₱9,067",
-        role: "Solar Customer",
-        installerName: "Carlos Villanueva",
-        installerPhone: "+63 917 555 0101",
+    const EMPTY_CUSTOMER = {
+        accountId: "",
+        name: "",
+        email: "",
+        phone: "",
+        accountNo: "",
+        address: "",
         preferredPayment: "gcash",
-        paymentAccount: "+63 917 555 0199",
+        paymentAccount: "",
         avatarUrl: null
     };
 
@@ -52,74 +39,78 @@
         return parts.slice(0, 2).map(w => w.charAt(0).toUpperCase()).join("");
     }
 
-    function getCustomer() {
-        const stored = localStorage.getItem("hello_solar_user");
-        if (!stored) {
-            return { ...DEFAULT_CUSTOMER };
-        }
+    const PROFILE_FIELDS = ["name", "phone", "address", "preferredPayment", "paymentAccount"];
+    const avatarKey = accountId => `hello_solar_customer_avatar:${accountId}`;
 
-        try {
-            const parsed = JSON.parse(stored);
-            if (typeof parsed === "object" && parsed !== null) {
-                return { ...DEFAULT_CUSTOMER, ...parsed };
-            }
-            if (typeof parsed === "string") {
-                return { ...DEFAULT_CUSTOMER, name: parsed };
-            }
-        } catch {
-            // If stored as a plain string rather than JSON
-            return { ...DEFAULT_CUSTOMER, name: stored };
-        }
-
-        return { ...DEFAULT_CUSTOMER };
+    function getSessionUser() {
+        return window.HSShared ? window.HSShared.session.get("customer") : null;
     }
 
-    function setCustomer(data) {
-        if (typeof data === "string") {
-            localStorage.setItem("hello_solar_user", data);
-        } else {
-            localStorage.setItem("hello_solar_user", JSON.stringify(data));
-        }
+    // Signed-in customer = shared account record (authoritative) + session identity. Never a demo default.
+    function getCustomer() {
+        const user = getSessionUser();
+        if (!user) return { ...EMPTY_CUSTOMER };
+        const record = window.HSShared.getAccount("customer", user.accountId) || {};
+        const { password, ...profile } = record;
+        let avatarUrl = null;
+        try { avatarUrl = localStorage.getItem(avatarKey(user.accountId)); } catch (e) { avatarUrl = null; }
+        return {
+            ...EMPTY_CUSTOMER,
+            ...user,
+            ...profile,
+            accountId: user.accountId,
+            accountNo: profile.hsId || "",
+            avatarUrl: avatarUrl || null
+        };
+    }
 
-        // Synchronize with stored account list if available
-        try {
-            const raw = localStorage.getItem("hello_solar_customer_accounts");
-            if (raw && typeof data === "object" && data !== null) {
-                const accounts = JSON.parse(raw);
-                if (Array.isArray(accounts)) {
-                    const idx = accounts.findIndex(a =>
-                        (a.email && data.email && a.email.toLowerCase() === data.email.toLowerCase()) ||
-                        (a.accountNo && data.accountNo && a.accountNo === data.accountNo)
-                    );
-                    if (idx !== -1) {
-                        accounts[idx] = { ...accounts[idx], ...data };
-                        localStorage.setItem("hello_solar_customer_accounts", JSON.stringify(accounts));
-                    }
-                }
+    // Saves profile edits to the shared customer record (and the session copy of name/email/phone).
+    function setCustomer(data) {
+        const user = getSessionUser();
+        if (!user || !data || typeof data !== "object") return { ok: false, error: "Not signed in." };
+        const result = window.HSShared.update(store => {
+            const record = (store.customers || []).find(c => c.id === user.accountId);
+            if (!record) return { ok: false, error: "Customer account not found." };
+            const email = String(data.email || record.email || "").trim();
+            if (email.toLowerCase() !== String(record.email || "").toLowerCase()) {
+                const taken = ["customers", "financers", "installers", "merchants"]
+                    .some(k => (store[k] || []).some(a => a.id !== record.id && String(a.email || "").toLowerCase() === email.toLowerCase()));
+                if (taken) return { ok: false, error: "That email is already used by another account." };
+                record.email = email;
             }
+            PROFILE_FIELDS.forEach(field => {
+                if (data[field] !== undefined) record[field] = data[field];
+            });
+            return { record };
+        }, r => ({ name: "profile.update", payload: { role: "customer", accountId: user.accountId, fields: Object.assign({ email: r.record.email }, ...PROFILE_FIELDS.map(f => ({ [f]: r.record[f] }))) } }));
+        if (!result.ok) return result;
+        try {
+            if (data.avatarUrl) localStorage.setItem(avatarKey(user.accountId), data.avatarUrl);
+            else localStorage.removeItem(avatarKey(user.accountId));
         } catch (e) {
-            console.warn("Could not sync account to hello_solar_customer_accounts", e);
+            console.warn("Could not save profile photo:", e);
         }
+        window.HSShared.session.patch("customer", { name: result.record.name, email: result.record.email, phone: result.record.phone });
+        return { ok: true };
     }
 
     // --------------------------------------------------------------------------
     // 3. AUTHENTICATION GUARD
     // --------------------------------------------------------------------------
     function isAuthenticated() {
-        return localStorage.getItem("hello_solar_logged_in") === "true";
+        return !!(window.HSShared && window.HSShared.session.isValid("customer"));
     }
 
     function requireAuth() {
-        if (!isAuthenticated()) {
+        if (!window.HSShared) {
             window.location.replace("login.html");
             return false;
         }
-        return true;
+        return !!window.HSShared.session.require("customer", "login.html");
     }
 
     function logout() {
-        localStorage.removeItem("hello_solar_logged_in");
-        localStorage.removeItem("hello_solar_user");
+        if (window.HSShared) window.HSShared.session.clear("customer");
         window.location.href = "login.html";
     }
 
@@ -368,7 +359,7 @@
             case "maya":
                 return "+63 917 555 0199";
             case "bdo":
-                return "Account name or ref (e.g. Juan Dela Cruz)";
+                return "Account name or reference";
             case "card":
                 return "Name as printed on Visa / Mastercard";
             default:
@@ -453,10 +444,10 @@
                                     <span class="badge badge-online" style="font-size: 11px; padding: 2px 8px;">Active Customer</span>
                                 </div>
                                 <div class="profile-modal-sub" style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
-                                    <span id="modalCustomerName">Juan Dela Cruz</span>
+                                    <span id="modalCustomerName"></span>
                                     <span>·</span>
                                     <button type="button" class="profile-copy-badge" id="modalAccountCopyBtn" title="Click to copy Solar Account ID">
-                                        <span id="modalAccountNo">HS-88219</span>
+                                        <span id="modalAccountNo"></span>
                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -603,19 +594,19 @@
                             <div class="simple-chips-row">
                                 <div class="simple-chip">
                                     <span class="simple-chip-k">System</span>
-                                    <span class="simple-chip-v" id="modalChipSystem">4.82 kW Hybrid</span>
+                                    <span class="simple-chip-v" id="modalChipSystem">—</span>
                                 </div>
                                 <div class="simple-chip">
                                     <span class="simple-chip-k">Inverter</span>
-                                    <span class="simple-chip-v" id="modalChipInverter">Solis 5kW Dual</span>
+                                    <span class="simple-chip-v" id="modalChipInverter">—</span>
                                 </div>
                                 <div class="simple-chip">
                                     <span class="simple-chip-k">Battery</span>
-                                    <span class="simple-chip-v" id="modalChipBattery">10 kWh Reserve</span>
+                                    <span class="simple-chip-v" id="modalChipBattery">—</span>
                                 </div>
                                 <div class="simple-chip">
                                     <span class="simple-chip-k">Installer</span>
-                                    <span class="simple-chip-v" id="modalChipInstaller">Carlos V.</span>
+                                    <span class="simple-chip-v" id="modalChipInstaller">—</span>
                                 </div>
                             </div>
                         </div>
@@ -804,15 +795,19 @@
             if (nameInput) nameInput.value = customer.name || "";
             if (emailInput) emailInput.value = customer.email || "";
             if (phoneInput) phoneInput.value = customer.phone || "";
-            if (planInput) planInput.value = customer.plan || "5-Year Amortization";
-            if (addressInput) addressInput.value = customer.address || "142 Solar Crest Way, Quezon City, Metro Manila";
+            // System chips describe the selected system (shared application record + presentation detail)
+            const activePkg = getLinkedPackages().length ? getActivePackage() : null;
+            const planLabel = activePkg && activePkg.paymentPlan && typeof activePkg.paymentPlan === "object"
+                ? (activePkg.paymentPlan.term || "") : (activePkg && typeof activePkg.paymentPlan === "string" ? activePkg.paymentPlan : "");
+            if (planInput) planInput.value = planLabel || (activePkg && activePkg.paymentType === "full_payment" ? "Full Payment" : "");
+            if (addressInput) addressInput.value = customer.address || "";
             if (modalCustomerName) modalCustomerName.textContent = customer.name || "Customer";
-            if (modalAccountNo) modalAccountNo.textContent = customer.accountNo || "HS-88219";
+            if (modalAccountNo) modalAccountNo.textContent = (activePkg && activePkg.hsId) || customer.accountNo || customer.accountId || "—";
 
-            if (modalChipSystem) modalChipSystem.textContent = customer.systemSize ? `${customer.systemSize} Hybrid` : "4.82 kW Hybrid";
-            if (modalChipInverter) modalChipInverter.textContent = customer.inverterModel ? customer.inverterModel.replace(" Inverter", "") : "Solis 5kW Dual";
-            if (modalChipBattery) modalChipBattery.textContent = customer.batteryCapacity ? customer.batteryCapacity.replace(" Lithium-ion Reserve", " Reserve") : "10 kWh Reserve";
-            if (modalChipInstaller) modalChipInstaller.textContent = customer.installerName || "Carlos V.";
+            if (modalChipSystem) modalChipSystem.textContent = activePkg && activePkg.capacity ? activePkg.capacity : "—";
+            if (modalChipInverter) modalChipInverter.textContent = activePkg && activePkg.inverterModel ? activePkg.inverterModel.replace(" Inverter", "") : "—";
+            if (modalChipBattery) modalChipBattery.textContent = activePkg && activePkg.batteryCapacity ? activePkg.batteryCapacity.replace(" Lithium-ion Reserve", " Reserve") : "—";
+            if (modalChipInstaller) modalChipInstaller.textContent = activePkg && activePkg.assignedInstaller && activePkg.assignedInstaller.name ? activePkg.assignedInstaller.name : "Not assigned";
 
             const selectedMethod = (customer.preferredPayment || "gcash").toLowerCase();
             const targetRadio = modalEl.querySelector(`input[name="preferredPayment"][value="${selectedMethod}"]`);
@@ -847,7 +842,8 @@
         if (modalAccountCopyBtn) {
             modalAccountCopyBtn.addEventListener("click", (e) => {
                 e.preventDefault();
-                const acc = (modalAccountNo && modalAccountNo.textContent) || "HS-88219";
+                const acc = (modalAccountNo && modalAccountNo.textContent) || "";
+                if (!acc || acc === "—") return;
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(acc).then(() => {
                         showToast("Account ID Copied", `${acc} copied to your clipboard.`);
@@ -939,7 +935,11 @@
                     avatarUrl: currentAvatarUrl
                 };
 
-                setCustomer(updated);
+                const saved = setCustomer(updated);
+                if (!saved.ok) {
+                    showToast("Profile Not Saved", saved.error || "Your profile could not be saved. Please try again.");
+                    return;
+                }
                 initUserDisplay();
                 updatePaymentsPagePreferred();
                 closeModal();
@@ -956,483 +956,166 @@
     }
 
     // --------------------------------------------------------------------------
-    // 7. MULTI-SYSTEM LINKED PACKAGES REPOSITORY & DATA STORE
-    // Note: Marked sample datasets for multi-package demonstration
+    // 7. CUSTOMER SYSTEMS (shared application records + presentation detail joined by APP ID)
     // --------------------------------------------------------------------------
-    const LINKED_PACKAGES = [
-        {
-            id: "pkg-home-5k4",
-            installerAcceptanceStatus: "accepted",
-            name: "Home Primary",
-            shortLabel: "Home — 5.4 kW",
-            capacity: "5.4 kW",
-            location: "Quezon City · HS-88219",
-            accountNo: "HS-88219",
-            status: "Online · Normal",
-            notice: "Demo dataset for primary residential hybrid solar system",
-            telemetry: {
-                baseSolar: 3.85,
-                baseHome: 1.95,
-                baseBattery: 1.25,
-                batterySoc: 92,
-                pvStrings: "PV1: 342V · PV2: 338V",
-                gridSync: "231.8 V · 60.0 Hz",
-                inverterTemp: "41.2°C (Optimal)",
-                gridStatus: "Luzon Grid Locked · PF 0.99"
-            },
-            energy: {
-                hasReadings: true,
-                todayGenerated: "7.1 kWh",
-                billSaved: "₱3,650",
-                savingsPeriod: "This month",
-                batteryReserve: "10 kWh",
-                batterySoc: 92,
-                backupHours: "18 hrs",
-                chart: {
-                    today: {
-                        values: [0, 1.1, 2.4, 4.2, 6.4, 7.2, 6.5, 5.1, 3.3, 1.5, 0.4],
-                        labels: ["7 AM", "8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM"],
-                        maxLabel: "8 kWh"
-                    },
-                    week: {
-                        values: [4.1, 5.8, 6.4, 7.2, 5.9, 7.6, 6.8],
-                        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                        maxLabel: "8 kWh"
-                    },
-                    month: {
-                        values: [12, 15, 17, 14, 19, 18, 21, 20, 24, 22, 26, 25],
-                        labels: ["1", "4", "7", "10", "13", "16", "19", "22", "25", "28", "30", "31"],
-                        maxLabel: "30 kWh"
-                    }
-                },
-                breakdown: {
-                    solarDirect: "64%",
-                    batteryStorage: "26%",
-                    gridExport: "10%"
-                },
-                ecoImpact: {
-                    trees: "14",
-                    co2Kg: "312"
-                }
-            },
-            payments: {
-                hasBills: true,
-                nextPaymentAmount: "₱9,067",
-                nextDueDate: "October 15, 2026",
-                currentDueDate: "October 15, 2026",
-                status: "Paid",
-                statusBadgeClass: "badge-paid",
-                statusBadgeText: "Paid",
-                term: "5 Years",
-                termBadge: "5-Year Term",
-                paidInstallments: "4 of 60",
-                totalPaid: "₱36,268",
-                standing: "Good",
-                standingMeta: "Account up to date",
-                currentBillPeriod: "Sep 2026 (Current)",
-                currentBillDue: "Sep 1, 2026",
-                currentBillRef: "HS-88219-0926",
-                schedule: [
-                    { period: "May 2026", due: "May 1, 2026", status: "Paid", badgeClass: "badge-paid", amount: "₱9,067", receiptId: "REC-88219-05" },
-                    { period: "Jun 2026", due: "Jun 1, 2026", status: "Paid", badgeClass: "badge-paid", amount: "₱9,067", receiptId: "REC-88219-06" },
-                    { period: "Jul 2026", due: "Jul 1, 2026", status: "Paid", badgeClass: "badge-paid", amount: "₱9,067", receiptId: "REC-88219-07" },
-                    { period: "Aug 2026", due: "Aug 1, 2026", status: "Paid", badgeClass: "badge-paid", amount: "₱9,067", receiptId: "REC-88219-08" },
-                    { period: "Sep 2026", due: "Sep 1, 2026", status: "Paid", badgeClass: "badge-paid", amount: "₱9,067", receiptId: "REC-88219-09" },
-                    { period: "Oct 2026", due: "Oct 15, 2026", status: "Upcoming", badgeClass: "badge-upcoming", amount: "₱9,067", receiptId: null }
-                ]
-            },
-            install: {
-                hasInstallation: true,
-                phase: "Completed",
-                phaseStatusText: "Commissioned",
-                phaseMeta: "Active rooftop generation",
-                completionPct: 100,
-                milestonesAchieved: "5 of 5 milestones achieved",
-                nextMilestone: "Routine Maintenance",
-                nextMilestoneMeta: "Annual inspection",
-                targetCompletion: "Aug 15, 2025",
-                targetCompletionMeta: "Fully energized",
-                milestones: [
-                    { num: "1", title: "1. Site Assessment & Engineering Survey", status: "Completed", badgeClass: "badge-paid", desc: "Roof structural audit, solar irradiation modeling, and electrical panel inspection completed.", date: "Completed March 1, 2025" },
-                    { num: "2", title: "2. Solar PV Panels Installed", status: "Completed", badgeClass: "badge-paid", desc: "12x Trina Solar 450W Monocrystalline modules mounted and DC wired.", date: "Completed March 10, 2025" },
-                    { num: "3", title: "3. Inverter & Battery Storage Setup", status: "Completed", badgeClass: "badge-paid", desc: "Solis 5kW hybrid inverter, 10 kWh battery enclosure, and ATS backup switch mounted.", date: "Completed March 15, 2025" },
-                    { num: "4", title: "4. Utility Grid Connection (Net Metering)", status: "Completed", badgeClass: "badge-paid", desc: "Utility bi-directional meter testing and distribution utility coordination completed.", date: "Completed April 20, 2025" },
-                    { num: "5", title: "5. Final Commissioning & Handover", status: "Completed", badgeClass: "badge-paid", desc: "Final safety commissioning, net-metering sign-off, and customer handover completed.", date: "Completed May 2, 2025" }
-                ],
-                assignedTeam: {
-                    name: "Carlos Villanueva",
-                    initials: "CV",
-                    role: "Certified Solar Master Installer",
-                    phone: "+63 917 555 0101",
-                    note: "Carlos managed your Quezon City rooftop installation and utility coordination. You can message him directly or call dispatch."
-                },
-                hardwareSpecs: "12x Trina Solar 450W Panels · Solis 5kW Hybrid Inverter · 10 kWh Lithium Battery"
-            },
-            support: {
-                hasSupport: true,
-                leadTechnician: "Carlos Villanueva",
-                leadPhone: "+63 917 555 0101",
-                leadContact: "+63 917 555 0101 (Carlos)",
-                tickets: [
-                    { id: "HS-SR-8120", subject: "Annual Inverter Efficiency & Panel Inspection", status: "Resolved", date: "July 12, 2026", category: "Routine Maintenance" },
-                    { id: "HS-SR-7091", subject: "Wi-Fi Datalogger Reconnection Assistance", status: "Closed", date: "May 4, 2026", category: "Monitoring Gateway" }
-                ]
-            }
-        },
-        {
-            id: "pkg-villa-10k8",
-            installerAcceptanceStatus: "accepted",
-            name: "Tagaytay Villa",
-            shortLabel: "Villa — 10.8 kW",
-            capacity: "10.8 kW",
-            location: "Tagaytay · HS-94021",
-            accountNo: "HS-94021",
-            status: "Online · Normal",
-            notice: "Demo dataset for commercial/residential hybrid system",
-            telemetry: {
-                baseSolar: 7.42,
-                baseHome: 3.10,
-                baseBattery: 2.80,
-                batterySoc: 100,
-                pvStrings: "PV1: 380V · PV2: 376V",
-                gridSync: "230.5 V · 60.0 Hz",
-                inverterTemp: "39.8°C (Optimal)",
-                gridStatus: "Southern Grid Locked · PF 0.99"
-            },
-            energy: {
-                hasReadings: true,
-                todayGenerated: "14.8 kWh",
-                billSaved: "₱7,840",
-                savingsPeriod: "This month",
-                batteryReserve: "20 kWh",
-                batterySoc: 100,
-                backupHours: "36 hrs",
-                chart: {
-                    today: {
-                        values: [0, 2.3, 5.1, 8.4, 12.8, 14.5, 13.2, 10.1, 6.7, 3.1, 0.8],
-                        labels: ["7 AM", "8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM"],
-                        maxLabel: "16 kWh"
-                    },
-                    week: {
-                        values: [9.2, 12.4, 13.8, 15.1, 12.0, 15.6, 14.8],
-                        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                        maxLabel: "18 kWh"
-                    },
-                    month: {
-                        values: [25, 29, 34, 30, 42, 38, 45, 41, 49, 44, 52, 50],
-                        labels: ["1", "4", "7", "10", "13", "16", "19", "22", "25", "28", "30", "31"],
-                        maxLabel: "60 kWh"
-                    }
-                },
-                breakdown: {
-                    solarDirect: "58%",
-                    batteryStorage: "30%",
-                    gridExport: "12%"
-                },
-                ecoImpact: {
-                    trees: "32",
-                    co2Kg: "680"
-                }
-            },
-            payments: {
-                hasBills: true,
-                nextPaymentAmount: "₱17,450",
-                nextDueDate: "October 20, 2026",
-                currentDueDate: "October 20, 2026",
-                status: "Paid",
-                statusBadgeClass: "badge-paid",
-                statusBadgeText: "Paid",
-                term: "5 Years",
-                termBadge: "5-Year Term",
-                paidInstallments: "8 of 60",
-                totalPaid: "₱139,600",
-                standing: "Good",
-                standingMeta: "All installments paid on time",
-                currentBillPeriod: "Sep 2026 (Current)",
-                currentBillDue: "Sep 20, 2026",
-                currentBillRef: "HS-94021-0926",
-                schedule: [
-                    { period: "Jun 2026", due: "Jun 20, 2026", status: "Paid", badgeClass: "badge-paid", amount: "₱17,450", receiptId: "REC-94021-06" },
-                    { period: "Jul 2026", due: "Jul 20, 2026", status: "Paid", badgeClass: "badge-paid", amount: "₱17,450", receiptId: "REC-94021-07" },
-                    { period: "Aug 2026", due: "Aug 20, 2026", status: "Paid", badgeClass: "badge-paid", amount: "₱17,450", receiptId: "REC-94021-08" },
-                    { period: "Sep 2026", due: "Sep 20, 2026", status: "Paid", badgeClass: "badge-paid", amount: "₱17,450", receiptId: "REC-94021-09" },
-                    { period: "Oct 2026", due: "Oct 20, 2026", status: "Upcoming", badgeClass: "badge-upcoming", amount: "₱17,450", receiptId: null }
-                ]
-            },
-            install: {
-                hasInstallation: true,
-                phase: "Completed",
-                phaseStatusText: "Commissioned",
-                phaseMeta: "100% capacity energized",
-                completionPct: 100,
-                milestonesAchieved: "5 of 5 milestones achieved",
-                nextMilestone: "Quarterly Thermal Scan",
-                nextMilestoneMeta: "Scheduled Q4",
-                targetCompletion: "Jan 20, 2026",
-                targetCompletionMeta: "Utility grid active",
-                milestones: [
-                    { num: "1", title: "1. Site Assessment & Engineering Survey", status: "Completed", badgeClass: "badge-paid", desc: "Structural load calculations for ceramic tile roof completed.", date: "Completed Nov 12, 2025" },
-                    { num: "2", title: "2. Solar PV Panels Installed", status: "Completed", badgeClass: "badge-paid", desc: "24x Canadian Solar 450W Monocrystalline panels mounted with anodized rails.", date: "Completed Nov 28, 2025" },
-                    { num: "3", title: "3. Inverter & Battery Storage Setup", status: "Completed", badgeClass: "badge-paid", desc: "Deye 10kW hybrid inverter and dual 10 kWh battery rack installed.", date: "Completed Dec 10, 2025" },
-                    { num: "4", title: "4. Utility Grid Connection (Net Metering)", status: "Completed", badgeClass: "badge-paid", desc: "Meralco bi-directional meter installed and net-metering tariff enabled.", date: "Completed Jan 12, 2026" },
-                    { num: "5", title: "5. Final Commissioning & Handover", status: "Completed", badgeClass: "badge-paid", desc: "System performance verified at 10.8 kW peak output.", date: "Completed Jan 20, 2026" }
-                ],
-                assignedTeam: {
-                    name: "Engr. Alex Rivera",
-                    initials: "AR",
-                    role: "Senior Electrical Engineer & Partner",
-                    phone: "+63 917 555 0199",
-                    note: "Engr. Rivera supervises the Tagaytay high-capacity hybrid solar installation and remote performance tuning."
-                },
-                hardwareSpecs: "24x Canadian Solar 450W Panels · Deye 10kW Hybrid Inverter · Dual 10 kWh Battery Rack"
-            },
-            support: {
-                hasSupport: true,
-                leadTechnician: "Engr. Alex Rivera",
-                leadPhone: "+63 917 555 0199",
-                leadContact: "+63 917 555 0199 (Engr. Rivera)",
-                tickets: [
-                    { id: "HS-SR-9104", subject: "Net-Metering Bi-Directional Tariff Verification", status: "Resolved", date: "Feb 18, 2026", category: "Billing / Net-Metering" }
-                ]
-            }
-        },
-        {
-            id: "pkg-farm-3k6",
-            installerAcceptanceStatus: "accepted",
-            name: "Batangas Farmhouse",
-            shortLabel: "Farmhouse — 3.6 kW",
-            capacity: "3.6 kW",
-            location: "Lipa, Batangas · HS-77310",
-            accountNo: "HS-77310",
-            status: "Online · Normal",
-            notice: "Demo dataset for in-progress provincial installation",
-            telemetry: {
-                baseSolar: 2.45,
-                baseHome: 1.60,
-                baseBattery: 0.60,
-                batterySoc: 68,
-                pvStrings: "PV1: 310V · PV2: 305V",
-                gridSync: "229.2 V · 60.0 Hz",
-                inverterTemp: "43.5°C (Optimal)",
-                gridStatus: "Batangas Co-op Grid · PF 0.98"
-            },
-            energy: {
-                hasReadings: true,
-                todayGenerated: "4.6 kWh",
-                billSaved: "₱2,410",
-                savingsPeriod: "This month",
-                batteryReserve: "5 kWh",
-                batterySoc: 68,
-                backupHours: "10 hrs",
-                chart: {
-                    today: {
-                        values: [0, 0.8, 1.6, 2.7, 3.4, 3.6, 3.2, 2.5, 1.7, 0.8, 0.2],
-                        labels: ["7 AM", "8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM"],
-                        maxLabel: "5 kWh"
-                    },
-                    week: {
-                        values: [2.9, 3.8, 4.1, 4.6, 3.5, 4.8, 4.2],
-                        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                        maxLabel: "6 kWh"
-                    },
-                    month: {
-                        values: [8, 9, 11, 10, 13, 12, 14, 13, 15, 14, 16, 15],
-                        labels: ["1", "4", "7", "10", "13", "16", "19", "22", "25", "28", "30", "31"],
-                        maxLabel: "20 kWh"
-                    }
-                },
-                breakdown: {
-                    solarDirect: "72%",
-                    batteryStorage: "20%",
-                    gridExport: "8%"
-                },
-                ecoImpact: {
-                    trees: "9",
-                    co2Kg: "185"
-                }
-            },
-            payments: {
-                hasBills: true,
-                nextPaymentAmount: "₱6,200",
-                nextDueDate: "September 30, 2026",
-                currentDueDate: "September 30, 2026",
-                status: "Unpaid",
-                statusBadgeClass: "badge-unpaid",
-                statusBadgeText: "Due Soon",
-                term: "3 Years",
-                termBadge: "3-Year Term",
-                paidInstallments: "2 of 36",
-                totalPaid: "₱12,400",
-                standing: "Due Soon",
-                standingMeta: "Bill due on September 30, 2026",
-                currentBillPeriod: "Sep 2026 (Current)",
-                currentBillDue: "Sep 30, 2026",
-                currentBillRef: "HS-77310-0926",
-                schedule: [
-                    { period: "Jul 2026", due: "Jul 30, 2026", status: "Paid", badgeClass: "badge-paid", amount: "₱6,200", receiptId: "REC-77310-07" },
-                    { period: "Aug 2026", due: "Aug 30, 2026", status: "Paid", badgeClass: "badge-paid", amount: "₱6,200", receiptId: "REC-77310-08" },
-                    { period: "Sep 2026", due: "Sep 30, 2026", status: "Due Soon", badgeClass: "badge-due", amount: "₱6,200", receiptId: null },
-                    { period: "Oct 2026", due: "Oct 30, 2026", status: "Upcoming", badgeClass: "badge-upcoming", amount: "₱6,200", receiptId: null }
-                ]
-            },
-            install: {
-                hasInstallation: true,
-                phase: "In Progress",
-                phaseStatusText: "Stage 4 of 5",
-                phaseMeta: "Active grid synchronization",
-                completionPct: 60,
-                milestonesAchieved: "3 of 5 milestones achieved",
-                nextMilestone: "Grid Sync",
-                nextMilestoneMeta: "Batelec connection scheduled",
-                targetCompletion: "Sep 30, 2026",
-                targetCompletionMeta: "Estimated final inspection",
-                milestones: [
-                    { num: "1", title: "1. Site Assessment & Engineering Survey", status: "Completed", badgeClass: "badge-paid", desc: "Farmhouse roof pitch and battery location surveyed.", date: "Completed July 1, 2026" },
-                    { num: "2", title: "2. Solar PV Panels Installed", status: "Completed", badgeClass: "badge-paid", desc: "8x Longi 450W panels mounted on metal roof structure.", date: "Completed July 15, 2026" },
-                    { num: "3", title: "3. Inverter & Battery Storage Setup", status: "Completed", badgeClass: "badge-paid", desc: "Growatt 3.6kW inverter and 5 kWh lithium battery installed.", date: "Completed August 2, 2026" },
-                    { num: "4", title: "4. Utility Grid Connection (Net Metering)", status: "In Progress", badgeClass: "badge-upcoming", desc: "Batelec II distribution transformer connection and testing in progress.", date: "Current Stage · Estimated 5-7 days" },
-                    { num: "5", title: "5. Final Safety Inspection & Handover", status: "Scheduled", badgeClass: "badge-neutral", desc: "Final electrical engineering safety certification and customer walk-through.", date: "Target: September 30, 2026" }
-                ],
-                assignedTeam: {
-                    name: "Marco Bautista",
-                    initials: "MB",
-                    role: "Lead Installation Field Specialist",
-                    phone: "+63 917 555 8921",
-                    note: "Marco is currently coordinating the Batangas local cooperative utility interconnection and testing."
-                },
-                hardwareSpecs: "8x Longi 450W Panels · Growatt 3.6kW Inverter · 5 kWh Battery"
-            },
-            support: {
-                hasSupport: true,
-                leadTechnician: "Marco Bautista",
-                leadPhone: "+63 917 555 8921",
-                leadContact: "+63 917 555 8921 (Marco)",
-                tickets: [
-                    { id: "HS-SR-9488", subject: "Pre-Commissioning Utility Meter Inspection Schedule", status: "In Progress", date: "Aug 24, 2026", category: "Utility Grid Connection" }
-                ]
-            }
-        },
-        {
-            id: "pkg-biz-6k0",
-            installerAcceptanceStatus: "pending",
-            name: "Business Annex",
-            shortLabel: "Business — 6.0 kW",
-            capacity: "6.0 kW",
-            location: "Pasig City · HS-10492",
-            accountNo: "HS-10492",
-            status: "Setup Pending",
-            notice: "Demo dataset for freshly linked account with missing / pending data",
-            telemetry: null,
-            energy: {
-                hasReadings: false,
-                todayGenerated: null,
-                billSaved: null,
-                savingsPeriod: null,
-                batteryReserve: null,
-                batterySoc: null,
-                backupHours: null,
-                chart: null,
-                breakdown: null,
-                ecoImpact: null
-            },
-            payments: {
-                hasBills: false,
-                nextPaymentAmount: null,
-                nextDueDate: null,
-                currentDueDate: null,
-                status: "Pending Billing",
-                statusBadgeClass: "badge-neutral",
-                statusBadgeText: "Pending Billing",
-                term: "Pending Setup",
-                termBadge: "Pending Assessment",
-                paidInstallments: "0 of 0",
-                totalPaid: "₱0",
-                standing: "Pending Billing",
-                standingMeta: "No billing records generated yet for this new installation",
-                currentBillPeriod: null,
-                currentBillDue: null,
-                currentBillRef: "HS-10492",
-                schedule: []
-            },
-            install: {
-                hasInstallation: true,
-                phase: "Scheduled",
-                phaseStatusText: "Stage 1 of 5",
-                phaseMeta: "Site assessment scheduled",
-                completionPct: 10,
-                milestonesAchieved: "0 of 5 milestones achieved",
-                nextMilestone: "Site Survey",
-                nextMilestoneMeta: "Pending contractor dispatch",
-                targetCompletion: "November 15, 2026",
-                targetCompletionMeta: "Target commissioning",
-                milestones: [
-                    { num: "1", title: "1. Site Assessment & Engineering Survey", status: "Scheduled", badgeClass: "badge-neutral", desc: "Structural assessment and panel layout design scheduled.", date: "Scheduled for October 5, 2026" },
-                    { num: "2", title: "2. Solar PV Panels Installed", status: "Pending", badgeClass: "badge-neutral", desc: "Awaiting engineering review approval.", date: "Pending Stage 1" },
-                    { num: "3", title: "3. Inverter & Battery Storage Setup", status: "Pending", badgeClass: "badge-neutral", desc: "Hardware dispatch scheduled upon approval.", date: "Pending Stage 2" },
-                    { num: "4", title: "4. Utility Grid Connection (Net Metering)", status: "Pending", badgeClass: "badge-neutral", desc: "Distribution utility application to follow.", date: "Pending Stage 3" },
-                    { num: "5", title: "5. Final Commissioning & Handover", status: "Pending", badgeClass: "badge-neutral", desc: "Target completion Q4 2026.", date: "Pending Stage 4" }
-                ],
-                assignedTeam: {
-                    name: "Hello Solar Dispatch Team",
-                    initials: "HS",
-                    role: "Project Engineering Coordinator",
-                    phone: "+63 2 8888 0100",
-                    note: "Your project engineering lead will be assigned upon site inspection sign-off."
-                },
-                hardwareSpecs: "Specifications pending on-site electrical audit"
-            },
-            support: {
-                hasSupport: true,
-                leadTechnician: "Hello Solar Dispatch",
-                leadPhone: "+63 2 8888 0100",
-                leadContact: "+63 2 8888 0100 (Central Dispatch)",
-                tickets: []
-            }
-        }
-    ];
-
     // Dynamic aggregation engine for packages
     function enrichPackageMetrics(pkg) {
         if (!pkg) return pkg;
 
-        // 1. Dynamic payments calculations
-        if (pkg.payments && Array.isArray(pkg.payments.schedule)) {
+        // Status and IDs come from the shared application record (see overlaySharedRecord); no local overrides.
+        if (!pkg.paymentType) pkg.paymentType = "installment";
+
+        const isOnline = (pkg.status && pkg.status.includes("Online")) || pkg.systemStatus === "Active";
+        if (!pkg.projectStatus) {
+            pkg.projectStatus = isOnline ? "Active" : (pkg.paymentType === "full_payment" ? "Payment Required" : "Installation In Progress");
+        }
+        const isActive = pkg.projectStatus === "Active";
+
+        if (!pkg.accountStatus) pkg.accountStatus = "Active";
+        if (!pkg.applicationStatus) {
+            pkg.applicationStatus = (pkg.paymentType === "full_payment" ? "Approved" : (isActive ? "Approved" : "Financing Approved"));
+        }
+        if (!pkg.paymentStatus || pkg.paymentStatus === "Financing Approved") {
+            pkg.paymentStatus = (pkg.paymentType === "full_payment" ? (isActive ? "Paid" : "Payment Required") : (isActive ? "Paid" : "Up to Date"));
+        }
+        if (!pkg.installationStatus) {
+            pkg.installationStatus = isActive ? "Completed" : (pkg.paymentType === "full_payment" ? "Ready for Installation" : "Installation In Progress");
+        }
+        if (!pkg.systemStatus) {
+            pkg.systemStatus = isActive ? "Active" : "Pending";
+        }
+        if (!pkg.receiptVerificationStatus) {
+            pkg.receiptVerificationStatus = isActive ? "Verified" : (pkg.paymentStatus === "Payment Under Review" ? "Under Review" : "Awaiting Submission");
+        }
+
+        // Full Payment enrichment
+        if (pkg.paymentType === "full_payment") {
+            if (!pkg.payments) pkg.payments = {};
+            pkg.payments.paymentType = "full_payment";
+            const total = Number(pkg.totalAmount) || 0;
+            const peso = n => "₱" + Number(n || 0).toLocaleString("en-PH");
+            const paid = pkg.paymentStatus === "Paid";
+            pkg.payments.totalAmount = total;
+            pkg.payments.formattedTotalAmount = pkg.formattedTotalAmount || peso(total);
+            pkg.payments.amountDue = (isActive || paid) ? 0 : (pkg.amountDue !== undefined ? pkg.amountDue : total);
+            pkg.payments.formattedAmountDue = (isActive || paid) ? "₱0" : (pkg.formattedAmountDue || peso(pkg.payments.amountDue));
+            pkg.payments.receiptVerificationStatus = pkg.receiptVerificationStatus || (isActive ? "Verified" : "Awaiting Submission");
+            pkg.payments.term = "Full Upfront Payment";
+            pkg.payments.termBadge = "Full Payment";
+            pkg.payments.standing = pkg.paymentStatus || (isActive ? "Paid" : "Payment Required");
+            pkg.payments.standingMeta = isActive ? "Payment completed and verified" : "Awaiting initial upfront payment or deposit receipt";
+            pkg.payments.currentBillRef = `${pkg.accountNo}-FP`;
+            pkg.payments.nextPaymentAmount = pkg.payments.formattedAmountDue;
+            pkg.payments.nextDueDate = (isActive || pkg.paymentStatus === "Paid") ? "Paid in Full" : (pkg.nextDueDate || "—");
+            pkg.payments.status = pkg.payments.standing;
+            pkg.payments.statusBadgeClass = isActive ? "badge-paid" : (pkg.paymentStatus === "Payment Under Review" ? "badge-upcoming" : "badge-due");
+            pkg.payments.statusBadgeText = pkg.payments.standing;
+        }
+
+        // Support contact resolution
+        if (!pkg.assignedInstaller && pkg.install && pkg.install.assignedTeam) {
+            pkg.assignedInstaller = { ...pkg.install.assignedTeam };
+        }
+        if (pkg.assignedInstaller) {
+            if (!pkg.support) pkg.support = {};
+            pkg.support.leadTechnician = pkg.assignedInstaller.name;
+            pkg.support.leadRole = pkg.assignedInstaller.role || "Certified Solar Master Installer";
+            pkg.support.leadPhone = pkg.assignedInstaller.phone;
+            pkg.support.leadContact = `${pkg.assignedInstaller.phone} (${pkg.assignedInstaller.name})`;
+        } else {
+            if (!pkg.support) pkg.support = {};
+            pkg.support.leadTechnician = "Hello Solar Central Dispatch";
+            pkg.support.leadRole = "Hello Solar Support / Super Admin";
+            pkg.support.leadPhone = "+63 2 8888 0100";
+            pkg.support.leadContact = "+63 2 8888 0100 (Central Dispatch)";
+        }
+
+        // 1. Dynamic payments calculations (for Installment)
+        if (pkg.paymentType !== "full_payment" && pkg.payments && Array.isArray(pkg.payments.schedule)) {
             let totalPaidSum = 0;
             let paidCount = 0;
-            let activeDueItem = null;
+            let unpaidItem = null;
+            let upcomingItem = null;
 
             pkg.payments.schedule.forEach(item => {
-                // Accept both the modular JSON fields and the legacy display fields.
                 item.due = item.due ?? item.dueDate ?? "—";
                 item.amount = item.formattedAmount ?? item.amount;
                 const num = parseFloat(String(item.amount ?? "").replace(/[^0-9.]/g, "")) || 0;
-                if (item.status === "Paid") {
+                const st = (item.status || "").toLowerCase();
+                // A rejected receipt (Re-upload Required) makes a bill overdue only once its due date has passed
+                const reupload = st === "re-upload required";
+                if (st === "paid") {
                     totalPaidSum += num;
                     paidCount++;
-                } else if (!activeDueItem && (item.status === "Due Soon" || item.status === "Upcoming" || item.status === "Overdue" || item.status === "Unpaid")) {
-                    activeDueItem = item;
+                } else if (!unpaidItem && (st === "unpaid" || st === "overdue" || (reupload && isBillPastDue(item)))) {
+                    unpaidItem = item;
+                } else if (!upcomingItem && (st === "upcoming" || st === "due soon" || st === "due" || reupload)) {
+                    upcomingItem = item;
                 }
             });
 
-            pkg.payments.paidInstallments = `${paidCount} of ${pkg.payments.schedule.length}`;
-            pkg.payments.totalPaid = `₱${totalPaidSum.toLocaleString()}`;
+            const plan = (pkg.paymentPlan && typeof pkg.paymentPlan === "object")
+                ? pkg.paymentPlan
+                : ((pkg.payments && pkg.payments.paymentPlan && typeof pkg.payments.paymentPlan === "object") ? pkg.payments.paymentPlan : null);
 
-            if (activeDueItem) {
-                pkg.payments.nextPaymentAmount = activeDueItem.amount;
-                pkg.payments.nextDueDate = activeDueItem.due;
-                pkg.payments.currentDueDate = activeDueItem.due;
-                pkg.payments.status = activeDueItem.status;
-                pkg.payments.currentBillPeriod = activeDueItem.period;
-                if (activeDueItem.status === "Due Soon") {
-                    pkg.payments.statusBadgeClass = "badge-due";
-                    pkg.payments.statusBadgeText = "Due Soon";
-                } else if (activeDueItem.status === "Overdue") {
-                    pkg.payments.statusBadgeClass = "badge-overdue";
-                    pkg.payments.statusBadgeText = "Overdue";
-                } else {
-                    pkg.payments.statusBadgeClass = "badge-upcoming";
-                    pkg.payments.statusBadgeText = "Upcoming";
+            let totalInstallmentsCount = (plan && plan.totalInstallments) || (pkg.payments && pkg.payments.totalInstallments) || pkg.totalInstallments;
+            if (!totalInstallmentsCount) {
+                const rawTerm = (plan && plan.term) || (typeof pkg.paymentPlan === "string" ? pkg.paymentPlan : "") || (pkg.payments && (pkg.payments.term || pkg.payments.planTerm)) || "";
+                const termMatch = typeof rawTerm === "string" ? rawTerm.match(/(\d+)[-\s]*year/i) : null;
+                totalInstallmentsCount = termMatch ? parseInt(termMatch[1], 10) * 12 : 60;
+            }
+            // Payments Completed must count only Paid records
+            pkg.payments.paidInstallments = `${paidCount} of ${totalInstallmentsCount}`;
+            pkg.paymentsCompleted = `${paidCount} of ${totalInstallmentsCount}`;
+            // Total Paid must be calculated only from Paid records
+            const formattedTotalPaid = "₱" + totalPaidSum.toLocaleString("en-PH", {
+                minimumFractionDigits: totalPaidSum % 1 !== 0 ? 2 : 0,
+                maximumFractionDigits: 2
+            });
+            pkg.payments.totalPaid = formattedTotalPaid;
+            pkg.totalPaid = formattedTotalPaid;
+
+            if (plan) {
+                pkg.paymentPlan = plan;
+                if (plan.downPayment !== undefined) {
+                    pkg.downPayment = plan.downPayment;
+                    pkg.formattedDownPayment = plan.formattedDownPayment || `₱${plan.downPayment.toLocaleString("en-PH")}`;
                 }
+                if (plan.monthlyInstallment !== undefined) {
+                    pkg.monthlyPayment = plan.monthlyInstallment;
+                    pkg.formattedMonthlyPayment = plan.formattedMonthlyPayment || `₱${plan.monthlyInstallment.toLocaleString("en-PH", { minimumFractionDigits: plan.monthlyInstallment % 1 !== 0 ? 2 : 0, maximumFractionDigits: 2 })}`;
+                }
+            }
+
+            // A previously overdue account is up to date once every past-due bill is settled (verified receipts)
+            if (!unpaidItem && pkg.paymentStatus === "Overdue") {
+                pkg.paymentStatus = "Up to Date";
+                if (pkg.payments.standing === "Overdue") pkg.payments.standing = "Up to Date";
+                pkg.payments.hasUnpaid = false;
+            }
+
+            if (unpaidItem) {
+                pkg.paymentStatus = "Overdue";
+                pkg.payments.standing = "Overdue";
+                pkg.payments.status = "Overdue";
+                pkg.payments.hasUnpaid = true;
+                pkg.payments.missedPeriod = unpaidItem.period;
+                pkg.payments.unpaidAmount = unpaidItem.formattedAmount || `₱${unpaidItem.amount}`;
+                pkg.payments.nextPaymentAmount = unpaidItem.formattedAmount || `₱${unpaidItem.amount}`;
+                pkg.payments.nextDueDate = unpaidItem.due;
+                pkg.payments.currentDueDate = unpaidItem.due;
+                pkg.payments.currentBillPeriod = unpaidItem.period;
+                pkg.payments.statusBadgeClass = "badge-overdue";
+                pkg.payments.statusBadgeText = "Overdue";
+            } else if (upcomingItem) {
+                const planMonthly = plan ? (plan.formattedMonthlyPayment || plan.formattedMonthlyInstallment) : null;
+                pkg.payments.nextPaymentAmount = planMonthly || upcomingItem.amount || pkg.formattedMonthlyPayment;
+                pkg.payments.nextDueDate = upcomingItem.due;
+                pkg.payments.currentDueDate = upcomingItem.due;
+                pkg.payments.status = upcomingItem.status;
+                pkg.payments.currentBillPeriod = upcomingItem.period;
+                pkg.payments.statusBadgeClass = "badge-upcoming";
+                pkg.payments.statusBadgeText = upcomingItem.status === "Re-upload Required" ? "Re-upload Required" : "Upcoming";
             } else if (paidCount === pkg.payments.schedule.length && paidCount > 0) {
                 pkg.payments.status = "Paid";
                 pkg.payments.statusBadgeClass = "badge-paid";
@@ -1443,7 +1126,8 @@
         }
 
         // 2. Dynamic install milestone progression
-        if (pkg.install && Array.isArray(pkg.install.milestones)) {
+        // Shared installer progress (overlaySharedRecord) is authoritative; only legacy milestone lists are counted
+        if (pkg.install && !pkg.install.sharedProgress && Array.isArray(pkg.install.milestones) && pkg.install.milestones.length > 0) {
             const total = pkg.install.milestones.length;
             const completed = pkg.install.milestones.filter(m => m.status === "Completed").length;
             pkg.install.completionPct = total > 0 ? Math.round((completed / total) * 100) : 0;
@@ -1468,30 +1152,278 @@
         return pkg;
     }
 
-    // Apply enrichments to base packages
-    LINKED_PACKAGES.forEach(p => enrichPackageMetrics(p));
-
-    let activePackagesStore = [...LINKED_PACKAGES];
+    let activePackagesStore = [];
+    let detailPackages = [];
     let cachedFaqs = [];
 
-    // Asynchronous JSON dataset loader
-    async function loadCustomerDatasetAsync() {
-        const storedCustom = localStorage.getItem("hello_solar_customer_custom_dataset");
-        if (storedCustom) {
-            try {
-                const parsed = JSON.parse(storedCustom);
-                if (parsed && Array.isArray(parsed.packages) && parsed.packages.length > 0) {
-                    activePackagesStore = parsed.packages.map(p => enrichPackageMetrics(p));
-                    if (Array.isArray(parsed.faqs)) cachedFaqs = parsed.faqs;
-                    window.dispatchEvent(new CustomEvent("helloSolarDataLoaded", { detail: { packages: activePackagesStore, faqs: cachedFaqs } }));
-                    return { packages: activePackagesStore, faqs: cachedFaqs };
-                }
-            } catch (e) {
-                console.warn("[Portal] Error parsing stored custom dataset:", e);
-            }
-        }
+    const SHARED_INSTALL_LABEL = {
+        AWAITING_INSTALLATION: "Awaiting Installation",
+        INSTALLATION_IN_PROGRESS: "Installation In Progress",
+        COMPLETED: "Completed"
+    };
 
-        // 1. First try shared DataLoader module (browser-native fetch of purpose-organized JSON)
+    // Read-only milestone view of the installer's progress percentage (installer / Direct Engineer own progress)
+    const INSTALL_MILESTONES = [
+        { num: "1", title: "1. Site Assessment & Engineering Survey", desc: "Structural audit and solar panel mounting geometry inspection.", at: 1 },
+        { num: "2", title: "2. Solar PV Panels Installed", desc: "Monocrystalline solar PV modules mounted and wired.", at: 25 },
+        { num: "3", title: "3. Inverter & Storage Setup", desc: "Hybrid inverter, electrical safety disconnects, and conduit setup.", at: 50 },
+        { num: "4", title: "4. Utility Grid Connection (Net Metering)", desc: "Distribution utility bi-directional meter testing and grid connection.", at: 75 },
+        { num: "5", title: "5. Final Safety Commissioning & Handover", desc: "Electrical engineering sign-off, live energization, and customer handover.", at: 100 }
+    ];
+
+    function isSharedActive(app) {
+        return String(app.systemStatus || "").toUpperCase() === "ACTIVE" || String(app.applicationStatus || "").toUpperCase() === "ACTIVE";
+    }
+
+    // Customer-facing project status derived from the shared record (Super Admin / Financer / Installer own it)
+    function sharedProjectStatus(app) {
+        const S = window.HSShared;
+        const inst = String(app.installationStatus || "").toUpperCase();
+        if (isSharedActive(app)) return "Active";
+        if (inst === "INSTALLATION_IN_PROGRESS" || inst === "COMPLETED") return "Installation In Progress";
+        if (inst === "AWAITING_INSTALLATION") return "Awaiting Installation";
+        const stage = String(app.stage || "");
+        if (S.isFullPayment(app)) {
+            if (S.isClearedForInstallation(app)) return "Ready for Installation";
+            if (app.paymentStatus === "Verification Required" || app.receiptVerificationStatus === "Pending Verification") return "Payment Under Review";
+            return "Payment Required";
+        }
+        if (stage === "Declined") return "Financing Declined";
+        if (stage === "Missing Documents") return "Documents Required / Under Review";
+        if (stage === "Financing Review" || stage === "Under Review" || stage === "Submitted") return "Financing Review";
+        if (stage === "Ready for Installation") return "Ready for Installation";
+        return "Financing Approved";
+    }
+
+    function sharedReceiptStatus(app) {
+        const v = String(app.receiptVerificationStatus || "");
+        if (v === "Pending Verification") return "Under Review";
+        if (v === "Verified" || v === "Rejected") return v;
+        return "";
+    }
+
+    // Applies the shared application record onto a package (shared values always win over presentation data)
+    function overlaySharedRecord(pkg, app) {
+        const S = window.HSShared;
+        const full = S.isFullPayment(app);
+        const active = isSharedActive(app);
+        const inst = String(app.installationStatus || "").toUpperCase();
+        pkg.appId = app.id;
+        pkg.hsId = app.hsId || "";
+        pkg.accountNo = app.hsId || "";
+        pkg.customerId = app.customerId || null;
+        pkg.paymentType = full ? "full_payment" : "installment";
+        pkg.projectStatus = sharedProjectStatus(app);
+        pkg.applicationStatus = app.stage || pkg.applicationStatus;
+        pkg.systemStatus = active ? "Active" : "Pending";
+        pkg.installationStatus = active ? "Completed" : (SHARED_INSTALL_LABEL[inst] || (S.isClearedForInstallation(app) ? "Ready for Installation" : "Pending"));
+        pkg.installerAcceptanceStatus = (app.assignedInstallerId && (app.dispatchStatus === "Accepted" || inst)) ? "accepted" : "pending";
+        if (!active && /online/i.test(String(pkg.status || ""))) pkg.status = "Setup Pending";
+        if (active && !/online/i.test(String(pkg.status || ""))) pkg.status = "Online · Normal";
+        if (full) {
+            const paid = ["Verified / Paid", "Verified", "Paid", "Completed"].includes(app.paymentStatus);
+            pkg.paymentStatus = paid ? "Paid" : (app.paymentStatus === "Verification Required" ? "Payment Under Review" : "Payment Required");
+            pkg.totalAmount = Number(app.amount) || pkg.totalAmount;
+        }
+        const receipt = sharedReceiptStatus(app);
+        if (receipt) pkg.receiptVerificationStatus = receipt;
+        pkg.receiptSubmissions = Array.isArray(app.receiptSubmissions) ? app.receiptSubmissions : [];
+        if (!full) {
+            // The shared APP schedule is the only source of billing periods, due dates, installment status and
+            // payment history (portal demo bill rows are not used for systems with a shared record).
+            // Installment billing starts once financing is approved.
+            const financed = S.isClearedForInstallation(app) || active || !!app.installationStatus;
+            if (!pkg.payments) pkg.payments = {};
+            pkg.payments.schedule = financed ? sharedScheduleRows(app) : [];
+            pkg.payments.hasBills = pkg.payments.schedule.length > 0;
+            pkg.payments.paymentType = "installment";
+            const nextBill = pkg.payments.schedule.find(row => row.status !== "Paid");
+            pkg.nextDueDate = nextBill ? nextBill.due : "";
+            const schedule = financed ? S.paymentScheduleFor(app.id) : null;
+            if (schedule && Array.isArray(schedule.installments) && schedule.installments.length) {
+                pkg.totalInstallments = schedule.installments.length;
+                pkg.payments.totalInstallments = schedule.installments.length;
+                if (pkg.paymentPlan && typeof pkg.paymentPlan === "object") pkg.paymentPlan.totalInstallments = schedule.installments.length;
+            }
+            applySharedBillResults(pkg, app);
+        }
+        if (Array.isArray(app.receiptForBills)) pkg.receiptForBills = app.receiptForBills;
+        if (app.rejectionReason && app.receiptVerificationStatus === "Rejected") pkg.receiptRejectionReason = app.rejectionReason;
+        // Installer of record (presentation detail may name the lead technician)
+        if (!app.assignedInstallerId || app.installer === "Unassigned") {
+            pkg.assignedInstaller = null;
+            if (pkg.install) pkg.install.assignedTeam = null;
+        } else if (!pkg.assignedInstaller) {
+            const isDirect = S.isDirect(app);
+            const partner = isDirect ? null : S.getAccount("installer", app.assignedInstallerId);
+            pkg.assignedInstaller = {
+                name: isDirect ? (app.assignedEngineer || app.installer || "Hello Solar Internal Team") : (app.installer || (partner && partner.name) || ""),
+                role: isDirect ? "Hello Solar Direct Installation" : "Partner Installer",
+                phone: (partner && partner.phone) || ""
+            };
+        }
+        // Installation progress is owned by the installer / Direct Engineer — read-only here
+        const progressPct = active ? 100 : (Number.isFinite(Number(app.progress)) ? Number(app.progress) : 0);
+        pkg.installationProgress = app.installationProgress || null;
+        pkg.installProgressPct = progressPct;
+        if (!pkg.install) pkg.install = { hasInstallation: true, milestones: [] };
+        const recordedOn = app.installationProgress && app.installationProgress.updatedAt
+            ? new Date(app.installationProgress.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+            : (app.activatedAt ? new Date(app.activatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "installer record");
+        let current = false;
+        pkg.install.milestones = INSTALL_MILESTONES.map(step => {
+            const done = progressPct >= step.at;
+            const inProgress = !done && !current && !!inst && inst !== "AWAITING_INSTALLATION";
+            if (inProgress) current = true;
+            return {
+                num: step.num,
+                title: step.title,
+                desc: step.desc,
+                status: done ? "Completed" : (inProgress ? "In Progress" : "Pending"),
+                badgeClass: done ? "badge-paid" : (inProgress ? "badge-upcoming" : "badge-neutral"),
+                date: done ? recordedOn : "To be scheduled by your installer"
+            };
+        });
+        const doneCount = pkg.install.milestones.filter(m => m.status === "Completed").length;
+        pkg.install.milestonesAchieved = `${doneCount} of ${INSTALL_MILESTONES.length} milestones achieved`;
+        pkg.install.completionPct = progressPct;
+        pkg.install.sharedProgress = true;
+        pkg.install.phase = active ? "Completed" : (inst ? "In Progress" : "Not Started");
+        pkg.install.phaseStatusText = active ? "Commissioned" : (pkg.installationStatus || "Pending");
+        pkg.install.nextMilestone = active ? "Routine Maintenance" : (inst === "COMPLETED" ? "System Activation" : "Installation");
+        if (!pkg.install.assignedTeam && pkg.assignedInstaller) pkg.install.assignedTeam = { ...pkg.assignedInstaller, initials: "" };
+        return pkg;
+    }
+
+    // Installment billing rows reflect Super Admin's receipt decisions on the shared record:
+    // verified → Paid, awaiting review → Pending Verification, rejected → Re-upload Required.
+    function applySharedBillResults(pkg, app) {
+        const rows = pkg.payments && Array.isArray(pkg.payments.schedule) ? pkg.payments.schedule : null;
+        if (!rows) return;
+        const results = app.billStatus || {};
+        const pending = new Set((app.receiptSubmissions || [])
+            .filter(s => s.status === "Pending Verification")
+            .flatMap(s => (s.bills || []).map(b => b.billId))
+            .filter(Boolean));
+        rows.forEach(row => {
+            const result = results[row.id];
+            if (result && result.status === "Paid") {
+                row.status = "Paid";
+                row.badgeClass = "badge-paid";
+            } else if (pending.has(row.id)) {
+                row.status = "Pending Verification";
+                row.badgeClass = "badge-upcoming";
+            } else if (result && result.status === "Re-upload Required") {
+                row.status = "Re-upload Required";
+                row.badgeClass = isBillPastDue(row) ? "badge-overdue" : "badge-due";
+                row.rejectionReason = result.reason || "";
+            }
+        });
+        const latest = (app.receiptSubmissions || [])[0];
+        if (latest) {
+            pkg.receiptVerificationStatus = latest.status === "Pending Verification" ? "Under Review"
+                : (latest.status === "Verified" ? "Verified" : "Rejected");
+        }
+    }
+
+    // Billing rows from the shared APP installment schedule: past and paid installments plus the next one due.
+    // Row IDs are the schedule installment IDs (APP-####-I#) so receipts match installments exactly.
+    function sharedScheduleRows(app) {
+        const schedule = window.HSShared.paymentScheduleFor(app.id);
+        const installments = schedule && Array.isArray(schedule.installments) ? schedule.installments : [];
+        const now = new Date();
+        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+        const peso = n => "₱" + Number(n || 0).toLocaleString("en-PH", { minimumFractionDigits: Number(n) % 1 ? 2 : 0, maximumFractionDigits: 2 });
+        const label = iso => {
+            const d = new Date(String(iso) + "T00:00:00");
+            return isNaN(d) ? { period: "", due: String(iso) } : {
+                period: d.toLocaleDateString("en-US", { month: "short", year: "numeric" }),
+                due: d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+            };
+        };
+        const rows = [];
+        let nextAdded = false;
+        installments.forEach(i => {
+            // Past due = after the due date; a bill due today is still "Due", not overdue
+            const past = String(i.dueDate) < today;
+            if (!(i.status === "Paid" || past || !nextAdded)) return;
+            if (!past && i.status !== "Paid") nextAdded = true;
+            const status = i.status === "Paid" ? "Paid"
+                : (i.status === "Overdue" ? "Overdue"
+                    : (i.status === "Re-upload Required" ? "Re-upload Required"
+                        : (past ? "Unpaid" : (String(i.dueDate) === today ? "Due" : "Upcoming"))));
+            const l = label(i.dueDate);
+            rows.push({
+                id: `${app.id}-I${i.no}`,
+                installmentNo: i.no,
+                period: l.period,
+                due: l.due,
+                dueDate: i.dueDate,
+                status,
+                badgeClass: status === "Paid" ? "badge-paid" : (status === "Upcoming" ? "badge-upcoming" : ((status === "Due" || (status === "Re-upload Required" && !past)) ? "badge-due" : "badge-overdue")),
+                amount: peso(i.amount),
+                formattedAmount: peso(i.amount),
+                paidDate: i.paidDate || null,
+                receiptId: i.status === "Paid" ? (i.reference || "") : null
+            });
+        });
+        return rows;
+    }
+
+    // Minimal package for an application that has no presentation detail (built only from the shared record)
+    function packageFromApplication(app) {
+        const loader = window.HelloSolarDataLoader;
+        const full = window.HSShared.isFullPayment(app);
+        const system = {
+            id: app.id,
+            appId: app.id,
+            hsId: app.hsId,
+            accountNo: app.hsId,
+            name: app.purchasedModel || (app.system ? `${app.system} Solar System` : app.id),
+            shortLabel: app.system || "",
+            capacity: app.system || "",
+            location: app.location || "",
+            paymentType: full ? "full_payment" : "installment",
+            hasBattery: false,
+            panelsModel: app.panels || "",
+            inverterModel: app.inverter || "",
+            batteryCapacity: "",
+            inverterSerial: "",
+            totalAmount: Number(app.amount) || 0,
+            monthlyPayment: Number(app.monthly) || 0,
+            downPayment: Number(app.downPayment) || 0,
+            termMonths: Number(app.termMonths) || null,
+            nextDueDate: app.nextDue && app.nextDue !== "N/A" ? app.nextDue : "",
+            assignedInstaller: null
+        };
+        // Installment billing rows come from the shared APP schedule (overlaySharedRecord)
+        return loader && typeof loader.assemblePackage === "function" ? loader.assemblePackage(system) : system;
+    }
+
+    // Systems of the signed-in customer = shared applications with customerId === this account
+    function buildCustomerPackages() {
+        const user = getSessionUser();
+        if (!user || !window.HSShared) return [];
+        return window.HSShared.applicationsForCustomer(user.accountId).map(app => {
+            const detail = detailPackages.find(p => p.appId === app.id);
+            const pkg = detail ? JSON.parse(JSON.stringify(detail)) : packageFromApplication(app);
+            return enrichPackageMetrics(overlaySharedRecord(pkg, app));
+        });
+    }
+
+    // Re-reads the shared records (after a submission or another portal's update) and notifies the page
+    function refreshSharedPackages() {
+        activePackagesStore = buildCustomerPackages();
+        window.dispatchEvent(new CustomEvent("helloSolarDataLoaded", { detail: { packages: activePackagesStore, faqs: cachedFaqs } }));
+        const active = getActivePackage();
+        if (active) {
+            window.dispatchEvent(new CustomEvent("helloSolarPackageChanged", { detail: { packageId: active.id, package: active } }));
+        }
+        return activePackagesStore;
+    }
+
+    // Loads presentation detail (telemetry, savings, schedules) and builds the customer's systems from shared records
+    async function loadCustomerDatasetAsync() {
         let loaded = null;
         if (window.HelloSolarDataLoader && typeof window.HelloSolarDataLoader.loadAll === "function") {
             try {
@@ -1500,46 +1432,128 @@
                 console.warn("[Portal] DataLoader.loadAll error:", e);
             }
         }
-
-        if (loaded && Array.isArray(loaded.packages) && loaded.packages.length > 0) {
-            activePackagesStore = loaded.packages.map(p => enrichPackageMetrics(p));
-            if (Array.isArray(loaded.faqs)) cachedFaqs = loaded.faqs;
-            if (loaded.customer && typeof loaded.customer === "object") {
-                const existingCust = getCustomer();
-                // User-saved localStorage modifications strictly take precedence over default JSON values
-                setCustomer({ ...loaded.customer, ...existingCust });
-            }
-            window.dispatchEvent(new CustomEvent("helloSolarDataLoaded", { detail: { packages: activePackagesStore, faqs: cachedFaqs } }));
-            return { packages: activePackagesStore, faqs: cachedFaqs };
-        }
-
-        // 2. Direct fetch fallback for legacy customer.json
-        try {
-            const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
-            const timeoutId = controller ? setTimeout(() => controller.abort(), 3500) : null;
-            const res = await fetch("assets/data/customer.json", {
-                cache: "no-cache",
-                signal: controller ? controller.signal : undefined
-            });
-            if (timeoutId) clearTimeout(timeoutId);
-            if (res.ok) {
-                const data = await res.json();
-                if (data && Array.isArray(data.packages) && data.packages.length > 0) {
-                    activePackagesStore = data.packages.map(p => enrichPackageMetrics(p));
-                    if (Array.isArray(data.faqs)) cachedFaqs = data.faqs;
-                    if (data.customer && typeof data.customer === "object") {
-                        const existingCust = getCustomer();
-                        setCustomer({ ...data.customer, ...existingCust });
-                    }
-                    window.dispatchEvent(new CustomEvent("helloSolarDataLoaded", { detail: { packages: activePackagesStore, faqs: cachedFaqs } }));
-                    return { packages: activePackagesStore, faqs: cachedFaqs };
-                }
-            }
-        } catch (err) {
-            console.warn("[Portal] Automated fetch of customer dataset failed (likely file:/// protocol or offline). Operating in offline mode.", err);
-        }
-
+        detailPackages = (loaded && Array.isArray(loaded.packages)) ? loaded.packages : [];
+        if (loaded && Array.isArray(loaded.faqs)) cachedFaqs = loaded.faqs;
+        activePackagesStore = buildCustomerPackages();
+        window.dispatchEvent(new CustomEvent("helloSolarDataLoaded", { detail: { packages: activePackagesStore, faqs: cachedFaqs } }));
         return { packages: activePackagesStore, faqs: cachedFaqs };
+    }
+
+    // --------------------------------------------------------------------------
+    // 7A. PROJECT STATUS & LIFECYCLE FLOW DEFINITIONS
+    // --------------------------------------------------------------------------
+    const FULL_PAYMENT_FLOW = [
+        { key: "Payment Required", label: "Payment Required", desc: "Order confirmed. Awaiting full payment proof upload.", step: 1 },
+        { key: "Payment Under Review", label: "Payment Under Review", desc: "Payment receipt submitted. Finance verification in progress.", step: 2 },
+        { key: "Ready for Installation", label: "Ready for Installation", desc: "Payment verified. Equipment allocated and installation queued.", step: 3 },
+        { key: "Awaiting Installation", label: "Awaiting Installation", desc: "Installer assigned. Site installation schedule confirmed.", step: 4 },
+        { key: "Installation In Progress", label: "Installation In Progress", desc: "Solar PV panels, inverter mounting, and wiring on-site.", step: 5 },
+        { key: "Active", label: "Active", desc: "System energized, utility grid connected, and live telemetry active.", step: 6 }
+    ];
+
+    const INSTALLMENT_FLOW = [
+        { key: "Financing Review", label: "Financing Review", desc: "Credit assessment and loan terms under financer review.", step: 1 },
+        { key: "Documents Required / Under Review", label: "Documents Required / Under Review", desc: "Required documentation submitted and undergoing review.", step: 2 },
+        { key: "Financing Approved", label: "Financing Approved", desc: "Amortization schedule approved and financing agreement cleared.", step: 3 },
+        { key: "Ready for Installation", label: "Ready for Installation", desc: "Financing cleared. Equipment dispatched to installation team.", step: 4 },
+        { key: "Awaiting Installation", label: "Awaiting Installation", desc: "Installer assigned. On-site engineering team scheduled.", step: 5 },
+        { key: "Installation In Progress", label: "Installation In Progress", desc: "Solar modules mounted, inverter wired, and safety audit in progress.", step: 6 },
+        { key: "Active", label: "Active", desc: "System energized, utility grid connected, and live telemetry active.", step: 7 }
+    ];
+
+    function isSystemActive(pkg) {
+        if (!pkg) return false;
+        return pkg.projectStatus === "Active" || pkg.systemStatus === "Active";
+    }
+
+    function getProjectStatus(pkg) {
+        if (!pkg) return "Active";
+        if (pkg.projectStatus) return pkg.projectStatus;
+        if (isSystemActive(pkg)) return "Active";
+        return pkg.paymentType === "full_payment" ? "Payment Required" : "Installation In Progress";
+    }
+
+    function getFlowMilestones(pkg) {
+        const type = (pkg && pkg.paymentType) || "installment";
+        return type === "full_payment" ? FULL_PAYMENT_FLOW : INSTALLMENT_FLOW;
+    }
+
+    // Delayed Payment Reminder state for an INSTALLMENT package, derived from its payment schedule and
+    // receipt status (no stored copies). Returns null when no reminder applies (full payment, nothing past due,
+    // or the covering receipt has been verified).
+    //  - Past due + unpaid               → state "overdue"
+    //  - Receipt submitted for it        → state "under_review"
+    //  - Verified / Paid                 → null (reminder removed)
+    // True once a bill's due date is before today (a bill due today is not yet past due)
+    function isBillPastDue(row, asOf) {
+        const d = asOf ? new Date(asOf) : new Date();
+        const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        const raw = String((row && (row.dueDate || row.due)) || "");
+        let iso = /^\d{4}-\d{2}-\d{2}/.test(raw) ? raw.slice(0, 10) : null;
+        if (!iso) {
+            const parsed = new Date(raw);
+            if (isNaN(parsed)) return false;
+            iso = `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, "0")}-${String(parsed.getDate()).padStart(2, "0")}`;
+        }
+        return iso < today;
+    }
+
+    function getDelayedPaymentReminder(pkg, asOf) {
+        if (!pkg || pkg.paymentType === "full_payment") return null;
+        const schedule = (pkg.payments && Array.isArray(pkg.payments.schedule)) ? pkg.payments.schedule : [];
+        if (!schedule.length) return null;
+
+        const d = asOf ? new Date(asOf) : new Date();
+        const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        const isoOf = (row) => {
+            const raw = String(row.dueDate || row.due || "");
+            if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw.slice(0, 10);
+            const parsed = new Date(raw);
+            return isNaN(parsed) ? null : `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, "0")}-${String(parsed.getDate()).padStart(2, "0")}`;
+        };
+        const statusOf = (row) => String(row.status || "").toLowerCase();
+        const isPaid = (row) => { const s = statusOf(row); return (s === "paid" || s.startsWith("paid") || s === "verified") && !s.includes("unpaid"); };
+        const amountOf = (row) => typeof row.amount === "number" ? row.amount
+            : (parseFloat(String(row.formattedAmount ?? row.amount ?? "").replace(/[^0-9.]/g, "")) || 0);
+
+        // Bills covered by a submitted receipt (recorded on submission as receiptForBills)
+        const coveredIds = Array.isArray(pkg.receiptForBills) ? pkg.receiptForBills : [];
+        const verification = String(pkg.receiptVerificationStatus || "");
+
+        let pastDue = schedule.filter(row => {
+            if (isPaid(row)) return false;
+            const s = statusOf(row);
+            const iso = isoOf(row);
+            return s.includes("unpaid") || s.includes("overdue") || (iso && iso < today);
+        });
+        // Verified receipt → the bills it covered are settled
+        if (verification === "Verified" && coveredIds.length) {
+            pastDue = pastDue.filter(row => !coveredIds.includes(row.id));
+        }
+        if (!pastDue.length) return null;
+
+        pastDue.sort((a, b) => String(isoOf(a)).localeCompare(String(isoOf(b))));
+        const total = pastDue.reduce((sum, row) => sum + amountOf(row), 0);
+        const pendingRow = row => /review|submitted|pending verification/.test(statusOf(row));
+        // Shared schedule rows carry their own receipt status: under review only while every past-due bill has a
+        // receipt awaiting verification
+        const sharedRows = pastDue.every(row => /^APP-\d+-I\d+$/.test(String(row.id || "")));
+        const underReview = sharedRows
+            ? pastDue.every(pendingRow)
+            : (verification === "Under Review" || pkg.paymentStatus === "Payment Under Review" || pastDue.some(pendingRow));
+
+        return {
+            state: underReview ? "under_review" : "overdue",
+            packageId: pkg.id,
+            packageName: pkg.name,
+            accountNo: pkg.accountNo,
+            bills: pastDue,
+            billIds: pastDue.map(row => row.id).filter(Boolean),
+            missedPeriods: pastDue.map(row => row.period).filter(Boolean),
+            dueDate: isoOf(pastDue[0]),
+            overdueAmount: total,
+            formattedOverdueAmount: "₱" + total.toLocaleString("en-PH", { minimumFractionDigits: total % 1 !== 0 ? 2 : 0, maximumFractionDigits: 2 })
+        };
     }
 
     function getLinkedPackages() {
@@ -1553,7 +1567,7 @@
     // Genuinely user-scoped storage key
     function getCustomerIdentifier() {
         const customer = getCustomer();
-        return customer.accountNo || customer.email || (customer.name ? customer.name.replace(/\s+/g, '_').toLowerCase() : 'default_customer');
+        return customer.accountId || "signed_out";
     }
 
     function getActivePackageStorageKey() {
@@ -1568,7 +1582,7 @@
             return stored;
         }
         // Fallback to first available package
-        return pkgs.length > 0 ? pkgs[0].id : LINKED_PACKAGES[0].id;
+        return pkgs.length > 0 ? pkgs[0].id : "";
     }
 
     function setActivePackageId(id) {
@@ -1591,7 +1605,7 @@
     function getActivePackage() {
         const id = getActivePackageId();
         const pkgs = getLinkedPackages();
-        return pkgs.find(p => p.id === id) || pkgs[0] || LINKED_PACKAGES[0];
+        return pkgs.find(p => p.id === id) || pkgs[0] || null;
     }
 
     // --------------------------------------------------------------------------
@@ -1660,12 +1674,12 @@
                     <div class="package-items-list" id="packageItemsList" role="presentation">
                     </div>
                     <div class="package-dropdown-footer">
-                        <button type="button" class="package-add-account-btn" id="openAddAccountBtn">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="12" y1="5" x2="12" y2="19"/>
-                                <line x1="5" y1="12" x2="19" y2="12"/>
+                        <button type="button" class="package-add-account-btn" id="openAddAccountBtn" aria-label="Link Existing System">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
                             </svg>
-                            <span>+ Add Account</span>
+                            <span>Link Existing System</span>
                         </button>
                     </div>
                 </div>
@@ -1699,8 +1713,10 @@
                             <span class="package-item-title">${pkg.name}</span>
                             <span class="package-item-capacity">${pkg.capacity}</span>
                         </div>
-                        <div class="package-item-meta">
-                            <span class="package-item-location">${pkg.location}</span>
+                        <div class="package-item-meta" style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px;">
+                            <span class="package-item-location" style="font-weight: 600;">${pkg.appId || 'APP'} · ${pkg.accountNo || 'HS-ID'}</span>
+                            <span style="font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: ${pkg.paymentType === 'full_payment' ? '#f0fdf4; color: #166534; border: 1px solid #bbf7d0;' : '#eff6ff; color: #1e40af; border: 1px solid #bfdbfe;'}">${pkg.paymentType === 'full_payment' ? 'Full Payment' : 'Installment'}</span>
+                            <span style="font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: ${pkg.projectStatus === 'Active' ? '#ecfdf5; color: #047857; border: 1px solid #a7f3d0;' : '#fff7ed; color: #c2410c; border: 1px solid #fed7aa;'}">${pkg.projectStatus || 'In Progress'}</span>
                         </div>
                     </div>
                     <div class="package-item-check" aria-hidden="true">
@@ -1807,89 +1823,20 @@
         renderItems();
     }
 
-    // Modal dialog for "+ Add Account"
+    // Modal dialog or redirection for "Link Existing System"
     function openAddAccountModal() {
-        let modal = document.getElementById("globalAddAccountModalBackdrop");
-        if (!modal) {
-            modal = document.createElement("div");
-            modal.id = "globalAddAccountModalBackdrop";
-            modal.className = "package-modal-backdrop";
-            modal.setAttribute("role", "dialog");
-            modal.setAttribute("aria-modal", "true");
-            modal.setAttribute("aria-labelledby", "globalAddAccountTitle");
-            modal.innerHTML = `
-                <div class="package-modal">
-                    <div class="package-modal-header">
-                        <div class="package-modal-title-wrap">
-                            <div class="package-modal-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 5v14M5 12h14"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="package-modal-title" id="globalAddAccountTitle">Link Additional Solar System</h3>
-                                <p class="package-modal-subtitle">Connect another Hello Solar property or service account</p>
-                            </div>
-                        </div>
-                        <button type="button" class="package-modal-close-btn" id="closeGlobalAddAccountModal" aria-label="Close modal">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="package-modal-body">
-                        <p class="package-modal-desc">
-                            Manage residential rooftop solar arrays, vacation homes, and commercial installations in one seamless portal.
-                        </p>
-                        <div class="package-modal-field">
-                            <label for="globalServiceAccountId">Service Account Number or System Serial #</label>
-                            <input type="text" id="globalServiceAccountId" placeholder="e.g. HS-102948" autocomplete="off">
-                            <span class="package-field-hint">Located on your Hello Solar installation contract or monthly statement.</span>
-                        </div>
-                        <div class="package-modal-notice">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
-                            </svg>
-                            <span>Multi-system account linking is in customer preview mode. In production, an OTP is dispatched to the account holder's registered mobile phone.</span>
-                        </div>
-                    </div>
-                    <div class="package-modal-footer">
-                        <button type="button" class="btn btn-outline" id="cancelGlobalAddAccountBtn">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="submitGlobalAddAccountBtn">Link System</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-
-            const closeBtn = modal.querySelector("#closeGlobalAddAccountModal");
-            const cancelBtn = modal.querySelector("#cancelGlobalAddAccountBtn");
-            const submitBtn = modal.querySelector("#submitGlobalAddAccountBtn");
-            const input = modal.querySelector("#globalServiceAccountId");
-
-            function closeModal() {
-                modal.classList.remove("open");
-                if (input) input.value = "";
-            }
-
-            closeBtn.addEventListener("click", closeModal);
-            cancelBtn.addEventListener("click", closeModal);
-            modal.addEventListener("click", (e) => {
-                if (e.target === modal) closeModal();
-            });
-
-            submitBtn.addEventListener("click", () => {
-                const val = input ? input.value.trim() : "";
-                closeModal();
-                showToast(
-                    "Account Linking In Preview",
-                    val ? `Account "${val}" noted. Linking will be verified when multi-system service launches.` : "Multi-system service account linking will be supported in the next system update."
-                );
-            });
+        const localModal = document.getElementById("addAccountModalBackdrop");
+        if (localModal) {
+            localModal.classList.add("open");
+            localModal.setAttribute("aria-hidden", "false");
+            document.body.classList.add("modal-open");
+            const input = document.getElementById("serviceAccountIdInput");
+            if (input) setTimeout(() => input.focus(), 100);
+            return;
         }
 
-        modal.classList.add("open");
-        const inputEl = modal.querySelector("#globalServiceAccountId");
-        if (inputEl) setTimeout(() => inputEl.focus(), 100);
+        // If on another page, navigate to mysystem.html with link action
+        window.location.href = "mysystem.html?action=link";
     }
 
     // --------------------------------------------------------------------------
@@ -1913,6 +1860,7 @@
             }
         },
         loadCustomerDataset: loadCustomerDatasetAsync,
+        loadCustomerDatasetAsync: loadCustomerDatasetAsync,
         getFaqs,
         enrichPackageMetrics,
         toast: showToast,
@@ -1925,7 +1873,15 @@
         registerDirtyCheck,
         unregisterDirtyCheck,
         openAddAccountModal,
-        dataLoader: window.HelloSolarDataLoader || null
+        dataLoader: window.HelloSolarDataLoader || null,
+        isSystemActive,
+        getProjectStatus,
+        getFlowMilestones,
+        refreshSharedPackages,
+        getDelayedPaymentReminder,
+        isBillPastDue,
+        FULL_PAYMENT_FLOW,
+        INSTALLMENT_FLOW
     };
 
     // Auto-init on DOMContentLoaded
